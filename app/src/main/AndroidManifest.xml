@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.florencia.erpapp">
+
+    <uses-permission
+        android:name="android.permission.INTERNET"
+        android:required="false" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_ADMIN"
+        android:required="false" />
+    <uses-permission
+        android:name="android.permission.BLUETOOTH"
+        android:required="false" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:required="false" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:required="false" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="android.permission.INSTALL_PACKAGES"
+        tools:ignore="ProtectedPermissions"/>
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_logo"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_logo_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true">
+        <activity android:name=".activities.ConfigActivity"></activity>
+        <activity
+            android:name=".activities.TransferenciaActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:theme="@style/ClienteTheme" />
+        <activity
+            android:name=".activities.RecepcionActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:theme="@style/ClienteTheme" />
+        <activity
+            android:name=".activities.ListaComprobantesActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:theme="@style/ClienteTheme" />
+        <activity
+            android:name=".activities.ClienteBusquedaActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:theme="@style/ClienteTheme" />
+        <activity
+            android:name=".activities.ProductoBusquedaActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:parentActivityName=".activities.ComprobanteActivity"
+            android:theme="@style/ClienteTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.ComprobanteActivity" />
+        </activity>
+        <activity
+            android:name=".activities.ComprobanteActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/ClienteTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+        <activity
+            android:name=".activities.PedidoActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/ClienteTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+        <activity
+            android:name=".activities.ClienteActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:theme="@style/ClienteTheme" />
+        <activity
+            android:name=".activities.actLogin"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
+
+            <!--
+            <intent-filter>
+                <action
+                    android:name="android.intent.action.MAIN"
+                    android:configChanges="screenSize|orientation" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            -->
+        </activity>
+        <activity
+            android:name=".MainActivity"
+            android:theme="@style/AppTheme" />
+        <activity android:name=".services.DeviceList" />
+        <activity
+            android:name=".activities.SplashScreenActivity"
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
+    </application>
+
+</manifest>

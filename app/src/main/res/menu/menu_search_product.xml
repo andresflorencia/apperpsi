@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/option_select"
+        android:title="Confirmar selección"
+        android:icon="@drawable/ic_check_white"
+        app:showAsAction="collapseActionView|always" />
+    <item android:id="@+id/option_date"
+        android:title="Fecha inicio"
+        android:icon="@drawable/ic_date_white"
+        app:showAsAction="collapseActionView|always"
+        android:visible="false"/>
+</menu>

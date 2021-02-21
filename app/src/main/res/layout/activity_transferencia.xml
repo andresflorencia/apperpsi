@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context=".activities.TransferenciaActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        xmlns:android="http://schemas.android.com/apk/res/android">
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/appbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <LinearLayout android:orientation="vertical"
+        android:layout_height="fill_parent"
+        android:layout_width="fill_parent"
+        android:layout_marginTop="55dp"
+        android:layout_marginBottom="50dp">
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_margin="5dp">
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="10dp"
+                    app:cardElevation="5dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginHorizontal="5dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="5dp"
+                        android:layout_gravity="center"
+                        android:gravity="center">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="TIPO: "
+                            style="@style/EstiloText_Black"
+                            android:clickable="true"
+                            android:paddingLeft="10dp"
+                            android:layout_marginRight="5dp"/>
+
+                        <RadioGroup
+                            android:id="@+id/rgTipoTransaccion"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+                            <RadioButton
+                                android:id="@+id/rbTransferencia"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Transferencia"
+                                android:checked="false"
+                                android:layout_marginRight="5dp"/>
+                            <RadioButton
+                                android:id="@+id/rbDevolucion"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Devolución Inventario"
+                                android:checked="false"/>
+                        </RadioGroup>
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="10dp"
+                    app:cardElevation="5dp"
+                    android:background="@color/colorPrimary"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginHorizontal="5dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="5dp">
+                        <TextView
+                            android:id="@+id/lblTransferencia"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="DESTINO"
+                            style="@style/EstiloText_Black"
+                            android:drawableRight="@drawable/ic_row_up"
+                            android:gravity="center_vertical"
+                            android:clickable="true"
+                            android:paddingLeft="10dp"/>
+
+                        <LinearLayout
+                            android:id="@+id/lyCombo"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+                            <LinearLayout
+                                android:id="@+id/lyDestino"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:background="@drawable/border_radius_spinner"
+                                android:layout_weight="1">
+                                <androidx.appcompat.widget.AppCompatSpinner
+                                    android:id="@+id/cbEstablecimiento"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="50dp"
+                                    android:layout_marginHorizontal="5dp"
+                                    android:spinnerMode="dialog"/>
+                            </LinearLayout>
+                            <ProgressBar
+                                android:id="@+id/pbCargando"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:visibility="gone"/>
+                            <ImageButton
+                                android:id="@+id/btnRefresh"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:src="@drawable/ic_refresh"
+                                android:scaleX="1.5"
+                                android:scaleY="1.5"
+                                android:layout_marginLeft="10dp"
+                                android:background="@null"
+                                android:layout_gravity="center_vertical"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/lyDatosInformativos"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/border_radius_spinner"
+                            android:orientation="horizontal"
+                            android:padding="3dp"
+                            android:visibility="gone">
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_weight="2"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:background="@color/colorGrayLight">
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="ENVIA: "
+                                    android:textSize="12sp"
+                                    android:textColor="@android:color/black"
+                                    android:layout_gravity="right"
+                                    android:textStyle="bold"/>
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="DOC. TRANS.: "
+                                    android:textSize="12sp"
+                                    android:textColor="@android:color/black"
+                                    android:layout_gravity="right"
+                                    android:textStyle="bold"/>
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="DESTINO: "
+                                    android:textSize="12sp"
+                                    android:textColor="@android:color/black"
+                                    android:layout_gravity="right"
+                                    android:textStyle="bold"/>
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_weight="5"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:layout_marginHorizontal="5dp">
+                                <TextView
+                                    android:id="@+id/lblEnvia"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="ENVIA:"
+                                    android:textSize="12sp"
+                                    android:textColor="@android:color/black"/>
+                                <TextView
+                                    android:id="@+id/lblDocTransferencia"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="DOC. TRANS.:"
+                                    android:textSize="12sp"
+                                    android:textColor="@android:color/black"/>
+                                <TextView
+                                    android:id="@+id/lblRecibe"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="DESTINO:"
+                                    android:textSize="12sp"
+                                    android:textColor="@android:color/black"/>
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="10dp"
+                    app:cardElevation="5dp"
+                    android:layout_marginVertical="10dp"
+                    android:layout_marginHorizontal="5dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="5dp">
+                        <TextView
+                            android:id="@+id/lblProducto"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="PRODUCTOS"
+                            style="@style/EstiloText_Black"
+                            android:drawableRight="@drawable/ic_row_down"
+                            android:gravity="center_vertical"
+                            android:clickable="true"
+                            android:paddingLeft="10dp"
+                            android:layout_marginBottom="10dp"/>
+
+                        <LinearLayout
+                            android:id="@+id/lyProductos"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+                            <Button
+                                android:id="@+id/btnBuscarProducto"
+                                android:layout_width="200dp"
+                                android:layout_height="35dp"
+                                android:text="BUSCAR PRODUCTO"
+                                android:drawableRight="@drawable/ic_search"
+                                android:paddingRight="10dp"
+                                android:background="@drawable/border2"
+                                android:focusedByDefault="true"
+                                android:layout_marginLeft="3dp"
+                                android:layout_gravity="end"
+                                android:elevation="5dp"
+                                android:layout_marginBottom="5dp"/>
+
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:id="@+id/rvDetalleProductos"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="5dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginHorizontal="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_gravity="bottom">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="5dp">
+            <TextView
+                android:id="@+id/lblObservacion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="OBSERVACIÓN"
+                android:textAlignment="viewStart"
+                style="@style/EstiloText_Black3"
+                android:drawableRight="@drawable/ic_row_up"/>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColorHint="@color/colorPrimaryDark">
+                <EditText
+                    android:id="@+id/tvObservación"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:lines="2"
+                    android:textSize="16sp"
+                    android:textColor="@color/colorGray"
+                    android:hint="Observación"
+                    android:visibility="gone"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

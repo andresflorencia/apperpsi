@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".fragments.ClienteFragment">
+
+        <ImageView
+                android:id="@+id/imgFondo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:src="@drawable/clientes"
+                android:layout_gravity="center"/>
+        <LinearLayout
+        android:id="@+id/lyContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone">
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/svBusqueda"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:queryHint="Buscar cliente"
+            app:iconifiedByDefault="false"
+            android:layout_margin="5dp"
+            android:background="@drawable/border1"/>
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeLayoutClientes"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:visibility="visible">
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvClientes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+    </LinearLayout>
+</FrameLayout>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/option_date_init"
+        android:title="Fecha inicio"
+        android:icon="@drawable/ic_date_white"
+        app:showAsAction="collapseActionView|always"/>
+    <item android:id="@+id/option_separator"
+        android:title="-"
+        android:icon="@drawable/ic_remove_white"
+        app:showAsAction="collapseActionView|always"
+        android:enabled="false"/>
+    <item android:id="@+id/option_date_end"
+        android:title="Fecha fin"
+        android:icon="@drawable/ic_date_white"
+        app:showAsAction="collapseActionView|always"/>
+    <item android:id="@+id/option_delete"
+        android:title="Eliminar registros"
+        android:icon="@drawable/ic_delete_white"
+        app:showAsAction="collapseActionView|always"/>
+</menu>

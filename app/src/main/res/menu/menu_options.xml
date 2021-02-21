@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/option_descargaproductos"
+        android:title="Descargar Productos"
+        app:showAsAction="never" />
+    <item android:id="@+id/option_sincronizaclientes"
+        android:title="Sincronizar Clientes"
+        app:showAsAction="never" />
+    <item android:id="@+id/option_sincronizacomprobantes"
+        android:title="Sincronizar Comprobantes"
+        app:showAsAction="never" />
+    <item android:id="@+id/option_sincronizapedidos"
+        android:title="Sincronizar Pedidos"
+        app:showAsAction="never" />
+</menu>

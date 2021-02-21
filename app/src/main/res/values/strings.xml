@@ -1,0 +1,252 @@
+<resources>
+    <string name="app_name">SI Móvil</string>
+
+    <string name="lblLogin">Inicio de Sesión</string>
+    <string name="lblConfirmePin">Confirme Pin</string>
+    <string name="lblIngresePin">Ingrese Nuevo Pin</string>
+    <string name="lblBlancoLogin">   </string>
+    <string name="GPSAlertDialogTitle">Configuración GPS</string>
+    <string name="GPSAlertDialogMessage">Por favor active los servicios de Ubicación</string>
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
+
+    <string name="dbUsuario">
+        CREATE TABLE IF NOT EXISTS usuario(
+            idusuario integer primary key,
+            razonsocial varchar(128),
+            usuario varchar(50),
+            clave varchar(128),
+            autorizacion integer,
+            pin varchar(4),
+            perfil integer,
+            sucursalid integer,
+            CONSTRAINT usuario_pin UNIQUE(idusuario,pin)
+        );
+        ALTER TABLE usuario ADD COLUMN parroquiaid integer DEFAULT 0;
+        ALTER TABLE usuario ADD COLUMN nombreperfil varchar(50) DEFAULT \'\';
+    </string>
+
+    <string name="dbSucursal">
+        CREATE TABLE IF NOT EXISTS sucursal(
+            idsucursal varchar(20) primary key,
+            ruc varchar(20),
+            razonsocial varchar(128),
+            nombrecomercial varchar(128),
+            nombresucursal varchar(128),
+            direccion varchar(128),
+            codigoestablecimiento varchar(3),
+            puntoemision varchar(3),
+            ambiente integer,
+            sucursalpadreid varchar(20),
+            idestablecimiento integer
+        );
+        ALTER TABLE sucursal ADD COLUMN idpuntoemision integer DEFAULT 0;
+    </string>
+
+    <string name="dbSecuencial">
+        CREATE TABLE IF NOT EXISTS secuencial (
+            sucursalid varchar(20),
+            tipocomprobante varchar(2),
+            codigoestablecimiento varchar(3),
+            puntoemision varchar(3),
+            secuencial integer,
+            constraint pksecuencial primary key (sucursalid, tipocomprobante, codigoestablecimiento, puntoemision)
+        );
+    </string>
+
+    <string name="dbProducto">
+        CREATE TABLE IF NOT EXISTS producto(
+            idproducto integer PRIMARY KEY,
+            codigoproducto varchar(100),
+            nombreproducto varchar(250),
+            pvp double,
+            unidadid integer,
+            unidadesporcaja integer,
+            iva integer,
+            ice integer,
+            factorconversion double,
+            pvp1 double,
+            pvp2 double,
+            pvp3 double,
+            pvp4 double,
+            pvp5 double,
+            stock double,
+            porcentajeiva double
+        );
+        ALTER TABLE producto ADD COLUMN establecimientoid INTEGER DEFAULT 0;
+        ALTER TABLE producto ADD COLUMN tipo VARCHAR(5) DEFAULT \'P\';
+    </string>
+
+    <string name="dbCliente">
+        CREATE TABLE IF NOT EXISTS cliente(
+            idcliente INTEGER PRIMARY KEY AUTOINCREMENT,
+            tiponip varchar(2),
+            nip varchar(20),
+            razonsocial varchar(200),
+            nombrecomercial varchar(200),
+            direccion text,
+            lat double,
+            lon double,
+            categoria varchar(1),
+            usuarioid integer,
+            fono1 varchar(20),
+            fono2 varchar(20),
+            email varchar(100),
+            observacion text,
+            ruc varchar(20),
+            codigosistema integer,
+            actualizado integer,
+            CONSTRAINT uknip UNIQUE(nip, usuarioid)
+        );
+        ALTER TABLE cliente ADD COLUMN establecimientoid INTEGER DEFAULT 0;
+    </string>
+
+    <string name="dbLote">
+        CREATE TABLE IF NOT EXISTS lote (
+            productoid INTEGER,
+            numerolote VARCHAR(150),
+            stock DOUBLE,
+            preciocosto DOUBLE,
+            fechavencimiento varchar(15)
+        );
+        ALTER TABLE lote ADD COLUMN longdate INTEGER DEFAULT 0;
+        ALTER TABLE lote ADD COLUMN establecimientoid INTEGER DEFAULT 0;
+    </string>
+
+    <string name="dbComprobante">
+        CREATE TABLE IF NOT EXISTS comprobante(
+            idcomprobante INTEGER PRIMARY KEY AUTOINCREMENT,
+            establecimientoid INTEGER,
+            clienteid INTEGER,
+            usuarioid INTEGER,
+            codigosistema INTEGER DEFAULT 0,
+            codigotransaccion VARCHAR(25),
+            tipotransaccion VARCHAR(2),
+            fechacelular VARCHAR(20),
+            fechadocumento VARCHAR(20),
+            observacion TEXT,
+            subtotal DOUBLE,
+            subtotaliva DOUBLE,
+            descuento DOUBLE,
+            porcentajeiva DOUBLE,
+            total DOUBLE,
+            estado INTEGER,
+            lat DOUBLE,
+            lon DOUBLE,
+            claveacceso VARCHAR(49),
+            secuencial INTEGER DEFAULT 0,
+            nip VARCHAR(20),
+            CONSTRAINT ukautorizacion UNIQUE(claveacceso)
+        );
+        ALTER TABLE comprobante ADD COLUMN sucursalenvia TEXT DEFAULT \'\';
+        ALTER TABLE comprobante ADD COLUMN sucursalrecibe TEXT DEFAULT \'\';
+        ALTER TABLE comprobante ADD COLUMN longdate INTEGER DEFAULT 0;
+    </string>
+
+    <string name="dbDetalleComprobante">
+        CREATE TABLE IF NOT EXISTS detallecomprobante(
+            comprobanteid INTEGER,
+            linea INTEGER,
+            productoid INTEGER,
+            cantidad DOUBLE,
+            total DOUBLE,
+            precio DOUBLE,
+            numerolote VARCHAR(30),
+            fechavencimiento VARCHAR(20),
+            stock DOUBLE,
+            preciocosto DOUBLE
+        );
+        ALTER TABLE detallecomprobante ADD COLUMN precioreferencia DOUBLE DEFAULT 0;
+        ALTER TABLE detallecomprobante ADD COLUMN valoriva DOUBLE DEFAULT 0;
+        ALTER TABLE detallecomprobante ADD COLUMN valorice DOUBLE DEFAULT 0;
+        ALTER TABLE detallecomprobante ADD COLUMN descuento DOUBLE DEFAULT 0;
+        ALTER TABLE detallecomprobante ADD COLUMN codigoproducto VARCHAR(100) DEFAULT \'\';
+        ALTER TABLE detallecomprobante ADD COLUMN nombreproducto VARCHAR(250) DEFAULT \'\';
+    </string>
+
+    <string name="dbPedido">
+        CREATE TABLE IF NOT EXISTS pedido(
+            idpedido INTEGER PRIMARY KEY AUTOINCREMENT,
+            codigosistema INTEGER,
+            clienteid INTEGER,
+            estado INTEGER,
+            usuarioid INTEGER,
+            parroquiaid INTEGER,
+            establecimientoid INTEGER,
+            secuencial INTEGER,
+            fechapedido VARCHAR(20),
+            fechacelular VARCHAR(20),
+            observacion TEXT,
+            categoria VARCHAR(2),
+            secuencialpedido VARCHAR(25),
+            nip VARCHAR(20),
+            total DOUBLE,
+            subtotal DOUBLE,
+            subtotaliva DOUBLE,
+            porcentajeiva DOUBLE,
+            descuento DOUBLE,
+            lat DOUBLE,
+            lon DOUBLE,
+            codigoestablecimiento VARCHAR(5),
+            puntoemision VARCHAR(5),
+            tipotransaccion VARCHAR(2),
+            CONSTRAINT uksecuencial UNIQUE(usuarioid, clienteid, secuencialpedido)
+        );
+        ALTER TABLE pedido ADD COLUMN longdate INTEGER DEFAULT 0;
+    </string>
+    <string name="dbDetallePedido">
+        CREATE TABLE IF NOT EXISTS detallepedido(
+            pedidoid INTEGER,
+            orden INTEGER,
+            cantidad DOUBLE,
+            factorconversion DOUBLE,
+            precio DOUBLE,
+            idproducto INTEGER,
+            observacion TEXT,
+            usuarioid INTEGER
+        );
+        ALTER TABLE detallepedido ADD COLUMN porcentajeiva DOUBLE DEFAULT 0;
+        ALTER TABLE detallepedido ADD COLUMN codigoproducto  VARCHAR(150) DEFAULT \'\';
+        ALTER TABLE detallepedido ADD COLUMN nombreproducto  VARCHAR(250) DEFAULT \'\';
+    </string>
+
+    <string name="dbPermiso">
+        CREATE TABLE IF NOT EXISTS permiso(
+            nombreopcion VARCHAR(150),
+            perfilid INTEGER,
+            opcionid INTEGER,
+            permisoescritura VARCHAR(10),
+            permisoimpresion VARCHAR(10),
+            permisomodificacion VARCHAR(10),
+            permisoborrar VARCHAR(10),
+            permisosubirarchivo VARCHAR(10)
+        );
+        ALTER TABLE permiso ADD COLUMN rutaopcion VARCHAR(150) DEFAULT \'\';
+    </string>
+
+    <string name="dbConfig">
+        CREATE TABLE IF NOT EXISTS configuracion(
+            idconfiguracion INTEGER PRIMARY KEY AUTOINCREMENT,
+            urlbase VARCHAR(250),
+            ssl INTEGER DEFAULT 0
+        );
+    </string>
+
+    <string name="dbReglaPrecio">
+        CREATE TABLE IF NOT EXISTS reglaprecio(
+            idproductoregla INTEGER PRIMARY KEY,
+            productoid INTEGER,
+            establecimientoid INTEGER,
+            cantidad DOUBLE,
+            numerolote VARCHAR(100),
+            fechamaxima VARCHAR(25),
+            precio DOUBLE
+        );
+        ALTER TABLE reglaprecio ADD COLUMN longdate INTEGER DEFAULT 0;
+    </string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="update"><![CDATA[<u>Actualizar</u>]]></string>
+
+</resources>

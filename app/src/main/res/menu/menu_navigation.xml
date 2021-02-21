@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/ic_home"
+            android:title="Inicio"/>
+        <item
+            android:id="@+id/nav_cliente"
+            android:icon="@drawable/ic_user"
+            android:title="Clientes"
+            android:titleCondensed="pe/personas"/>
+        <item
+            android:id="@+id/nav_factura"
+            android:icon="@drawable/ic_document"
+            android:title="Comprobante"
+            android:titleCondensed="in/puntoventa"/>
+        <item
+            android:id="@+id/nav_pedido"
+            android:icon="@drawable/ic_document"
+            android:title="Pedido"
+            android:titleCondensed="cc/gestiondepedidos"/>
+        <item
+            android:id="@+id/nav_recepcion"
+            android:icon="@drawable/ic_recepcion"
+            android:title="Recepción"
+            android:titleCondensed="in/recepcion"/>
+        <item
+            android:id="@+id/nav_transferencia"
+            android:icon="@drawable/ic_transferencia"
+            android:title="Transferencia"
+            android:titleCondensed="in/transferencia"/>
+        <item android:id="@+id/section_opciones"
+            android:title="Opciones">
+            <menu>
+                <item
+                    android:id="@+id/nav_config"
+                    android:icon="@drawable/ic_settings"
+                    android:title="Configuración"
+                    android:visible="false"/>
+                <item
+                    android:id="@+id/nav_cerrarsesion"
+                    android:icon="@drawable/ic_exit"
+                    android:title="Cerrar sesión" />
+            </menu>
+        </item>
+    </group>
+
+</menu>

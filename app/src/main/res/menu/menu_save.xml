@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/option_save"
+        android:title="Guardar"
+        android:icon="@drawable/ic_save"
+        app:showAsAction="collapseActionView|always" />
+    <item android:id="@+id/option_reimprimir"
+        android:title="Imprimir"
+        android:icon="@drawable/ic_printer_white"
+        app:showAsAction="collapseActionView|always" />
+    <item android:id="@+id/option_newdocument"
+        android:title="Nuevo Comprobante"
+        android:icon="@drawable/ic_note_add"
+        app:showAsAction="ifRoom" />
+    <item android:id="@+id/option_listdocument"
+        android:title="Buscar Comprobante"
+        android:icon="@drawable/ic_list_document"
+        app:showAsAction="ifRoom" />
+    <item android:id="@+id/option_newclient"
+        android:title="Nuevo Cliente"
+        android:icon="@drawable/ic_note_add"
+        app:showAsAction="ifRoom" />
+</menu>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#666666</color>
+    <color name="colorAccent">#0066cc</color>
+    <color name="colorText">#efefef</color>
+    <color name="black_overlay">#5E0808</color>
+    <color name="black_overlay2">#F3831B1B</color>
+    <color name="tabAccent">#0066cc</color>
+    <color name="resalta">#cc3333</color>
+    <color name="texthint">#444444</color>
+    <color name="texthintenabled">#F87C2424</color>
+    <color name="colorWhite">#FFFFFFFF</color>
+    <color name="colorBlue">#F8050531</color>
+    <color name="colorGreenLight">#0A80B8</color>
+    <color name="colorGray">#303133</color>
+    <color name="colorSincronizado">#E6C8F5CD</color>
+    <color name="colorNoSincronizado">#EEF7DCCE</color>
+    <color name="colorGreenClarito">#EE56F782</color>
+    <color name="colorMoradito">#EE410474</color>
+    <color name="colorGrayLight">#DDADADAF</color>
+    <color name="colornavheader">#06212C</color>
+
+    <color name="colorstart_splash">#A8221F</color>
+    <color name="colorcenter_splash">#8B1815</color>
+    <color name="colorend_splash">#700F0C</color>
+
+    <color name="colorDate">#004087</color>
+    <color name="colorWarning">#FF9800</color>
+    <color name="colorSuccess">#1A5A1C</color>
+    <color name="colorRed">#C20000</color>
+    <color name="colorPrimaryDark">#444444</color>
+
+    <color name="colorGreenPastelito">#B2EAF1E8</color>
+    <color name="colorRedPastelito">#A9F3EBEB</color>
+</resources>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="4dp"
+    android:layout_marginVertical="2dp"
+    android:orientation="vertical"
+    app:cardCornerRadius="6dp"
+    app:cardElevation="3dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:padding="5dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginHorizontal="5dp">
+
+            <TextView
+                android:id="@+id/tv_NombreProducto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="CODIGO - NOMBRE PRODUCTO"
+                android:textSize="14sp"
+                style="@style/EstiloText_Black2"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:weightSum="3"
+                android:orientation="horizontal">
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textColorHint="@color/colorPrimary">
+                    <EditText
+                        android:id="@+id/tvLote"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="00000"
+                        android:textSize="15sp"
+                        android:textColor="@color/colorGray"
+                        android:hint="Lote"
+                        android:textAlignment="center"
+                        android:enabled="false"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:textColorHint="@color/colorPrimary">
+                    <EditText
+                        android:id="@+id/tvFechaVencimiento"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="1900-01-01"
+                        android:textSize="15sp"
+                        android:textColor="@color/colorGray"
+                        android:hint="Fecha Vencimiento"
+                        android:textAlignment="center"
+                        android:enabled="false"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:textColorHint="@color/colorPrimaryDark">
+                    <EditText
+                        android:id="@+id/tvCantidad"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="1.00"
+                        android:textSize="16sp"
+                        android:textColor="@color/colorGray"
+                        android:hint="Cantidad"
+                        android:textAlignment="center"
+                        android:enabled="false"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/btnDeleteProducto"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_delete2"
+            android:background="@null"
+            android:clickable="true"
+            android:layout_gravity="center"
+            android:paddingHorizontal="7dp"
+            android:visibility="gone"/>
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
