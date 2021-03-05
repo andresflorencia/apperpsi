@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -130,6 +132,30 @@ public class PedidoActivity extends AppCompatActivity {
                     }
                 }
                 return false;
+            }
+        });
+
+        txtCliente.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                try{
+                    if(s.length()>0 && idpedido == 0)
+                        txtCliente.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_user,0, R.drawable.ic_close,0);
+                    else
+                        txtCliente.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_user,0, 0,0);
+                }catch (Exception e){
+                    Log.d("TAG_PEDIDOACT", e.getMessage());
+                }
             }
         });
     }
@@ -258,7 +284,7 @@ public class PedidoActivity extends AppCompatActivity {
         int day=calendar.get(Calendar.DAY_OF_MONTH);
         int month=calendar.get(Calendar.MONTH);
         int year=calendar.get(Calendar.YEAR);
-        String[] fecha= btnFecha.getText().toString().split("-");
+        String[] fecha= btnFecha.getTag().toString().split("-");
         day = Integer.valueOf(fecha[2]);
         month = Integer.valueOf(fecha[1])-1;
         year = Integer.valueOf(fecha[0]);
@@ -268,8 +294,9 @@ public class PedidoActivity extends AppCompatActivity {
                 String dia = (day>=0 && day<10?"0"+(day):String.valueOf(day));
                 String mes = (month>=0 && month<10?"0"+(month+1):String.valueOf(month+1));
 
-                String mitextoU = year + "-" + mes +"-" + dia;
-                btnFecha.setText(mitextoU);
+                String mitextoU = year + "-" + mes + "-" + dia;
+                btnFecha.setTag(mitextoU);
+                btnFecha.setText(dia + "-" + Utils.getMes(month, true) + "-" + year);
             }
         },year,month,day);
         dtpDialog.show();
@@ -539,9 +566,17 @@ public class PedidoActivity extends AppCompatActivity {
             return false;
         }
         if(pedido.detalle.size()==0){
-            Banner.make(rootView,PedidoActivity.this,Banner.ERROR,"Especifique un detalle para la venta", Banner.BOTTOM,3000).show();
+            Banner.make(rootView,PedidoActivity.this,Banner.ERROR,"Especifique un detalle para el pedido", Banner.BOTTOM,3000).show();
             return false;
-        }else if(pedido.total == 0){
+        }else{
+            for (DetallePedido det:pedido.detalle){
+                if(det.cantidad<=0){
+                    Banner.make(rootView,PedidoActivity.this,Banner.ERROR,"Ingrese una cantidad mayor a 0 para " + det.producto.nombreproducto , Banner.BOTTOM, 3500).show();
+                    return false;
+                }
+            }
+        }
+        if(pedido.total == 0){
             //Utils.showMessage(this, "El total del pedido debe ser mayor que $0.");
             Banner.make(rootView,PedidoActivity.this,Banner.ERROR,"El total del pedido debe ser mayor que $0.", Banner.BOTTOM,3000).show();
             return false;
@@ -688,6 +723,7 @@ public class PedidoActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.appbar);
         toolbar.setTitleTextColor(Color.WHITE);
         toolbar.setSubtitleTextColor(Color.WHITE);
+        toolbar.setTitle("Nuevo pedido");
         //toolbar.setBackgroundColor(getResources().getColor(R.color.colorMoradito));
         //toolbar.getNavigationIcon().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
         super.onResume();
@@ -703,8 +739,8 @@ public class PedidoActivity extends AppCompatActivity {
             ((TextView)view.findViewById(R.id.lblTitle)).setText("Cerrar");
             ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Desea salir de la ventana de pedido?");
             ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_check_white);
-            ((Button)view.findViewById(R.id.btnCancel)).setText("Cancelar");
-            ((Button)view.findViewById(R.id.btnConfirm)).setText("Si");
+            ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
+            ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
             final AlertDialog alertDialog = builder.create();
             view.findViewById(R.id.btnConfirm).setOnClickListener(new View.OnClickListener() {
                 @Override

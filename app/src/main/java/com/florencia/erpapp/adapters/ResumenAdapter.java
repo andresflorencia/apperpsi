@@ -16,6 +16,7 @@ import com.florencia.erpapp.R;
 import com.florencia.erpapp.activities.ComprobanteActivity;
 import com.florencia.erpapp.activities.ListaComprobantesActivity;
 import com.florencia.erpapp.activities.PedidoActivity;
+import com.florencia.erpapp.activities.PedidoInventarioActivity;
 import com.florencia.erpapp.activities.RecepcionActivity;
 import com.florencia.erpapp.activities.TransferenciaActivity;
 import com.florencia.erpapp.utils.Utils;
@@ -75,7 +76,7 @@ public class ResumenAdapter extends RecyclerView.Adapter<ResumenAdapter.ResumenV
         void bindResumen(final JsonObject jDocumento){
             tvDocumento.setText(jDocumento.get("documento").getAsString());
             tvCantidad.setText(jDocumento.get("cantidad").getAsString());
-            tvTotal.setText("Total: " + Utils.FormatoMoneda(jDocumento.get("total").getAsDouble(),2));
+            tvTotal.setText(jDocumento.get("total").getAsDouble()==0?"":"Total: " + Utils.FormatoMoneda(jDocumento.get("total").getAsDouble(),2));
 
             tvCantidadNS.setText(jDocumento.get("cantidadns").getAsString());
             if(jDocumento.get("cantidadns").getAsInt()>0)
@@ -94,7 +95,7 @@ public class ResumenAdapter extends RecyclerView.Adapter<ResumenAdapter.ResumenV
                                 i = new Intent(activity, ComprobanteActivity.class);
                                 activity.startActivity(i);
                                 break;
-                            case "PEDIDOS":
+                            case "PEDIDOS CLIENTE":
                                 i = new Intent(activity, PedidoActivity.class);
                                 activity.startActivity(i);
                                 break;
@@ -104,6 +105,10 @@ public class ResumenAdapter extends RecyclerView.Adapter<ResumenAdapter.ResumenV
                                 break;
                             case "TRANSFERENCIAS":
                                 i = new Intent(activity, TransferenciaActivity.class);
+                                activity.startActivity(i);
+                                break;
+                            case "PEDIDOS INVENTARIO":
+                                i = new Intent(activity, PedidoInventarioActivity.class);
                                 activity.startActivity(i);
                                 break;
                         }
@@ -132,21 +137,21 @@ public class ResumenAdapter extends RecyclerView.Adapter<ResumenAdapter.ResumenV
                         switch (miDoc.get("documento").getAsString()){
                             case "FACTURAS":
                                 i.putExtra("tipobusqueda","01");
-                                activity.startActivity(i);
                                 break;
-                            case "PEDIDOS":
+                            case "PEDIDOS CLIENTE":
                                 i.putExtra("tipobusqueda","PC");
-                                activity.startActivity(i);
                                 break;
                             case "RECEPCIONES":
                                 i.putExtra("tipobusqueda","8,23");
-                                activity.startActivity(i);
                                 break;
                             case "TRANSFERENCIAS":
                                 i.putExtra("tipobusqueda","4,20");
-                                activity.startActivity(i);
+                                break;
+                            case "PEDIDOS INVENTARIO":
+                                i.putExtra("tipobusqueda","PI");
                                 break;
                         }
+                        activity.startActivity(i);
                     }
                 }
             });

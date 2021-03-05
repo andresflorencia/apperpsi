@@ -128,13 +128,15 @@ public class Comprobante {
                 this.detalle.get(i).linea = i+1;
                 sqLiteDatabase.execSQL("INSERT OR REPLACE INTO " +
                         "detallecomprobante(comprobanteid, linea, productoid, cantidad, precio, numerolote, " +
-                        "fechavencimiento, stock, preciocosto, precioreferencia, valoriva, valorice, descuento, codigoproducto, nombreproducto) " +
-                        "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        "fechavencimiento, stock, preciocosto, precioreferencia, valoriva, valorice, descuento, " +
+                        "codigoproducto, nombreproducto, marquetas) " +
+                        "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                         new String[]{idComprobante.toString(), this.detalle.get(i).linea.toString(), this.detalle.get(i).producto.idproducto.toString(),
                                 this.detalle.get(i).cantidad.toString(), this.detalle.get(i).precio.toString(), this.detalle.get(i).numerolote,
                                 this.detalle.get(i).fechavencimiento, this.detalle.get(i).stock.toString(), this.detalle.get(i).preciocosto.toString(),
                                 this.detalle.get(i).precioreferencia.toString(), this.detalle.get(i).valoriva.toString(), this.detalle.get(i).valorice.toString(),
-                                this.detalle.get(i).descuento.toString(), this.detalle.get(i).producto.codigoproducto, this.detalle.get(i).producto.nombreproducto});
+                                this.detalle.get(i).descuento.toString(), this.detalle.get(i).producto.codigoproducto, this.detalle.get(i).producto.nombreproducto,
+                                this.detalle.get(i).marquetas.toString()});
 
                 this.detalle.get(i).comprobanteid = idComprobante;
 

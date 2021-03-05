@@ -31,6 +31,7 @@ import com.florencia.erpapp.adapters.ComprobantesAdapter;
 import com.florencia.erpapp.models.Cliente;
 import com.florencia.erpapp.models.Comprobante;
 import com.florencia.erpapp.models.Pedido;
+import com.florencia.erpapp.models.PedidoInventario;
 import com.florencia.erpapp.services.SQLite;
 import com.florencia.erpapp.utils.Constants;
 import com.florencia.erpapp.utils.Utils;
@@ -47,6 +48,7 @@ public class ListaComprobantesActivity extends AppCompatActivity implements Sear
     RecyclerView rvComprobantes;
     List<Comprobante> listComprobantes = null;
     List<Pedido> listPedido = null;
+    List<PedidoInventario> listPedidoInv = null;
     ComprobantesAdapter comprobanteAdapter;
     SearchView svBusqueda;
     LinearLayout lyContainer;
@@ -112,7 +114,7 @@ public class ListaComprobantesActivity extends AppCompatActivity implements Sear
                                         } else {
                                             imgFondo.setVisibility(View.GONE);
                                             lyContainer.setVisibility(View.VISIBLE);
-                                            comprobanteAdapter = new ComprobantesAdapter(ListaComprobantesActivity.this, listComprobantes, null, tipobusqueda, retornar);
+                                            comprobanteAdapter = new ComprobantesAdapter(ListaComprobantesActivity.this, listComprobantes, null, null, tipobusqueda, retornar);
                                             rvComprobantes.setAdapter(comprobanteAdapter);
                                             toolbar.getMenu().findItem(R.id.option_delete).setVisible(true);
                                         }
@@ -126,7 +128,21 @@ public class ListaComprobantesActivity extends AppCompatActivity implements Sear
                                         } else {
                                             imgFondo.setVisibility(View.GONE);
                                             lyContainer.setVisibility(View.VISIBLE);
-                                            comprobanteAdapter = new ComprobantesAdapter(ListaComprobantesActivity.this, null, listPedido, tipobusqueda, retornar);
+                                            comprobanteAdapter = new ComprobantesAdapter(ListaComprobantesActivity.this, null, listPedido, null, tipobusqueda, retornar);
+                                            rvComprobantes.setAdapter(comprobanteAdapter);
+                                            toolbar.getMenu().findItem(R.id.option_delete).setVisible(true);
+                                        }
+                                        break;
+                                    case "PI":  //PEDIDOS INVENTARIO
+                                        listPedidoInv = PedidoInventario.getByUsuario(SQLite.usuario.IdUsuario, SQLite.usuario.sucursal.IdEstablecimiento, fechadesde, fechahasta);
+                                        if (listPedidoInv == null || listPedidoInv.size() == 0) {
+                                            imgFondo.setVisibility(View.VISIBLE);
+                                            lyContainer.setVisibility(View.GONE);
+                                            toolbar.getMenu().findItem(R.id.option_delete).setVisible(false);
+                                        } else {
+                                            imgFondo.setVisibility(View.GONE);
+                                            lyContainer.setVisibility(View.VISIBLE);
+                                            comprobanteAdapter = new ComprobantesAdapter(ListaComprobantesActivity.this, null, null, listPedidoInv, tipobusqueda, retornar);
                                             rvComprobantes.setAdapter(comprobanteAdapter);
                                             toolbar.getMenu().findItem(R.id.option_delete).setVisible(true);
                                         }
@@ -192,14 +208,16 @@ public class ListaComprobantesActivity extends AppCompatActivity implements Sear
     public void onResume() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.appbar);
         String documento = "";
-        if(tipobusqueda.equals("01"))
-            documento = "Comprobantes";
+        if(tipobusqueda.equals("01"))//FACTURAS
+            documento = "Facturas";
         else if (tipobusqueda.equals("8,23") || tipobusqueda.equals("23,8"))
             documento = "Recepciones";
         else if(tipobusqueda.equals("PC"))
-            documento = "Pedidos";
+            documento = "Pedidos Cliente";
         else if (tipobusqueda.equals("4,20") || tipobusqueda.equals("20,4"))
             documento = "Transferencias || Devoluciones";
+        else if (tipobusqueda.equals("PI"))
+            documento = "Pedidos Inventario";
         toolbar.setTitle(documento);
 
         if(!fechadesde.equals(""))
@@ -230,13 +248,13 @@ public class ListaComprobantesActivity extends AppCompatActivity implements Sear
                 showDatePickerDialog(false);
                 break;
             case R.id.option_delete:
-                EliminaRegistros(fechadesde, fechahasta);
+                EliminarRegistros(fechadesde, fechahasta);
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void EliminaRegistros(String fechadesde, String fechahasta) {
+    private void EliminarRegistros(String fechadesde, String fechahasta) {
         try{
             String title = "¿Desea eliminar ";
             if(fechadesde.equals("") && fechahasta.equals(""))

@@ -22,8 +22,9 @@
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:required="false" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
-    <uses-permission android:name="android.permission.INSTALL_PACKAGES"
-        tools:ignore="ProtectedPermissions"/>
+    <uses-permission
+        android:name="android.permission.INSTALL_PACKAGES"
+        tools:ignore="ProtectedPermissions" />
 
     <application
         android:allowBackup="true"
@@ -33,7 +34,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".activities.ConfigActivity"></activity>
+        <activity android:name=".activities.PedidoInventarioActivity"></activity>
+        <activity android:name=".activities.ConfigActivity" />
         <activity
             android:name=".activities.TransferenciaActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"

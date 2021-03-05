@@ -143,7 +143,7 @@ public class RecepcionActivity extends AppCompatActivity {
         pbCargando = findViewById(R.id.pbCargando);
         btnRefresh = findViewById(R.id.btnRefresh);
         lblObservacion = findViewById(R.id.lblObservacion);
-        tvObservacion = findViewById(R.id.tvObservación);
+        tvObservacion = findViewById(R.id.tvObservacion);
         lyCombo = findViewById(R.id.lyCombo);
         lyDatosInformativos = findViewById(R.id.lyDatosInformativos);
         lblTransferencia = findViewById(R.id.lblTransferencia);
@@ -200,7 +200,10 @@ public class RecepcionActivity extends AppCompatActivity {
                     btsDialog.dismiss();
                     break;
                 case R.id.lblTransferencia:
-                    Utils.EfectoLayout(lyCombo, lblTransferencia);
+                    if(idrecepcion>0)
+                        Utils.EfectoLayout(lyDatosInformativos, lblTransferencia);
+                    else
+                        Utils.EfectoLayout(lyCombo, lblTransferencia);
                     break;
                 case R.id.lblProducto:
                     Utils.EfectoLayout(lyProductos, lblProducto);
@@ -344,12 +347,13 @@ public class RecepcionActivity extends AppCompatActivity {
                                         JsonObject trans = ele.getAsJsonObject();
                                         midetalle = new DetalleComprobante();
                                         midetalle.producto.idproducto = trans.get("productoid").getAsInt();
-                                        midetalle.producto.nombreproducto = trans.get("nombreproducto").getAsString();
-                                        midetalle.producto.codigoproducto = trans.get("codigoproducto").getAsString();
-                                        midetalle.numerolote = trans.get("numerolote").getAsString();
-                                        midetalle.fechavencimiento = trans.get("fechavencimiento").getAsString();
-                                        midetalle.preciocosto = trans.get("preciocosto").getAsDouble();
-                                        midetalle.cantidad = trans.get("cantidad").getAsDouble();
+                                        midetalle.producto.nombreproducto = trans.has("nombreproducto")? trans.get("nombreproducto").getAsString():"";
+                                        midetalle.producto.codigoproducto = trans.has("codigoproducto")?trans.get("codigoproducto").getAsString():"";
+                                        midetalle.numerolote = trans.has("numerolote")? trans.get("numerolote").getAsString():"";
+                                        midetalle.fechavencimiento = trans.has("fechavencimiento")? trans.get("fechavencimiento").getAsString():"1900-01-01";
+                                        midetalle.preciocosto = trans.has("preciocosto")? trans.get("preciocosto").getAsDouble():0;
+                                        midetalle.cantidad = trans.has("cantidad")?trans.get("cantidad").getAsDouble():0;
+                                        midetalle.marquetas = trans.has("marquetas")?trans.get("marquetas").getAsDouble():0;
                                         detalleProductos.add(midetalle);
                                         Log.d("TAG",midetalle.producto.nombreproducto);
                                     }
@@ -866,6 +870,7 @@ public class RecepcionActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.appbar);
+        toolbar.setTitle("Recepción de Inventario");
         toolbar.setTitleTextColor(Color.WHITE);
         toolbar.setSubtitleTextColor(Color.WHITE);
         super.onResume();

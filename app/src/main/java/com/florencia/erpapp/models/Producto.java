@@ -211,7 +211,7 @@ public class Producto
         ArrayList<Producto> Items = new ArrayList<Producto>();
         try {
             sqLiteDatabase = SQLite.sqlDB.getReadableDatabase();
-            Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM producto WHERE establecimientoid = ? ORDER BY nombreproducto", new String[]{idestablecimiento.toString()});
+            Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM producto WHERE establecimientoid = ? ORDER BY stock DESC, nombreproducto", new String[]{idestablecimiento.toString()});
             Producto Item;
             if (cursor.moveToFirst()) {
                 do {

@@ -146,7 +146,7 @@ public class TransferenciaActivity extends AppCompatActivity{
         pbCargando = findViewById(R.id.pbCargando);
         btnRefresh = findViewById(R.id.btnRefresh);
         lblObservacion = findViewById(R.id.lblObservacion);
-        tvObservacion = findViewById(R.id.tvObservación);
+        tvObservacion = findViewById(R.id.tvObservacion);
         lyCombo = findViewById(R.id.lyCombo);
         lyDatosInformativos = findViewById(R.id.lyDatosInformativos);
         lblTransferencia = findViewById(R.id.lblTransferencia);
@@ -213,7 +213,10 @@ public class TransferenciaActivity extends AppCompatActivity{
                     btsDialog.dismiss();
                     break;
                 case R.id.lblTransferencia:
-                    Utils.EfectoLayout(lyCombo, lblTransferencia);
+                    if(idtransferencia>0)
+                        Utils.EfectoLayout(lyDatosInformativos, lblTransferencia);
+                    else
+                        Utils.EfectoLayout(lyCombo, lblTransferencia);
                     break;
                 case R.id.lblProducto:
                     Utils.EfectoLayout(lyProductos, lblProducto);
@@ -857,6 +860,7 @@ public class TransferenciaActivity extends AppCompatActivity{
     @Override
     protected void onResume() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.appbar);
+        toolbar.setTitle("Transferencia de Inventario");
         toolbar.setTitleTextColor(Color.WHITE);
         toolbar.setSubtitleTextColor(Color.WHITE);
         super.onResume();

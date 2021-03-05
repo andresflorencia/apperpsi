@@ -41,6 +41,8 @@
             idestablecimiento integer
         );
         ALTER TABLE sucursal ADD COLUMN idpuntoemision integer DEFAULT 0;
+        ALTER TABLE sucursal ADD COLUMN periodo integer DEFAULT 0;
+        ALTER TABLE sucursal ADD COLUMN mesactual integer DEFAULT 0;
     </string>
 
     <string name="dbSecuencial">
@@ -99,6 +101,7 @@
             CONSTRAINT uknip UNIQUE(nip, usuarioid)
         );
         ALTER TABLE cliente ADD COLUMN establecimientoid INTEGER DEFAULT 0;
+        ALTER TABLE cliente ADD COLUMN parroquiaid INTEGER DEFAULT 0;
     </string>
 
     <string name="dbLote">
@@ -162,6 +165,7 @@
         ALTER TABLE detallecomprobante ADD COLUMN descuento DOUBLE DEFAULT 0;
         ALTER TABLE detallecomprobante ADD COLUMN codigoproducto VARCHAR(100) DEFAULT \'\';
         ALTER TABLE detallecomprobante ADD COLUMN nombreproducto VARCHAR(250) DEFAULT \'\';
+        ALTER TABLE detallecomprobante ADD COLUMN marquetas DOUBLE DEFAULT 0;
     </string>
 
     <string name="dbPedido">
@@ -223,7 +227,6 @@
         );
         ALTER TABLE permiso ADD COLUMN rutaopcion VARCHAR(150) DEFAULT \'\';
     </string>
-
     <string name="dbConfig">
         CREATE TABLE IF NOT EXISTS configuracion(
             idconfiguracion INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -231,7 +234,6 @@
             ssl INTEGER DEFAULT 0
         );
     </string>
-
     <string name="dbReglaPrecio">
         CREATE TABLE IF NOT EXISTS reglaprecio(
             idproductoregla INTEGER PRIMARY KEY,
@@ -245,8 +247,67 @@
         ALTER TABLE reglaprecio ADD COLUMN longdate INTEGER DEFAULT 0;
     </string>
 
+    <string name="dbProvincia">
+        CREATE TABLE IF NOT EXISTS provincia(
+            idprovincia integer,
+            nombreprovincia varchar(100),
+            CONSTRAINT ukprovincia UNIQUE(idprovincia)
+        );
+    </string>
+    <string name="dbCanton">
+        CREATE TABLE IF NOT EXISTS canton(
+            idcanton integer,
+            nombrecanton varchar(100),
+            provinciaid integer,
+            CONSTRAINT ukcanton UNIQUE(idcanton)
+        );
+    </string>
+    <string name="dbParroquia">
+        CREATE TABLE IF NOT EXISTS parroquia(
+            idparroquia integer,
+            nombreparroquia varchar(100),
+            cantonid integer,
+            CONSTRAINT ukparroquia UNIQUE(idparroquia)
+        );
+    </string>
+    
+    <string name="dbPedidoInv">
+        CREATE TABLE IF NOT EXISTS pedidoinv(
+            idpedido INTEGER PRIMARY KEY AUTOINCREMENT,
+            codigosistema INTEGER,
+            establecimientoid INTEGER,
+            usuarioid INTEGER,
+            diasabastecimiento INTEGER DEFAULT 7,
+            estadomovil INTEGER DEFAULT 0,
+            secuencial INTEGER,
+            codigopedido VARCHAR(50),
+            fecharegistro VARCHAR(25),
+            fechahora VARCHAR(25),
+            estado VARCHAR(2) DEFAULT \'P\',
+            observacion VARCHAR(250),
+            longdate INTEGER DEFAULT 0,
+            tipotransaccion VARCHAR(5),
+            CONSTRAINT uksecuencial UNIQUE(usuarioid, establecimientoid, codigopedido, estado)
+        );
+    </string>
+    <string name="dbDetallePedidoInv">
+        CREATE TABLE IF NOT EXISTS detallepedidoinv(
+            pedidoid INTEGER,
+            orden INTEGER,
+            productoid INTEGER,
+            cantidadpedida DOUBLE,
+            cantidadautorizada DOUBLE,
+            stockactual DOUBLE,
+            usuarioid INTEGER,
+            codigoproducto VARCHAR(100),
+            nombreproducto VARCHAR(250)
+        );
+    </string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="update"><![CDATA[<u>Actualizar</u>]]></string>
-
+    <string name="leyendaConsumidorFinal"><![CDATA[*Si no especifica el cliente, la factura se guardará con <strong>CONSUMIDOR FINAL</strong>]]></string>
+    <string name="Cancel">No</string>
+    <string name="Confirm">Si</string>
 </resources>

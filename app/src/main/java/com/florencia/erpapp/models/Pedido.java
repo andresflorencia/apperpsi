@@ -281,7 +281,8 @@ public class Pedido {
         String codigo ="";
         try {
             this.secuencial = ultimosecuencial();
-            codigo = "PC-" + this.codigoestablecimiento + "-" + this.puntoemision + "-" + String.format("%09d", this.secuencial);
+            //codigo = "PC-" + this.codigoestablecimiento + "-" + this.puntoemision + "-" + String.format("%09d", this.secuencial);
+            codigo = "PC-" + String.format("%03d", this.establecimientoid) + "-" + String.format("%09d", this.secuencial);
             this.secuencialpedido = codigo;
         }catch (Exception e){
             Log.d("TAGPEDIDO", "getCodigoTransaccion(): " + e.getMessage());

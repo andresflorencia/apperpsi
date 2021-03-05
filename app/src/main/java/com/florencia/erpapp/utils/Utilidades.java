@@ -46,6 +46,11 @@ public class Utilidades {
         SQLite.sqlDB.SQLEstructura(context.getString(R.string.dbPermiso));
         SQLite.sqlDB.SQLEstructura(context.getString(R.string.dbConfig));
         SQLite.sqlDB.SQLEstructura(context.getString(R.string.dbReglaPrecio));
+        SQLite.sqlDB.SQLEstructura(context.getString(R.string.dbProvincia));
+        SQLite.sqlDB.SQLEstructura(context.getString(R.string.dbCanton));
+        SQLite.sqlDB.SQLEstructura(context.getString(R.string.dbParroquia));
+        SQLite.sqlDB.SQLEstructura(context.getString(R.string.dbPedidoInv));
+        SQLite.sqlDB.SQLEstructura(context.getString(R.string.dbDetallePedidoInv));
     }
 
     public static String[] getDateTime() {

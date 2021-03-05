@@ -18,7 +18,11 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.Html;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -80,7 +84,7 @@ public class ComprobanteActivity extends AppCompatActivity {
     ImageButton btViewSubtotales;
 
     //CONTROLES DEL DIALOG_BOTTOMSHEET
-    TextView lblMessage, lblTitle, lblCliente, lblProducto;
+    TextView lblMessage, lblTitle, lblCliente, lblProducto, lblLeyendaCF;
     LinearLayout lyCliente, lyProductos, lyBotones;
     BottomSheetDialog btsDialog;
     Button btnPositive, btnNegative;
@@ -134,6 +138,30 @@ public class ComprobanteActivity extends AppCompatActivity {
                 return false;
             }
         });
+
+        txtCliente.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                try{
+                    if(s.length()>0 && idcomprobante == 0)
+                        txtCliente.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_user,0, R.drawable.ic_close,0);
+                    else
+                        txtCliente.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_user,0, 0,0);
+                }catch (Exception e){
+                    Log.d("TAG_COMPROBANTEACT", e.getMessage());
+                }
+            }
+        });
     }
 
     private void crearBottonSheet() {
@@ -182,6 +210,7 @@ public class ComprobanteActivity extends AppCompatActivity {
         lyCliente = findViewById(R.id.lyCliente);
         lyProductos = findViewById(R.id.lyProductos);
         lyBotones = findViewById(R.id.lyBotones);
+        lblLeyendaCF = findViewById(R.id.lblLeyendaCF);
 
         lblTotal.setOnClickListener(onClick);
         lySubtotales.setOnClickListener(onClick);
@@ -189,6 +218,11 @@ public class ComprobanteActivity extends AppCompatActivity {
         btnBuscarProducto.setOnClickListener(onClick);
         lblCliente.setOnClickListener(onClick);
         lblProducto.setOnClickListener(onClick);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+            lblLeyendaCF.setText(Html.fromHtml(getResources().getString(R.string.leyendaConsumidorFinal), Html.FROM_HTML_MODE_COMPACT));
+        else
+            lblLeyendaCF.setText(Html.fromHtml(getResources().getString(R.string.leyendaConsumidorFinal)));
 
         if(getIntent().getExtras()!=null){
             int idcliente = getIntent().getExtras().getInt("idcliente",0);
@@ -603,6 +637,10 @@ public class ComprobanteActivity extends AppCompatActivity {
             return false;
         }else{
             for(DetalleComprobante miDetalle: comprobante.detalle){
+                if(miDetalle.cantidad <= 0) {
+                    Banner.make(rootView,ComprobanteActivity.this,Banner.ERROR,"Ingresa una cantidad mayor a 0 para el producto " + miDetalle.producto.nombreproducto, Banner.BOTTOM, 3500).show();
+                    return false;
+                }
                 if(miDetalle.cantidad>miDetalle.producto.stock && miDetalle.producto.tipo.equalsIgnoreCase("P")){
                     Banner.make(rootView,ComprobanteActivity.this,Banner.ERROR,"El producto: " + miDetalle.producto.nombreproducto +
                             " tiene stock insuficiente para la venta.", Banner.BOTTOM, 3500).show();
@@ -768,6 +806,7 @@ public class ComprobanteActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.appbar);
+        toolbar.setTitle("Nuevo comprobante");
         toolbar.setTitleTextColor(Color.WHITE);
         toolbar.setSubtitleTextColor(Color.WHITE);
         toolbar.setBackgroundColor(getResources().getColor(R.color.black_overlay));

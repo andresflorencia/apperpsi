@@ -24,7 +24,7 @@ public class Cliente {
     public String categoria;
     public Integer usuarioid;
     public String fono1, fono2, email, observacion, ruc;
-    public Integer codigosistema, actualizado, establecimientoid;
+    public Integer codigosistema, actualizado, establecimientoid, parroquiaid;
 
     public static SQLiteDatabase sqLiteDatabase;
 
@@ -47,6 +47,7 @@ public class Cliente {
         this.codigosistema = 0;
         this.actualizado =0;
         this.establecimientoid = 0;
+        this.parroquiaid = 0;
     }
 
     public static boolean removeClientes(Integer idUsuario) {
@@ -69,26 +70,28 @@ public class Cliente {
             if (this.idcliente == 0)
                 this.sqLiteDatabase.execSQL("INSERT INTO " +
                         "cliente(tiponip, nip, razonsocial, nombrecomercial, direccion, lat, lon, categoria, " +
-                                "usuarioid, fono1, fono2, email, observacion, ruc, codigosistema, actualizado, establecimientoid) " +
-                        "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                                "usuarioid, fono1, fono2, email, observacion, ruc, codigosistema, actualizado, establecimientoid, parroquiaid) " +
+                        "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                         new String[]{ this.tiponip, this.nip, this.razonsocial, this.nombrecomercial, this.direccion,
                                 this.lat.toString(), this.lon.toString(), this.categoria.equals("")?"A":this.categoria, this.usuarioid.toString(), this.fono1,
-                                this.fono2, this.email, this.observacion, this.ruc, this.codigosistema.toString(), this.actualizado.toString(), this.establecimientoid.toString()});
+                                this.fono2, this.email, this.observacion, this.ruc, this.codigosistema.toString(), this.actualizado.toString(),
+                                this.establecimientoid.toString(), this.parroquiaid.toString()});
             else
                 this.sqLiteDatabase.execSQL("INSERT OR REPLACE INTO " +
                                 "cliente(idcliente, tiponip, nip, razonsocial, nombrecomercial, direccion, lat, lon, categoria, " +
-                                "usuarioid, fono1, fono2, email, observacion, ruc, codigosistema, actualizado, establecimientoid) " +
-                                "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                                "usuarioid, fono1, fono2, email, observacion, ruc, codigosistema, actualizado, establecimientoid, parroquiaid) " +
+                                "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                         new String[]{ this.idcliente.toString(), this.tiponip, this.nip, this.razonsocial, this.nombrecomercial, this.direccion,
                                 this.lat.toString(), this.lon.toString(), this.categoria.equals("")?"A":this.categoria, this.usuarioid.toString(), this.fono1,
-                                this.fono2, this.email, this.observacion, this.ruc, this.codigosistema.toString(), this.actualizado.toString(), this.establecimientoid.toString()});
+                                this.fono2, this.email, this.observacion, this.ruc, this.codigosistema.toString(), this.actualizado.toString(),
+                                this.establecimientoid.toString(), this.parroquiaid.toString()});
             if (this.idcliente == 0) this.idcliente = SQLite.sqlDB.getLastId();
 
             this.sqLiteDatabase.close();
             Log.d("TAGCLIENTE","SAVE CLIENTE OK");
             return true;
         } catch (SQLException ex){
-            Log.d("TAGCLIENTE",String.valueOf(ex));
+            Log.d("TAGCLIENTE", this.nip + " - " + ex.getMessage());
             return false;
         }
     }
@@ -140,7 +143,8 @@ public class Cliente {
             Item.ruc = cursor.getString(14);
             Item.codigosistema = cursor.getInt(15);
             Item.actualizado = cursor.getInt(16);
-            Item.establecimientoid= cursor.getInt(17);
+            Item.establecimientoid = cursor.getInt(17);
+            Item.parroquiaid = cursor.getInt(18);
         } catch (SQLiteException ec) {
             Log.d("TAGCLIENTE", ec.getMessage());
         }

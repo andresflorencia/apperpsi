@@ -221,9 +221,15 @@ public class Usuario {
             }
             if(SQLite.usuario.VerificaPermiso(ctx, Constants.PEDIDO, "lectura")) {
                 if(query.length()>0) query += " UNION";
-                query += " select 'PEDIDOS', count(pe.idpedido), round(ifnull(sum(pe.total),0),2), " +
+                query += " select 'PEDIDOS CLIENTE', count(pe.idpedido), round(ifnull(sum(pe.total),0),2), " +
                         "(select count(idpedido) as cantidad from pedido where estado >= 0 and codigosistema = 0 and (fechapedido = '" + fecha + "' or fechacelular like '" + fecha + "%')  and usuarioid =" + SQLite.usuario.IdUsuario +") " +
                         "from pedido pe where pe.estado >= 0 and (fechapedido = '" + fecha + "' or fechacelular like '" + fecha + "%') and usuarioid =" + SQLite.usuario.IdUsuario;
+            }
+            if(SQLite.usuario.VerificaPermiso(ctx, Constants.PEDIDO_INVENTARIO, "lectura")){
+                if(query.length()>0) query += " UNION";
+                query += " select 'PEDIDOS INVENTARIO', count(pe.idpedido), 0, " +
+                        "(select count(idpedido) as cantidad from pedidoinv where estadomovil = 1 and codigosistema = 0 and fechahora like '"+fecha+"%' and usuarioid = "+SQLite.usuario.IdUsuario+")" +
+                        "from pedidoinv pe where pe.estadomovil >= 0 and fechahora like '"+fecha+"%' and usuarioid = " + SQLite.usuario.IdUsuario;
             }
 
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
@@ -247,13 +253,16 @@ public class Usuario {
         return resumen;
     }
 
-    public static int numDocNoSincronizados(Integer idUsuario, boolean isPedido){
+    public static int numDocNoSincronizados(Integer idUsuario, String tipodoc){
         int cant = 0;
         try{
-            String query = "SELECT COUNT(*) FROM comprobante WHERE tipotransaccion = '01' AND codigosistema = 0 AND estado = 0 " +
-                    "AND usuarioid = ?";
-            if(isPedido)
+            String query = "";
+            if(tipodoc.equals("01"))  //FACTURAS
+                query = "SELECT COUNT(*) FROM comprobante WHERE tipotransaccion = '01' AND codigosistema = 0 AND estado = 0 AND usuarioid = ?";
+            else if(tipodoc.equals("PC"))//PEDIDOS CLIENTE
                 query = "SELECT count(*) FROM pedido WHERE codigosistema = 0 AND estado = 1 AND usuarioid = ?";
+            else if(tipodoc.equals("PI"))//PEDIDOS INVENTARIO
+                query = "SELECT count(*) FROM pedidoinv WHERE codigosistema = 0 AND estadomovil = 1 AND usuarioid = ?";
 
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
             Cursor cursor = sqLiteDatabase.rawQuery(query, new String[]{idUsuario.toString()});

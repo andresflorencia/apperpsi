@@ -25,7 +25,7 @@ public class Sucursal {
     public String PuntoEmision;
     public String Ambiente;
     public String SucursalPadreID;
-    public Integer IdEstablecimiento, IdPuntoEmision;
+    public Integer IdEstablecimiento, IdPuntoEmision, periodo, mesactual;
     public static SQLiteDatabase sqLiteDatabase;
 
     public Sucursal() {
@@ -41,14 +41,18 @@ public class Sucursal {
         this.SucursalPadreID = "";
         this.IdEstablecimiento=0;
         this.IdPuntoEmision =0;
+        this.periodo = 0;
+        this.mesactual = 0;
     }
 
     public boolean Guardar(){
         try {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
             sqLiteDatabase.execSQL("INSERT OR REPLACE INTO " +
-                    "sucursal(idsucursal, ruc, razonsocial, nombrecomercial, nombresucursal, direccion, codigoestablecimiento, puntoemision, ambiente, idestablecimiento, idpuntoemision) " +
-                    "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)", new String[]{this.IdSucursal, this.RUC, this.RazonSocial, this.NombreComercial, this.NombreSucursal, this.Direcion, this.CodigoEstablecimiento, this.PuntoEmision, this.Ambiente, this.IdEstablecimiento.toString() , this.IdPuntoEmision.toString()});
+                    "sucursal(idsucursal, ruc, razonsocial, nombrecomercial, nombresucursal, direccion, codigoestablecimiento, puntoemision, ambiente, idestablecimiento, idpuntoemision, periodo, mesactual) " +
+                    "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", new String[]{this.IdSucursal, this.RUC, this.RazonSocial, this.NombreComercial, this.NombreSucursal, this.Direcion, this.CodigoEstablecimiento,
+                    this.PuntoEmision, this.Ambiente, this.IdEstablecimiento.toString() , this.IdPuntoEmision.toString(),
+                    this.periodo.toString(), this.mesactual.toString()});
             sqLiteDatabase.close();
             return true;
         } catch (SQLException ex) {
@@ -96,6 +100,8 @@ public class Sucursal {
         Item.Ambiente = cursor.getString(8);
         Item.IdEstablecimiento = cursor.getInt(10);
         Item.IdPuntoEmision = cursor.getInt(11);
+        Item.periodo = cursor.getInt(12);
+        Item.mesactual = cursor.getInt(13);
         return Item;
     }
 
@@ -115,6 +121,8 @@ public class Sucursal {
                 Item.IdEstablecimiento = object.get("idestablecimiento").getAsInt();
                 Item.IdPuntoEmision = object.get("idpuntoemision").getAsInt();
                 Item.NombreSucursal = object.get("nombreestablecimiento").getAsString();
+                Item.periodo =  object.has("periodo")? object.get("periodo").getAsInt():0;
+                Item.mesactual =  object.has("mesactual")? object.get("mesactual").getAsInt():0;
                 Sucursal.Delete(Item.IdEstablecimiento);
                 if(Item.Guardar())
                     Item.actualizasecuencial(object.get("s01").getAsInt(), "01");

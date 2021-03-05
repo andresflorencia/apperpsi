@@ -301,7 +301,7 @@
                 android:layout_height="wrap_content"
                 android:textColorHint="@color/colorPrimaryDark">
                 <EditText
-                    android:id="@+id/tvObservación"
+                    android:id="@+id/tvObservacion"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:lines="2"

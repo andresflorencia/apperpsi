@@ -35,6 +35,7 @@ import com.florencia.erpapp.fragments.InfoItemDialogFragment;
 import com.florencia.erpapp.models.Cliente;
 import com.florencia.erpapp.models.DetalleComprobante;
 import com.florencia.erpapp.models.DetallePedido;
+import com.florencia.erpapp.models.DetallePedidoInv;
 import com.florencia.erpapp.models.Producto;
 import com.florencia.erpapp.utils.Utils;
 import com.shasin.notificationbanner.Banner;
@@ -47,8 +48,9 @@ import java.util.stream.Collectors;
 public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.ProductoViewHolder>{
     public List<Producto> listProductos;
     private List<Producto> orginalItems = new ArrayList<>();
-    public List<DetalleComprobante> productosSelected = new ArrayList<>();
-    public List<DetallePedido> productosSelectedP = new ArrayList<>();
+    public List<DetalleComprobante> productosSelected = new ArrayList<>(); //LISTA PARA COMPROBANTE
+    public List<DetallePedido> productosSelectedP = new ArrayList<>(); //LISTA PARA PEDIDO CLIENTE
+    public List<DetallePedidoInv> productosSelectedPI = new ArrayList<>(); //LISTA PARA PEDIDO INVENTARIO
     androidx.appcompat.widget.Toolbar toolbar;
     String tipobusqueda;
     ProductoBusquedaActivity activity;
@@ -89,6 +91,7 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.Produc
                 List<Producto> collect = orginalItems.stream()
                         .filter(i -> i.nombreproducto.toLowerCase()
                                 .concat(i.codigoproducto.toLowerCase())
+                                .concat(i.numerolote.toLowerCase())
                                 .contains(busqueda.toLowerCase()))
                         .collect(Collectors.<Producto>toList());
                 listProductos.addAll(collect);
@@ -96,6 +99,7 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.Produc
                 for(Producto i: orginalItems){
                     if(i.nombreproducto.toLowerCase()
                             .concat(i.codigoproducto.toLowerCase())
+                            .concat(i.numerolote.toLowerCase())
                             .contains(busqueda.toLowerCase()))
                         listProductos.add(i);
                 }
@@ -191,18 +195,35 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.Produc
                             }
                         }
                     }
-                }else if(tipobusqueda.equals("PC")){
+                }else if(tipobusqueda.equals("PC") || tipobusqueda.equals("PI")){
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        if (productosSelectedP.stream().filter(i -> i.producto.equals(producto)).
-                                collect(Collectors.toList()).size() > 0) {
-                            Banner.make(rootView,activity,Banner.WARNING,"Item ya seleccionado...", Banner.BOTTOM,2000).show();
-                            return;
+                        if(tipobusqueda.equals("PC")) {
+                            if (productosSelectedP.stream().filter(i -> i.producto.equals(producto)).
+                                    collect(Collectors.toList()).size() > 0) {
+                                Banner.make(rootView, activity, Banner.WARNING, "Item ya seleccionado...", Banner.BOTTOM, 2000).show();
+                                return;
+                            }
+                        }else if(tipobusqueda.equals("PI")){
+                            if (productosSelectedPI.stream().filter(i -> i.producto.equals(producto)).
+                                    collect(Collectors.toList()).size() > 0) {
+                                Banner.make(rootView, activity, Banner.WARNING, "Item ya seleccionado...", Banner.BOTTOM, 2000).show();
+                                return;
+                            }
                         }
                     } else {
-                        for (DetallePedido detalle : productosSelectedP) {
-                            if (detalle.producto.equals(producto)) {
-                                Banner.make(rootView,activity,Banner.WARNING, "Item ya seleccionado...",Banner.BOTTOM,2000).show();
-                                return;
+                        if(tipobusqueda.equals("PC")) {
+                            for (DetallePedido detalle : productosSelectedP) {
+                                if (detalle.producto.equals(producto)) {
+                                    Banner.make(rootView, activity, Banner.WARNING, "Item ya seleccionado...", Banner.BOTTOM, 2000).show();
+                                    return;
+                                }
+                            }
+                        }else if(tipobusqueda.equals("PI")){
+                            for (DetallePedidoInv detalle : productosSelectedPI) {
+                                if (detalle.producto.equals(producto)) {
+                                    Banner.make(rootView, activity, Banner.WARNING, "Item ya seleccionado...", Banner.BOTTOM, 2000).show();
+                                    return;
+                                }
                             }
                         }
                     }
@@ -263,6 +284,13 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.Produc
                                 midetalle.stock = producto.lotes.get(0).stock - cantidad;
                                 midetalle.fechavencimiento = producto.lotes.get(0).fechavencimiento;
                                 productosSelected.add(midetalle);
+                            }else if(tipobusqueda.equals("PI")){ //PEDIDO INVENTARIO
+                                DetallePedidoInv midetalle = new DetallePedidoInv();
+                                midetalle.producto = producto;
+                                midetalle.cantidadpedida = cantidad;
+                                midetalle.cantidadautorizada = cantidad;
+                                midetalle.stockactual = producto.stock;
+                                productosSelectedPI.add(midetalle);
                             }
                             toolbar.getMenu().findItem(R.id.option_select).setVisible(true);
                             Banner.make(rootView,activity,Banner.INFO,"Item agregado a la lista", Banner.BOTTOM,2000).show();

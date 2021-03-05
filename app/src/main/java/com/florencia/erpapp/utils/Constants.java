@@ -33,6 +33,7 @@ public class Constants {
     public static final String REGISTRO_CLIENTE = "pe/personas";
     public static final String RECEPCION_INVENTARIO = "in/recepcion";
     public static final String TRANSFERENCIA_INVENTARIO = "in/transferencia";
+    public static final String PEDIDO_INVENTARIO = "in/pedido";
 
     public static final String CLAVE_SEGURIDAD = "T3cn0l0g14_";
     public static final String URL_DOWNLOAD_APK = "downloadapk";

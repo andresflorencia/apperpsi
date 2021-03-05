@@ -20,9 +20,13 @@ import android.widget.Toast;
 import com.florencia.erpapp.MainActivity;
 import com.florencia.erpapp.R;
 import com.florencia.erpapp.interfaces.UsuarioInterface;
+import com.florencia.erpapp.models.Canton;
 import com.florencia.erpapp.models.Comprobante;
 import com.florencia.erpapp.models.Configuracion;
+import com.florencia.erpapp.models.Parroquia;
+import com.florencia.erpapp.models.PedidoInventario;
 import com.florencia.erpapp.models.Permiso;
+import com.florencia.erpapp.models.Provincia;
 import com.florencia.erpapp.models.Sucursal;
 import com.florencia.erpapp.models.Usuario;
 import com.florencia.erpapp.services.SQLite;
@@ -262,7 +266,7 @@ public class actLogin extends AppCompatActivity {
                                 if(usuario.Guardar()) {
                                     //ACTUALIZAR EL SECUENCIAL DE FACTURAS
                                     Comprobante comprobante;
-                                    if(Usuario.numDocNoSincronizados(usuario.IdUsuario, false) == 0) {
+                                    if(jsonUsuario.has("secuencial_fa") && Usuario.numDocNoSincronizados(usuario.IdUsuario, "01") == 0) {
                                         Integer secuencial_fa = jsonUsuario.get("secuencial_fa").getAsInt();
                                         comprobante = new Comprobante();
                                         comprobante.secuencial = secuencial_fa - 1;
@@ -273,8 +277,8 @@ public class actLogin extends AppCompatActivity {
                                         comprobante.actualizasecuencial();
                                     }
 
-                                    //ACTUALIZAR EL SECUENCIAL DE PEDIDOS
-                                    if(Usuario.numDocNoSincronizados(usuario.IdUsuario, true) == 0) {
+                                    //ACTUALIZAR EL SECUENCIAL DE PEDIDOS CLIENTE
+                                    if(jsonUsuario.has("secuencial_pe") && Usuario.numDocNoSincronizados(usuario.IdUsuario, "PC") == 0) {
                                         Integer secuencial_pe = jsonUsuario.get("secuencial_pe").getAsInt();
                                         comprobante = new Comprobante();
                                         comprobante.secuencial = secuencial_pe - 1;
@@ -284,6 +288,51 @@ public class actLogin extends AppCompatActivity {
                                         comprobante.tipotransaccion = "PC";
                                         comprobante.actualizasecuencial();
                                     }
+
+                                    //ACTUALIZAR EL SECUENCIAL DE PEDIDOS INVENTARIO
+                                    if(jsonUsuario.has("secuencial_pi") && Usuario.numDocNoSincronizados(usuario.IdUsuario, "PI") == 0) {
+                                        Integer secuencial_pi = jsonUsuario.get("secuencial_pi").getAsInt();
+                                        PedidoInventario pedidoinv = new PedidoInventario();
+                                        pedidoinv.secuencial = secuencial_pi - 1;
+                                        pedidoinv.establecimientoid = usuario.sucursal.IdEstablecimiento;
+                                        pedidoinv.tipotransaccion = "PI";
+                                        pedidoinv.actualizasecuencial();
+                                    }
+
+                                    List<Provincia> listProvincia = new ArrayList<>();
+                                    JsonArray jsonProvincias = obj.get("provincias").getAsJsonArray();
+                                    for (JsonElement ele : jsonProvincias) {
+                                        JsonObject prov = ele.getAsJsonObject();
+                                        Provincia miProvincia = new Provincia();
+                                        miProvincia.idprovincia = prov.get("idprovincia").getAsInt();
+                                        miProvincia.nombreprovincia = prov.get("nombreprovincia").getAsString();
+                                        listProvincia.add(miProvincia);
+                                    }
+                                    Provincia.SaveLista(listProvincia);
+
+                                    JsonArray jsonCantones = obj.get("cantones").getAsJsonArray();
+                                    List<Canton> cantones = new ArrayList<>();
+                                    for (JsonElement ele : jsonCantones) {
+                                        JsonObject prov = ele.getAsJsonObject();
+                                        Canton miCanton = new Canton();
+                                        miCanton.idcanton= prov.get("idcanton").getAsInt();
+                                        miCanton.nombrecanton= prov.get("nombrecanton").getAsString();
+                                        miCanton.provinciaid = prov.get("provinciaid").getAsInt();
+                                        cantones.add(miCanton);
+                                    }
+                                    Canton.SaveLista(cantones);
+
+                                    JsonArray jsonParroquias = obj.get("parroquias").getAsJsonArray();
+                                    List<Parroquia> parroquias = new ArrayList<>();
+                                    for (JsonElement ele : jsonParroquias) {
+                                        JsonObject prov = ele.getAsJsonObject();
+                                        Parroquia miParroquia = new Parroquia();
+                                        miParroquia.idparroquia= prov.get("idparroquia").getAsInt();
+                                        miParroquia.nombreparroquia= prov.get("nombreparroquia").getAsString();
+                                        miParroquia.cantonid= prov.get("cantonid").getAsInt();
+                                        parroquias.add(miParroquia);
+                                    }
+                                    Parroquia.SaveLista(parroquias);
 
                                     SQLite.usuario = usuario;
                                     SQLite.usuario.GuardarSesionLocal(context);

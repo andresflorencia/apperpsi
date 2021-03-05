@@ -15,7 +15,7 @@ public class DetalleComprobante {
     public Producto producto;
     public Double cantidad, precio, total;
     public String numerolote, fechavencimiento, codigoproducto, nombreproducto;
-    public Double stock, preciocosto, precioreferencia, valoriva, valorice, descuento;
+    public Double stock, preciocosto, precioreferencia, valoriva, valorice, descuento, marquetas;
 
     public static SQLiteDatabase sqLiteDatabase;
 
@@ -36,6 +36,7 @@ public class DetalleComprobante {
         this.descuento = 0d;
         this.codigoproducto = "";
         this.nombreproducto = "";
+        this.marquetas = 0d;
     }
 
     public Double Subtotal(){
@@ -107,6 +108,7 @@ public class DetalleComprobante {
             Item.descuento = cursor.getDouble(13);
             Item.codigoproducto = cursor.getString(14);
             Item.nombreproducto = cursor.getString(15);
+            Item.marquetas = cursor.getDouble(16);
             if(Item.producto == null){
                 Item.producto = new Producto();
                 Item.producto.codigoproducto = Item.codigoproducto;

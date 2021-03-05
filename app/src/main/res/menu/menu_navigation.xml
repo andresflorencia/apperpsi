@@ -15,12 +15,12 @@
         <item
             android:id="@+id/nav_factura"
             android:icon="@drawable/ic_document"
-            android:title="Comprobante"
+            android:title="Factura"
             android:titleCondensed="in/puntoventa"/>
         <item
             android:id="@+id/nav_pedido"
             android:icon="@drawable/ic_document"
-            android:title="Pedido"
+            android:title="Pedido Cliente"
             android:titleCondensed="cc/gestiondepedidos"/>
         <item
             android:id="@+id/nav_recepcion"
@@ -32,6 +32,11 @@
             android:icon="@drawable/ic_transferencia"
             android:title="Transferencia"
             android:titleCondensed="in/transferencia"/>
+        <item
+            android:id="@+id/nav_pedidoinv"
+            android:icon="@drawable/ic_recepcion"
+            android:title="Pedido Inventario"
+            android:titleCondensed="in/pedido"/>
         <item android:id="@+id/section_opciones"
             android:title="Opciones">
             <menu>

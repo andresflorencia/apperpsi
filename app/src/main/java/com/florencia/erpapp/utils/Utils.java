@@ -239,7 +239,7 @@ public class Utils {
     }
 
     public static Double RoundDecimal(Double numero, Integer numeroDecimales) {
-        return Math.round(numero * Math.pow(10, numeroDecimales)) / Math.pow(10, numeroDecimales);
+        return (double)Math.round(numero * Math.pow(10, numeroDecimales)) / Math.pow(10, numeroDecimales);
     }
 
     public static void verificarPermisos(Activity context){

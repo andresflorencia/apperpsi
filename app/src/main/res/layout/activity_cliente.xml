@@ -63,16 +63,21 @@
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:weightSum="3">
-                                <Spinner
-                                    android:id="@+id/spTipoDocumento"
+                                android:weightSum="2">
+                                <LinearLayout
                                     android:layout_width="0dp"
+                                    android:layout_weight="1"
                                     android:layout_height="match_parent"
-                                    android:layout_weight="1.5"
-                                    android:spinnerMode="dropdown"/>
+                                    android:background="@drawable/border_radius_spinner">
+                                    <Spinner
+                                        android:id="@+id/spTipoDocumento"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:spinnerMode="dropdown"/>
+                                </LinearLayout>
                                 <com.google.android.material.textfield.TextInputLayout
                                     android:layout_width="0dp"
-                                    android:layout_weight="1.5"
+                                    android:layout_weight="1"
                                     android:layout_height="wrap_content"
                                     android:hint="Identificación*"
                                     android:textColorHint="@color/texthint"
@@ -166,13 +171,79 @@
                                     android:id="@+id/btnObtenerDireccion"
                                     android:layout_weight="0.3"
                                     android:layout_width="0dp"
-                                    android:layout_height="40dp"
+                                    android:layout_height="45dp"
                                     android:text="GPS"
                                     android:src="@drawable/ic_location"
                                     android:background="@drawable/border_radius_spinner"
                                     android:layout_gravity="center"
                                     android:clickable="true"
                                     android:layout_marginLeft="2dp"/>
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:orientation="horizontal">
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_height="wrap_content"
+                                    android:text="Provincia"
+                                    android:textSize="12dp"
+                                    style="@style/EstiloText_Black2"/>
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_height="wrap_content"
+                                    android:text="Cantón"
+                                    android:textSize="12dp"
+                                    style="@style/EstiloText_Black2"/>
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_height="wrap_content"
+                                    android:text="Parroquia"
+                                    android:textSize="12dp"
+                                    style="@style/EstiloText_Black2"/>
+                            </LinearLayout>
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:layout_marginBottom="4dp">
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/border_radius_spinner"
+                                    android:layout_marginRight="2dp">
+                                    <Spinner
+                                        android:id="@+id/cbProvincia"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="35dp"/>
+                                </LinearLayout>
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/border_radius_spinner"
+                                    android:layout_marginRight="2dp">
+                                    <Spinner
+                                        android:id="@+id/cbCanton"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="35dp"/>
+                                </LinearLayout>
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/border_radius_spinner">
+                                    <Spinner
+                                        android:id="@+id/cbParroquia"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="35dp"/>
+                                </LinearLayout>
                             </LinearLayout>
 
                             <com.google.android.material.textfield.TextInputLayout

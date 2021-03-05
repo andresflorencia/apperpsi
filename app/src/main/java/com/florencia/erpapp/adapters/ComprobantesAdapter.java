@@ -19,10 +19,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.florencia.erpapp.R;
 import com.florencia.erpapp.activities.ComprobanteActivity;
 import com.florencia.erpapp.activities.PedidoActivity;
+import com.florencia.erpapp.activities.PedidoInventarioActivity;
 import com.florencia.erpapp.activities.RecepcionActivity;
 import com.florencia.erpapp.activities.TransferenciaActivity;
 import com.florencia.erpapp.models.Comprobante;
 import com.florencia.erpapp.models.Pedido;
+import com.florencia.erpapp.models.PedidoInventario;
 import com.florencia.erpapp.utils.Constants;
 import com.florencia.erpapp.utils.Utils;
 import com.makeramen.roundedimageview.RoundedImageView;
@@ -36,17 +38,20 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
 
     public List<Comprobante> listComprobantes;
     public List<Pedido> listPedidos;
+    public List<PedidoInventario> listPedidosInv;
     private List<Comprobante> orginalItems = new ArrayList<>();
     private List<Pedido> orginalItemsP = new ArrayList<>();
+    private List<PedidoInventario> orginalItemsPI = new ArrayList<>();
     Activity activity;
     String tipobusqueda;
     View rootView;
     Boolean retornar;
 
-    public ComprobantesAdapter(Activity activity, List<Comprobante> listComprobantes, List<Pedido> listPedidos, String tipobusqueda, Boolean retornar) {
+    public ComprobantesAdapter(Activity activity, List<Comprobante> listComprobantes, List<Pedido> listPedidos, List<PedidoInventario> listPedidosInv, String tipobusqueda, Boolean retornar) {
         this.activity = activity;
         this.listComprobantes= listComprobantes;
         this.listPedidos = listPedidos;
+        this.listPedidosInv = listPedidosInv;
         this.tipobusqueda = tipobusqueda;
         this.rootView = activity.findViewById(android.R.id.content);
         this.retornar = retornar;
@@ -59,6 +64,8 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
         }
         if(this.tipobusqueda.equals("PC") && this.listPedidos != null)
             this.orginalItemsP.addAll(this.listPedidos);
+        if(this.tipobusqueda.equals("PI") && this.listPedidosInv != null)
+            this.orginalItemsPI.addAll(this.listPedidosInv);
     }
 
     @NonNull
@@ -74,9 +81,11 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
         if(tipobusqueda.equals("01")
                 || tipobusqueda.equals("8,23") || tipobusqueda.equals("23,8")
                 || tipobusqueda.equals("4,20") || tipobusqueda.equals("20,4")) {
-            holder.bindComprobante(listComprobantes.get(position), null);
+            holder.bindComprobante(listComprobantes.get(position), null, null);
         }else if(tipobusqueda.equals("PC"))
-            holder.bindComprobante(null, listPedidos.get(position));
+            holder.bindComprobante(null, listPedidos.get(position), null);
+        else if(tipobusqueda.equals("PI"))
+            holder.bindComprobante(null, null, listPedidosInv.get(position));
     }
 
     @Override
@@ -88,6 +97,8 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
             size = listComprobantes.size();
         }else if(this.tipobusqueda.equals("PC"))
             size = listPedidos.size();
+        else if(this.tipobusqueda.equals("PI"))
+            size = listPedidosInv.size();
         return size;
     }
 
@@ -146,6 +157,29 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                     }
                 }
             }
+        }else if(this.tipobusqueda.equals("PI")){
+            listPedidosInv.clear();
+            if(busqueda.length()==0){
+                listPedidosInv.addAll(orginalItemsPI);
+            }else{
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    List<PedidoInventario> collect = orginalItemsPI.stream()
+                            .filter(i -> i.codigopedido.toLowerCase()
+                                    .concat(i.fecharegistro)
+                                    .concat(i.observacion.toLowerCase())
+                                    .contains(busqueda.toLowerCase()))
+                            .collect(Collectors.<PedidoInventario>toList());
+                    listPedidosInv.addAll(collect);
+                }else{
+                    for(PedidoInventario i: orginalItemsPI){
+                        if(i.codigopedido.toLowerCase()
+                                .concat(i.fecharegistro)
+                                .concat(i.observacion.toLowerCase())
+                                .contains(busqueda.toLowerCase()))
+                            listPedidosInv.add(i);
+                    }
+                }
+            }
         }
         notifyDataSetChanged();
     }
@@ -164,7 +198,7 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
             btnAnular = itemView.findViewById(R.id.btnAnular);
         }
 
-        void bindComprobante(final Comprobante comprobante, final Pedido pedido){
+        void bindComprobante(final Comprobante comprobante, final Pedido pedido, final PedidoInventario pedidoinv){
             try {
                 if (tipobusqueda.equals("01")) {
                     tvNombreCliente.setText(comprobante.cliente.nip + " - " + comprobante.cliente.razonsocial);
@@ -215,6 +249,26 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                     tvFecha.setText("F. Reg.: " + comprobante.fechacelular);
                     btnAnular.setVisibility(View.GONE);
                     itemView.setBackgroundResource(R.drawable.bg_btn_gps);
+                }else if (tipobusqueda.equals("PI")) { //PEDIDO INVENTARIO
+                    tvNombreCliente.setText("DOC: " + pedidoinv.codigopedido);
+                    tvNumeroComprobante.setText("Fecha: " + pedidoinv.fecharegistro);
+                    tvTotal.setText("Num Items: " + pedidoinv.detalle.size());
+                    btnAnular.setVisibility(View.GONE);
+                    if (pedidoinv.estadomovil == 1 && pedidoinv.codigosistema == 0) {
+                        btnAnular.setVisibility(View.VISIBLE);
+                        btnAnular.setImageResource(R.drawable.ic_delete2);
+                        btnAnular.setEnabled(true);
+                        tvFecha.setText("No sincronizado");
+                        tvFecha.setTextColor(activity.getResources().getColor(R.color.black_overlay));
+                        itemView.setBackgroundResource(R.drawable.bg_btn_red);
+                    } else {
+                        btnAnular.setVisibility(View.VISIBLE);
+                        btnAnular.setImageResource(R.drawable.ic_cloud_green);
+                        btnAnular.setEnabled(false);
+                        tvFecha.setText("Sincronizado");
+                        tvFecha.setTextColor(activity.getResources().getColor(R.color.colorSuccess));
+                        itemView.setBackgroundResource(R.drawable.bg_btn_green);
+                    }
                 }
             }catch (Exception e){
                 Log.d("TAGCOMPROBANTEADAPTER", "bindComprobante(): " + e.getMessage());
@@ -230,6 +284,8 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                         idcomprobante = listComprobantes.get(getAdapterPosition()).idcomprobante;
                     }else if(tipobusqueda.equals("PC"))
                         idcomprobante = listPedidos.get(getAdapterPosition()).idpedido;
+                    else if(tipobusqueda.equals("PI"))
+                        idcomprobante = listPedidosInv.get(getAdapterPosition()).idpedido;
 
                     if(retornar) {
                         activity.setResult(Activity.RESULT_OK, new Intent().putExtra("idcomprobante", idcomprobante));
@@ -250,6 +306,9 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                                 break;
                             case "PC":
                                 i = new Intent(activity, PedidoActivity.class);
+                                break;
+                            case "PI":
+                                i = new Intent(activity, PedidoInventarioActivity.class);
                                 break;
                         }
                         i.putExtra("idcomprobante", idcomprobante);
@@ -273,6 +332,9 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                             break;
                         case "PC":
                             secuencial = listPedidos.get(getAdapterPosition()).secuencialpedido;
+                            break;
+                        case "PI":
+                            secuencial = listPedidosInv.get(getAdapterPosition()).codigopedido;
                             break;
                     }
                     AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
@@ -308,6 +370,14 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                                         notifyDataSetChanged();
                                     }
                                     break;
+                                case "PI":
+                                    eliminado = PedidoInventario.Delete(listPedidosInv.get(getAdapterPosition()).idpedido, "", "", 0, false);
+                                    if(eliminado > 0){
+                                        numdoc = listPedidosInv.get(getAdapterPosition()).codigopedido;
+                                        listPedidosInv.remove(getAdapterPosition());
+                                        notifyDataSetChanged();
+                                    }
+                                    break;
                             }
 
                             if(eliminado > 0){
@@ -331,6 +401,8 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                         secuencial = listComprobantes.get(getAdapterPosition()).codigotransaccion;
                     else if(tipobusqueda.equals("PC"))
                             secuencial = listPedidos.get(getAdapterPosition()).secuencialpedido;
+                    else if(tipobusqueda.equals("PI"))
+                        secuencial = listPedidosInv.get(getAdapterPosition()).codigopedido;
                     AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
                     builder.setTitle("Anular documento " + secuencial);
                     builder.setMessage("¿Está seguro que desea anular este documento?\n" +
@@ -352,6 +424,11 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                                 id = listPedidos.get(getAdapterPosition()).idpedido;
                                 actualizado = Pedido.Update(id, values);
                                 listPedidos.remove(getAdapterPosition());
+                                notifyDataSetChanged();
+                            }else if(tipobusqueda.equals("PI")) {
+                                id = listPedidosInv.get(getAdapterPosition()).idpedido;
+                                actualizado = PedidoInventario.Update(id, values);
+                                listPedidosInv.remove(getAdapterPosition());
                                 notifyDataSetChanged();
                             }
 

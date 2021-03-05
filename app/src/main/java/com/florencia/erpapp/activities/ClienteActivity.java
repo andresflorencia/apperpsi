@@ -20,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -30,7 +31,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.florencia.erpapp.R;
+import com.florencia.erpapp.models.Canton;
 import com.florencia.erpapp.models.Cliente;
+import com.florencia.erpapp.models.Parroquia;
+import com.florencia.erpapp.models.Provincia;
 import com.florencia.erpapp.models.TipoIdentificacion;
 import com.florencia.erpapp.services.GPSTracker;
 import com.florencia.erpapp.services.SQLite;
@@ -40,16 +44,17 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.shasin.notificationbanner.Banner;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ClienteActivity extends AppCompatActivity implements View.OnFocusChangeListener, View.OnClickListener {
 
-    Spinner cbTipoDocumento;
+    Spinner cbTipoDocumento, cbProvincia, cbCanton, cbParroquia;;
     EditText txtNIP, txtRazonSocial, txtNombreComercial, txtLatitud, txtLongitud, txtDireccion,
             txtFono1, txtFono2, txtCorreo, txtObservacion;
     ImageButton btnObtenerDireccion;
     Cliente miCliente;
     View rootView;
-    boolean isReturn = false;
+    boolean isReturn = false, band = false;
 
     TextView lblMessage, lblTitle, lblInfoPersonal, lblInfoContacto;
     LinearLayout lyInfoPersonal, lyInfoContacto;
@@ -58,6 +63,11 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
     View viewSeparator;
     String tipoAccion="";
     Toolbar toolbar;
+    List<Provincia> provincias = new ArrayList<>();
+    List<Canton> cantones = new ArrayList<>();
+    List<Parroquia> parroquias = new ArrayList<>();
+    Provincia provActual = new Provincia();
+    Canton canActual = new Canton();
 
     public ClienteActivity(){}
 
@@ -96,6 +106,21 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
                                 miCliente = Cliente.get(nip);
 
                             if(miCliente != null){
+
+                                band = true;
+                                Parroquia miparroquia = Parroquia.get(miCliente.parroquiaid);
+                                canActual = Canton.get(miparroquia.cantonid);
+                                provActual = Provincia.get(canActual.provinciaid);
+
+                                for(Provincia miP:provincias){
+                                    if(provActual.idprovincia.equals(miP.idprovincia)){
+                                        cbProvincia.setSelection(provincias.indexOf(miP));
+                                        break;
+                                    }
+                                }
+                                LlenarComboCantones(provActual.idprovincia, canActual.idcanton);
+                                LlenarComboParroquias(canActual.idcanton, miparroquia.idparroquia);
+
                                 txtNIP.setTag(miCliente.idcliente);
                                 txtNIP.setText(miCliente.nip);
                                 txtRazonSocial.setText(miCliente.razonsocial);
@@ -174,6 +199,9 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
         lblInfoContacto = findViewById(R.id.lblInfoContacto);
         lyInfoPersonal = findViewById(R.id.lyInfoPersonal);
         lyInfoContacto = findViewById(R.id.lyInfoContacto);
+        cbProvincia = findViewById(R.id.cbProvincia);
+        cbCanton = findViewById(R.id.cbCanton);
+        cbParroquia = findViewById(R.id.cbParroquia);
         LlenarTipoNIP();
         txtNIP.setOnFocusChangeListener(this);
         btnObtenerDireccion.setOnClickListener(this::onClick);
@@ -187,6 +215,40 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
 
         ObtenerCoordenadas(false);
 
+        LlenarComboProvincias(0);
+        LlenarComboCantones(0,-1);
+        LlenarComboParroquias(0,-1);
+
+        cbProvincia.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if(cbProvincia.getAdapter()!=null) {
+                    Provincia provincia = ((Provincia)cbProvincia.getItemAtPosition(position));
+                    if(provincia.idprovincia!=provActual.idprovincia)
+                        band=false;
+                    if(!band)
+                        LlenarComboCantones(provincia.idprovincia,-1);
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        cbCanton.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if(cbCanton.getAdapter()!=null) {
+                    Canton canton = ((Canton)cbCanton.getItemAtPosition(position));
+                    if(!band)
+                        LlenarComboParroquias(canton.idcanton,-1);
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
     private void ObtenerCoordenadas(boolean alertar){
@@ -287,6 +349,7 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
             miCliente.usuarioid = SQLite.usuario.IdUsuario;
             miCliente.actualizado = 1;
             miCliente.establecimientoid = SQLite.usuario.sucursal.IdEstablecimiento;
+            miCliente.parroquiaid = ((Parroquia) cbParroquia.getSelectedItem()).idparroquia;
             if(miCliente.Save()) {
                 Banner.make(rootView, this, Banner.SUCCESS, Constants.MSG_DATOS_GUARDADOS, Banner.BOTTOM, 3000).show();
                 if(this.isReturn)
@@ -448,6 +511,70 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
             }
         }catch (Exception e){
             Log.d("TAGCLIENTE", "onFocusChange(): " + e.getMessage());
+        }
+    }
+
+    private void LlenarComboProvincias(Integer idprovincia){
+        try{
+            provincias = Provincia.getList();
+            ArrayAdapter<Provincia> adapterProvincia = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, provincias);
+            adapterProvincia.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            cbProvincia.setAdapter(adapterProvincia);
+            int position = 0;
+            for(int i=0; i<provincias.size(); i++){
+                if(provincias.get(i).idprovincia == idprovincia){
+                    position = i;
+                    break;
+                }
+            }
+            if(idprovincia>=0)
+                cbProvincia.setSelection(position,true);
+        }catch (Exception e){
+            Log.d("TAG_CLIENTEACT", "LlenarComboProvincias(): " +e.getMessage());
+        }
+    }
+
+    private void LlenarComboCantones(Integer idprovincia, Integer idcanton){
+        try{
+            cantones.clear();
+            cantones = Canton.getList(idprovincia);
+            ArrayAdapter<Canton> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, cantones);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            cbCanton.setAdapter(adapter);
+            int position = 0;
+            for(int i=0; i<cantones.size(); i++){
+                if(cantones.get(i).idcanton.equals(idcanton)){
+                    position = i;
+                    break;
+                }
+            }
+            if(idcanton>=0)
+                cbCanton.setSelection(position, true);
+        }catch (Exception e){
+            Log.d("TAG_CLIENTEACT", "LlenarComboCantones(): " +e.getMessage());
+        }
+    }
+
+    private void LlenarComboParroquias(Integer idcanton, Integer idparroquia){
+        try{
+            parroquias.clear();
+            parroquias = Parroquia.getList(idcanton);
+            ArrayAdapter<Parroquia> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, parroquias);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            cbParroquia.setAdapter(adapter);
+            int position = 0;
+            for(int i=0; i<parroquias.size(); i++){
+                if(parroquias.get(i).idparroquia.equals(idparroquia)){
+                    position = i;
+                    break;
+                }
+            }
+            if(idparroquia>=0) {
+                cbParroquia.setSelection(position, true);
+                //band = false;
+            }
+        }catch (Exception e){
+            Log.d("TAG_CLIENTEACT", "LlenarComboProvincias(): " +e.getMessage());
         }
     }
 }

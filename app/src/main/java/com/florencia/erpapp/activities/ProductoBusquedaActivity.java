@@ -93,6 +93,7 @@ public class ProductoBusquedaActivity extends AppCompatActivity implements Searc
                     switch (tipobusqueda) {
                         case "01":
                         case "PC":
+                        case "PI":
                             lstProductos = Producto.getAll(SQLite.usuario.sucursal.IdEstablecimiento);
                             break;
                         case "4,20":
@@ -157,6 +158,9 @@ public class ProductoBusquedaActivity extends AppCompatActivity implements Searc
                 }else if(tipobusqueda.equals("4,20") ||tipobusqueda.equals("20,4")){
                     TransferenciaActivity.productBusqueda.clear();
                     TransferenciaActivity.productBusqueda.addAll(productoAdapter.productosSelected);
+                }else if(tipobusqueda.equals("PI")){
+                    PedidoInventarioActivity.productBusqueda.clear();
+                    PedidoInventarioActivity.productBusqueda.addAll(productoAdapter.productosSelectedPI);
                 }
                 setResult(RESULT_OK);
                 finish();

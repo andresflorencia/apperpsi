@@ -22,6 +22,7 @@
                 android:layout_height="wrap_content"
                 android:text="DOCUMENTO"
                 style="@android:style/TextAppearance.Material.Title"
+                android:textSize="17sp"
                 android:textColor="@color/colorDate"
                 android:textAlignment="center"/>
             <LinearLayout
