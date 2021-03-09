@@ -8,9 +8,12 @@
         android:title="Sincronizar Clientes"
         app:showAsAction="never" />
     <item android:id="@+id/option_sincronizacomprobantes"
-        android:title="Sincronizar Comprobantes"
+        android:title="Sincronizar Facturas"
         app:showAsAction="never" />
     <item android:id="@+id/option_sincronizapedidos"
-        android:title="Sincronizar Pedidos"
+        android:title="Sincronizar Pedidos Cliente"
+        app:showAsAction="never" />
+    <item android:id="@+id/option_sincronizapedidos_inv"
+        android:title="Sincronizar Pedidos Inventario"
         app:showAsAction="never" />
 </menu>

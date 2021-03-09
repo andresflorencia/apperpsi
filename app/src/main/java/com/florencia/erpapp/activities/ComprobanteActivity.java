@@ -101,7 +101,7 @@ public class ComprobanteActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(true);
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         rootView = findViewById(android.R.id.content);
-        toolbar.setTitle("Nuevo comprobante");
+        toolbar.setTitle("Nueva factura");
         init();
 
         txtCliente.setOnKeyListener(new View.OnKeyListener() {
@@ -128,7 +128,9 @@ public class ComprobanteActivity extends AppCompatActivity {
                         cliente = Cliente.get(0);
                         if(cliente == null)
                             cliente = Cliente.get("9999999999999");
+                        detalleAdapter.categoria = "A";
                         detalleAdapter.CambiarPrecio("A");
+                        detalleAdapter.notifyDataSetChanged();
                         return true;
                     }else if(event.getRawX() <= txtCliente.getTotalPaddingLeft()
                             && cliente.idcliente>0 && !cliente.nip.contains("999999999")){
@@ -194,7 +196,7 @@ public class ComprobanteActivity extends AppCompatActivity {
 
     private void init(){
         pgCargando = new ProgressDialog(this);
-        pgCargando.setTitle("Cargando comprobante");
+        pgCargando.setTitle("Cargando factura");
         pgCargando.setMessage("Espere un momento...");
         pgCargando.setCancelable(false);
 
@@ -321,8 +323,9 @@ public class ComprobanteActivity extends AppCompatActivity {
                                 comprobante.getTotal();
                                 detalleAdapter.notifyDataSetChanged();
                                 setSubtotales(comprobante.total, comprobante.subtotal, comprobante.subtotaliva);
+                                lblLeyendaCF.setVisibility(View.GONE);
                             } else {
-                                Banner.make(rootView, ComprobanteActivity.this,Banner.ERROR,"Ocurrió un error al obtener los datos para este comprobante.", Banner.BOTTOM, 3500).show();
+                                Banner.make(rootView, ComprobanteActivity.this,Banner.ERROR,"Ocurrió un error al obtener los datos para esta factura.", Banner.BOTTOM, 3500).show();
                             }
                             pgCargando.dismiss();
                         }
@@ -356,7 +359,7 @@ public class ComprobanteActivity extends AppCompatActivity {
         switch (item.getItemId()){
             case R.id.option_save:
                 if(!SQLite.usuario.VerificaPermiso(this,Constants.PUNTO_VENTA, "escritura")){
-                    Banner.make(rootView,ComprobanteActivity.this,Banner.ERROR,"No tiene permisos para registrar comprobantes.", Banner.BOTTOM, 3000).show();
+                    Banner.make(rootView,ComprobanteActivity.this,Banner.ERROR,"No tiene permisos para registrar facturas.", Banner.BOTTOM, 3000).show();
                     break;
                 }
                 if(detalleAdapter.detalleComprobante.size()==0) {
@@ -367,11 +370,11 @@ public class ComprobanteActivity extends AppCompatActivity {
                 View view = LayoutInflater.from(this).inflate(R.layout.layout_confirmation_dialog,
                         (ConstraintLayout) findViewById(R.id.lyDialogContainer));
                 builder.setView(view);
-                ((TextView)view.findViewById(R.id.lblTitle)).setText("Guardar comprobante");
-                ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Está seguro que desea guardar este comprobante?");
+                ((TextView)view.findViewById(R.id.lblTitle)).setText("Guardar factura");
+                ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Está seguro que desea guardar esta factura?");
                 ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_save);
-                ((Button)view.findViewById(R.id.btnCancel)).setText("Cancelar");
-                ((Button)view.findViewById(R.id.btnConfirm)).setText("Si");
+                ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
+                ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
                 final AlertDialog alertDialog = builder.create();
                 view.findViewById(R.id.btnConfirm).setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -565,7 +568,7 @@ public class ComprobanteActivity extends AppCompatActivity {
                         startActivityForResult(BTIntent, DeviceList.REQUEST_CONNECT_BT);
                         return;
                     }else {
-                        imprimirFactura(idcomprobante==0?"* ORIGINAL CLIENTE *":"* REIMPRESIÓN DE COMPROBANTE *", idcomprobante>0);
+                        imprimirFactura(idcomprobante==0?"* ORIGINAL CLIENTE *":"* REIMPRESIÓN DE FACTURA *", idcomprobante>0);
                     }
                     alertDialog.dismiss();
                 }
@@ -590,7 +593,7 @@ public class ComprobanteActivity extends AppCompatActivity {
 
     private void LimpiarDatos() {
         try{
-            toolbar.setTitle("Nuevo comprobante");
+            toolbar.setTitle("Nueva factura");
             toolbar.setSubtitle("");
             comprobante = new Comprobante();
             cliente = new Cliente();
@@ -607,6 +610,7 @@ public class ComprobanteActivity extends AppCompatActivity {
             detalleAdapter.notifyDataSetChanged();
             lyBotones.setVisibility(View.VISIBLE);
             idcomprobante = 0;
+            lblLeyendaCF.setVisibility(View.VISIBLE);
         }catch (Exception e){
             Log.d("TAGCOMPROBANTE_ACT", "LimpiarDatos(): " + e.getMessage());
         }
@@ -777,7 +781,7 @@ public class ComprobanteActivity extends AppCompatActivity {
                         btsocket = DeviceList.getSocket();
                         if(btsocket!=null) {
                             Utils.showMessageShort(this,"Imprimiendo comprobante");
-                            imprimirFactura(idcomprobante==0?"* ORIGINAL CLIENTE *": "* REIMPRESIÓN DE COMPROBANTE *",
+                            imprimirFactura(idcomprobante==0?"* ORIGINAL CLIENTE *": "* REIMPRESIÓN DE FACTURA *",
                                     idcomprobante>0);
                             Log.d("TAGIMPRIMIR2", "IMPRESORA SELECCIONADA");
                         }
@@ -806,7 +810,7 @@ public class ComprobanteActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.appbar);
-        toolbar.setTitle("Nuevo comprobante");
+        toolbar.setTitle("Nueva factura");
         toolbar.setTitleTextColor(Color.WHITE);
         toolbar.setSubtitleTextColor(Color.WHITE);
         toolbar.setBackgroundColor(getResources().getColor(R.color.black_overlay));
@@ -822,7 +826,7 @@ public class ComprobanteActivity extends AppCompatActivity {
                     (ConstraintLayout) findViewById(R.id.lyDialogContainer));
             builder.setView(view);
             ((TextView)view.findViewById(R.id.lblTitle)).setText("Cerrar");
-            ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Desea salir de la ventana de comprobante?");
+            ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Desea salir de la ventana de facturación?");
             ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_check_white);
             ((Button)view.findViewById(R.id.btnCancel)).setText("Cancelar");
             ((Button)view.findViewById(R.id.btnConfirm)).setText("Si");

@@ -124,6 +124,7 @@ public class PedidoActivity extends AppCompatActivity {
                     if(event.getRawX() >= txtCliente.getRight() - txtCliente.getTotalPaddingRight()) {
                         txtCliente.setText("");
                         cliente = new Cliente();
+                        detalleAdapter.categoria = "A";
                         detalleAdapter.CambiarPrecio("A");
                         return true;
                     }else if(event.getRawX() <= txtCliente.getTotalPaddingLeft()

@@ -350,8 +350,15 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
             miCliente.actualizado = 1;
             miCliente.establecimientoid = SQLite.usuario.sucursal.IdEstablecimiento;
             miCliente.parroquiaid = ((Parroquia) cbParroquia.getSelectedItem()).idparroquia;
+            if(miCliente.idcliente == 0) {
+                miCliente.fecharegistro = Utils.getDateFormat("yyyy-MM-dd HH:mm:ss");
+                miCliente.longdater = Utils.longDate(Utils.getDateFormat("yyyy-MM-dd"));
+            }
+            miCliente.fechamodificacion = Utils.getDateFormat("yyyy-MM-dd HH:mm:ss");
+            miCliente.longdatem = Utils.longDate(Utils.getDateFormat("yyyy-MM-dd"));
             if(miCliente.Save()) {
-                Banner.make(rootView, this, Banner.SUCCESS, Constants.MSG_DATOS_GUARDADOS, Banner.BOTTOM, 3000).show();
+                Utils.showMessageShort(this, Constants.MSG_DATOS_GUARDADOS);
+                //Banner.make(rootView, this, Banner.SUCCESS, Constants.MSG_DATOS_GUARDADOS, Banner.BOTTOM, 3000).show();
                 if(this.isReturn)
                     setResult(Activity.RESULT_OK,new Intent().putExtra("idcliente",miCliente.idcliente));
                 finish();

@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".activities.ClienteBusquedaActivity">
+    tools:context=".activities.ClienteBusquedaActivity"
+    android:background="@color/colorGrayLight2">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -37,7 +38,7 @@
             android:id="@+id/svBusqueda"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:queryHint="Buscar producto"
+            app:queryHint="Filtrar"
             app:iconifiedByDefault="false"
             android:background="@drawable/border1"
             android:layout_margin="5dp"/>

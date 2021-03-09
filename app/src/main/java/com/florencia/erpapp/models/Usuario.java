@@ -232,6 +232,15 @@ public class Usuario {
                         "from pedidoinv pe where pe.estadomovil >= 0 and fechahora like '"+fecha+"%' and usuarioid = " + SQLite.usuario.IdUsuario;
             }
 
+            if(SQLite.usuario.VerificaPermiso(ctx, Constants.REGISTRO_CLIENTE, "lectura")){
+                if(query.length()>0) query += " UNION";
+                query += " select 'CLIENTES'," +
+                        "(select count(*) from cliente where usuarioid = "+SQLite.usuario.IdUsuario+" and fecharegistro like '"+fecha+"%')," +
+                        "count(*)," +
+                        "(select count(*) from cliente where usuarioid = "+SQLite.usuario.IdUsuario+" and fechamodificacion like '"+fecha+"%' and actualizado = 1) " +
+                        "from cliente where usuarioid = " + SQLite.usuario.IdUsuario + " and nip not like '999999999%'";
+            }
+
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
             Cursor cursor = sqLiteDatabase.rawQuery(query, null);
             if (cursor.moveToFirst()) {

@@ -2,6 +2,7 @@ package com.florencia.erpapp.adapters;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,15 +11,19 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.florencia.erpapp.MainActivity;
 import com.florencia.erpapp.R;
+import com.florencia.erpapp.activities.ClienteActivity;
 import com.florencia.erpapp.activities.ComprobanteActivity;
 import com.florencia.erpapp.activities.ListaComprobantesActivity;
 import com.florencia.erpapp.activities.PedidoActivity;
 import com.florencia.erpapp.activities.PedidoInventarioActivity;
 import com.florencia.erpapp.activities.RecepcionActivity;
 import com.florencia.erpapp.activities.TransferenciaActivity;
+import com.florencia.erpapp.fragments.ClienteFragment;
 import com.florencia.erpapp.utils.Utils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -75,8 +80,14 @@ public class ResumenAdapter extends RecyclerView.Adapter<ResumenAdapter.ResumenV
 
         void bindResumen(final JsonObject jDocumento){
             tvDocumento.setText(jDocumento.get("documento").getAsString());
-            tvCantidad.setText(jDocumento.get("cantidad").getAsString());
-            tvTotal.setText(jDocumento.get("total").getAsDouble()==0?"":"Total: " + Utils.FormatoMoneda(jDocumento.get("total").getAsDouble(),2));
+            if(jDocumento.get("documento").getAsString().equalsIgnoreCase("CLIENTES"))
+                tvCantidad.setText(jDocumento.get("cantidad").getAsInt() + "/" + jDocumento.get("total").getAsInt());
+            else
+                tvCantidad.setText(jDocumento.get("cantidad").getAsString());
+            if(jDocumento.get("documento").getAsString().equalsIgnoreCase("CLIENTES"))
+                tvTotal.setText("Nuevos/Totales");
+            else
+                tvTotal.setText(jDocumento.get("total").getAsDouble()==0?"":"Total: " + Utils.FormatoMoneda(jDocumento.get("total").getAsDouble(),2));
 
             tvCantidadNS.setText(jDocumento.get("cantidadns").getAsString());
             if(jDocumento.get("cantidadns").getAsInt()>0)
@@ -89,29 +100,29 @@ public class ResumenAdapter extends RecyclerView.Adapter<ResumenAdapter.ResumenV
                 public void onClick(View v) {
                     JsonObject miDoc = jDatos.get(getAdapterPosition()).getAsJsonObject();
                     if(miDoc!=null){
-                        Intent i;
+                        Intent i = null;
                         switch (miDoc.get("documento").getAsString()){
                             case "FACTURAS":
                                 i = new Intent(activity, ComprobanteActivity.class);
-                                activity.startActivity(i);
                                 break;
                             case "PEDIDOS CLIENTE":
                                 i = new Intent(activity, PedidoActivity.class);
-                                activity.startActivity(i);
                                 break;
                             case "RECEPCIONES":
                                 i = new Intent(activity, RecepcionActivity.class);
-                                activity.startActivity(i);
                                 break;
                             case "TRANSFERENCIAS":
                                 i = new Intent(activity, TransferenciaActivity.class);
-                                activity.startActivity(i);
                                 break;
                             case "PEDIDOS INVENTARIO":
                                 i = new Intent(activity, PedidoInventarioActivity.class);
-                                activity.startActivity(i);
+                                break;
+                            case "CLIENTES":
+                                i = new Intent(activity, ClienteActivity.class);
                                 break;
                         }
+                        if(i != null)
+                            activity.startActivity(i);
                     }
                 }
             });
@@ -121,7 +132,8 @@ public class ResumenAdapter extends RecyclerView.Adapter<ResumenAdapter.ResumenV
                 public void onClick(View v) {
                     JsonObject miDoc = jDatos.get(getAdapterPosition()).getAsJsonObject();
                     if(miDoc!=null){
-                        if(miDoc.get("cantidad").getAsInt() == 0){
+                        if(!miDoc.get("documento").getAsString().equalsIgnoreCase("CLIENTES")
+                                && miDoc.get("cantidad").getAsInt() == 0){
                             String[] fecA = fecha.split("-");
                             Banner.make(rootView, activity, Banner.INFO,
                                     "No existen " + miDoc.get("documento").getAsString() + " para la fecha: "
@@ -151,7 +163,12 @@ public class ResumenAdapter extends RecyclerView.Adapter<ResumenAdapter.ResumenV
                                 i.putExtra("tipobusqueda","PI");
                                 break;
                         }
-                        activity.startActivity(i);
+                        if(miDoc.get("documento").getAsString().equalsIgnoreCase("CLIENTES")){
+                            ((MainActivity)activity).fragment = new ClienteFragment(miDoc.get("cantidad").getAsInt()==0?"":fecha);
+                            //Log.d("TAG", ((MainActivity)activity).fragment.getClass().getName());
+                            ((MainActivity)activity).agregaFragment(((MainActivity)activity).fragment.getClass().getName());
+                        }else
+                            activity.startActivity(i);
                     }
                 }
             });

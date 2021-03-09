@@ -47,6 +47,7 @@ import com.florencia.erpapp.interfaces.ProductoInterface;
 import com.florencia.erpapp.models.Cliente;
 import com.florencia.erpapp.models.Comprobante;
 import com.florencia.erpapp.models.Pedido;
+import com.florencia.erpapp.models.PedidoInventario;
 import com.florencia.erpapp.models.Permiso;
 import com.florencia.erpapp.models.Producto;
 import com.florencia.erpapp.services.GPSTracker;
@@ -80,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
 
     Toolbar toolbar;
     private DrawerLayout drawerLayout;
-    Fragment fragment;
+    public Fragment fragment;
     private FragmentTransaction fragmentTransaction;
     private FragmentManager fragmentManager;
     public static List<String> listaFragments = new ArrayList<String>();
@@ -144,6 +145,7 @@ public class MainActivity extends AppCompatActivity {
         fragmentManager = getSupportFragmentManager();
         fragment = new PrincipalFragment();
         String backStateName = fragment.getClass().getName();
+        //agregaFragment(backStateName);
         fragment.setArguments(getIntent().getExtras());
         fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.fragment, fragment)
@@ -162,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
             SQLite.gpsTracker = new GPSTracker(this);
     }
 
-    private void agregaFragment(String backStateName){
+    public void agregaFragment(String backStateName){
         fragment.setArguments(getIntent().getExtras());
         fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.fragment, fragment)
@@ -291,13 +293,11 @@ public class MainActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_options, menu);
         menu.findItem(R.id.option_sincronizacomprobantes)
-                .setVisible(
-                        SQLite.usuario.VerificaPermiso(this,Constants.PUNTO_VENTA,"escritura")
-                );
+                .setVisible(SQLite.usuario.VerificaPermiso(this,Constants.PUNTO_VENTA,"escritura"));
         menu.findItem(R.id.option_sincronizapedidos)
-                .setVisible(
-                        SQLite.usuario.VerificaPermiso(this,Constants.PEDIDO,"escritura")
-                );
+                .setVisible(SQLite.usuario.VerificaPermiso(this,Constants.PEDIDO,"escritura"));
+        menu.findItem(R.id.option_sincronizapedidos_inv)
+                .setVisible(SQLite.usuario.VerificaPermiso(this,Constants.PEDIDO_INVENTARIO,"escritura"));
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -316,6 +316,9 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.option_sincronizapedidos:
                 sincronizaPedidos(getApplicationContext());
+                break;
+            case R.id.option_sincronizapedidos_inv:
+                sincronizaPedidos_Inv(getApplicationContext());
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -400,6 +403,8 @@ public class MainActivity extends AppCompatActivity {
                                         miCliente.observacion = clie.get("observacion").isJsonNull()?"":clie.get("observacion").getAsString();
                                         miCliente.ruc = clie.get("ruc").isJsonNull()?"":clie.get("ruc").getAsString();
                                         miCliente.parroquiaid = clie.get("parroquiaid").isJsonNull()?0:clie.get("parroquiaid").getAsInt();
+                                        miCliente.fecharegistro = clie.has("fechareg")?clie.get("fechareg").getAsString():"";
+                                        miCliente.longdater = Utils.longDate(miCliente.fecharegistro);
 
                                         if(miCliente.Save() || miCliente.nip.equals("9999999999999"))
                                             numClientUpdate++;
@@ -411,15 +416,20 @@ public class MainActivity extends AppCompatActivity {
                                             if (fragments != null) {
                                                 for (Fragment f : fragments) {
                                                     Log.d("TAGMAIN", "Fls: " + f.getClass().getSimpleName());
-                                                    if (f.getClass().getSimpleName().equalsIgnoreCase("clientefragment")) {
+                                                    if (f.getClass().getSimpleName().equalsIgnoreCase("clientefragment") && f.isVisible()) {
+                                                        fragment = f;
+                                                        break;
+                                                    }else if (f.getClass().getSimpleName().equalsIgnoreCase("principalfragment") && f.isVisible()) {
                                                         fragment = f;
                                                         break;
                                                     }
                                                 }
                                             }
                                             if (fragment != null) {
-                                                if (fragment.getClass().getSimpleName().equalsIgnoreCase("clientefragment"))
+                                                if (fragment.getClass().getSimpleName().equalsIgnoreCase("clientefragment") && fragment.isVisible())
                                                     ((ClienteFragment) fragment).CargarDatos(false);
+                                                else if (fragment.getClass().getSimpleName().equalsIgnoreCase("principalfragment") && fragment.isVisible())
+                                                    ((PrincipalFragment) fragment).BuscaResumen("");
                                             }
                                         }catch (Exception e){
                                             Log.d("TAGMAIN", e.getMessage());
@@ -534,7 +544,7 @@ public class MainActivity extends AppCompatActivity {
                                         if (fragments != null) {
                                             for (Fragment f : fragments) {
                                                 Log.d("TAGMAIN", "Fls: " + f.getClass().getSimpleName());
-                                                if(f.getClass().getSimpleName().equalsIgnoreCase("principalfragment")) {
+                                                if(f.getClass().getSimpleName().equalsIgnoreCase("principalfragment") && f.isVisible()) {
                                                     fragment = f;
                                                     break;
                                                 }
@@ -672,7 +682,7 @@ public class MainActivity extends AppCompatActivity {
                                             if (fragments != null) {
                                                 for (Fragment f : fragments) {
                                                     Log.d("TAGMAIN", "Fls: " + f.getClass().getSimpleName());
-                                                    if(f.getClass().getSimpleName().equalsIgnoreCase("principalfragment")) {
+                                                    if(f.getClass().getSimpleName().equalsIgnoreCase("principalfragment") && f.isVisible()) {
                                                         fragment = f;
                                                         break;
                                                     }
@@ -825,6 +835,139 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
             Log.d("TAG", e.getMessage());
             Utils.showErrorDialog(this,"Error",e.getMessage());
+            pbProgreso.dismiss();
+        }
+    }
+
+    private void sincronizaPedidos_Inv(final Context context) {
+        try{
+            if(!Utils.isOnlineNet(SQLite.configuracion.urlbase)) {
+                Banner.make(rootView, this,Banner.ERROR, Constants.MSG_COMPROBAR_CONEXION_INTERNET, Banner.BOTTOM,3000).show();
+                return;
+            }
+
+            List<PedidoInventario> listPedidos = PedidoInventario.getPorSincronizar(SQLite.usuario.IdUsuario);
+            if(listPedidos == null)
+                listPedidos = new ArrayList<>();
+
+            if(listPedidos.size() == 0 ){
+                Banner.make(rootView,this, Banner.INFO,"No hay pedidos por sincronizar.", Banner.BOTTOM,2000).show();
+                return;
+            }
+
+            pbProgreso.setTitle("Sincronizando pedidos");
+            pbProgreso.setMessage("Espere un momento...");
+            pbProgreso.setCancelable(false);
+            pbProgreso.show();
+
+            Gson gson = new GsonBuilder()
+                    .setLenient()
+                    .create();
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(SQLite.configuracion.url_ws)
+                    .addConverterFactory(GsonConverterFactory.create(gson))
+                    .client(okHttpClient)
+                    .build();
+            ComprobanteInterface miInterface = retrofit.create(ComprobanteInterface.class);
+
+            Map<String,Object> post = new HashMap<>();
+            post.put("usuario",SQLite.usuario.Usuario);
+            post.put("clave",SQLite.usuario.Clave);
+            post.put("pedidos", listPedidos);
+            post.put("periodo", SQLite.usuario.sucursal.periodo.toString() + SQLite.usuario.sucursal.mesactual);
+            post.put("codigoestablecimiento", SQLite.usuario.sucursal.IdSucursal);
+            Call<JsonObject> call = miInterface.LoadPedidosInv(post);
+            call.enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    if(!response.isSuccessful()){
+                        Banner.make(rootView,MainActivity.this,Banner.ERROR,"Código: " + response.code() + " - " + response.message(), Banner.BOTTOM,3000).show();
+                        pbProgreso.dismiss();
+                        return;
+                    }
+                    try {
+
+                        if (response.body() != null) {
+                            JsonObject obj = response.body();
+                            if (!obj.get("haserror").getAsBoolean()) {
+                                JsonArray jsonPedidosUpdate = obj.getAsJsonArray("pedidosupdate");
+                                if(jsonPedidosUpdate!=null){
+                                    int numUpdate = 0;
+                                    ContentValues values;
+                                    for(JsonElement ele:jsonPedidosUpdate){
+                                        JsonObject upd = ele.getAsJsonObject();
+
+                                        values = new ContentValues();
+                                        values.put("codigosistema", upd.get("codigosistema_pedido").getAsInt());
+                                        values.put("estadomovil", upd.get("codigosistema_pedido").getAsInt());
+                                        if(PedidoInventario.Update(upd.get("idpedido").getAsInt(), values))
+                                            numUpdate++;
+                                    }
+
+                                    if(obj.has("secuencial_pi")){
+                                        Integer secuencial_pi = obj.get("secuencial_pi").getAsInt();
+                                        PedidoInventario pedido = new PedidoInventario();
+                                        pedido.secuencial = secuencial_pi;
+                                        pedido.establecimientoid = SQLite.usuario.sucursal.IdEstablecimiento;
+                                        pedido.tipotransaccion = "PI";
+                                        pedido.actualizasecuencial();
+                                    }
+                                    if(numUpdate == jsonPedidosUpdate.size()) {
+                                        Banner.make(rootView,MainActivity.this,Banner.SUCCESS, Constants.MSG_PROCESO_COMPLETADO
+                                                + "\nSe sincronizó " + numUpdate + " pedido(s)."
+                                                + "\n" + obj.get("message").getAsString(), Banner.BOTTOM, 3000).show();
+
+                                        try {
+                                            List<Fragment> fragments = fragmentManager.getFragments();
+                                            if (fragments != null) {
+                                                for (Fragment f : fragments) {
+                                                    Log.d("TAGMAIN", "Fls: " + f.getClass().getSimpleName());
+                                                    if(f.getClass().getSimpleName().equalsIgnoreCase("principalfragment") && f.isVisible()) {
+                                                        fragment = f;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                            if(fragment!=null) {
+                                                Log.d("TAGMAIN1", fragment.getClass().getSimpleName());
+                                                if (fragment.getClass().getSimpleName().equalsIgnoreCase("principalfragment") ||
+                                                        (listaFragments.size() > 0 && listaFragments.get(listaFragments.size() - 1).toLowerCase().contains("principalfragment"))) {
+                                                    ((PrincipalFragment) fragment).BuscaResumen("");
+                                                }
+                                            }
+                                        }catch (Exception e){
+                                            Log.d("TAGMAIN", e.getMessage());
+                                        }
+                                    }else {
+                                        Banner.make(rootView, MainActivity.this, Banner.SUCCESS, Constants.MSG_PROCESO_NO_COMPLETADO
+                                                + "\nSe sincronizó " + numUpdate + "/" + jsonPedidosUpdate.size() + " pedido(s)."
+                                                + "\n" + obj.get("message").getAsString(), Banner.BOTTOM,3500).show();
+                                    }
+                                }
+
+                            } else
+                                Utils.showErrorDialog(MainActivity.this,"Error", obj.get("message").getAsString());
+                        } else {
+                            Banner.make(rootView,MainActivity.this,Banner.ERROR, Constants.MSG_USUARIO_CLAVE_INCORRECTO, Banner.BOTTOM,3000).show();
+                        }
+                    }catch (JsonParseException ex){
+                        Log.d("TAG", ex.getMessage());
+                    }
+                    pbProgreso.dismiss();
+                }
+
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    Utils.showErrorDialog(MainActivity.this,"Error",t.getMessage());
+                    Log.d("TAG", t.getMessage());
+                    pbProgreso.dismiss();
+                }
+            });
+        }catch (Exception e){
+            e.printStackTrace();
+            Log.d("TAG", e.getMessage());
+            Utils.showErrorDialog(this, "Error",e.getMessage());
             pbProgreso.dismiss();
         }
     }

@@ -73,7 +73,7 @@ public class ClienteBusquedaActivity extends AppCompatActivity implements Search
 
     private void CargarDatos(){
         try {
-            listClientes = Cliente.getClientes(SQLite.usuario.IdUsuario);
+            listClientes = Cliente.getClientes(SQLite.usuario.IdUsuario, "");
             if (listClientes == null || listClientes.size() == 0) {
                 imgFondo.setVisibility(View.VISIBLE);
                 lyContainer.setVisibility(View.GONE);

@@ -231,6 +231,7 @@ public class PedidoInventarioActivity extends AppCompatActivity implements View.
             productBusqueda.clear();
             detalleAdapter.notifyDataSetChanged();
             tvObservacion.setText("");
+            tvObservacion.setEnabled(true);
             btnBuscaProducto.setVisibility(View.VISIBLE);
             cvInformacion.setVisibility(View.GONE);
             idpedido = 0;
@@ -306,7 +307,9 @@ public class PedidoInventarioActivity extends AppCompatActivity implements View.
                         public void run() {
                             if (pedido != null) {
                                 toolbar.setTitle(pedido.codigopedido);
+                                toolbar.setSubtitle("");
                                 cvInformacion.setVisibility(View.VISIBLE);
+                                btnBuscaProducto.setVisibility(View.GONE);
                                 lblCodDocumento.setText(pedido.codigopedido);
                                 lblFechaReg.setText(pedido.fecharegistro);
                                 lblEstado.setText(pedido.estadomovil == 1?"No sincronizado":"Sincronizado");
@@ -318,6 +321,7 @@ public class PedidoInventarioActivity extends AppCompatActivity implements View.
                                 detalleAdapter.detallePedido.addAll(pedido.detalle);
                                 detalleAdapter.notifyDataSetChanged();
                                 tvObservacion.setText(pedido.observacion);
+                                tvObservacion.setEnabled(false);
                             } else {
                                 Banner.make(rootView,PedidoInventarioActivity.this, Banner.ERROR,"Ocurrió un error al obtener los datos para este pedido.", Banner.BOTTOM, 3000).show();
                             }

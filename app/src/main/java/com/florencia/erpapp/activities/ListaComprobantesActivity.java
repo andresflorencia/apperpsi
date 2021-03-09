@@ -301,6 +301,13 @@ public class ListaComprobantesActivity extends AppCompatActivity implements Sear
                                 comprobanteAdapter.notifyDataSetChanged();
                             }
                             break;
+                        case "PI":
+                            eliminado = PedidoInventario.Delete(0, fechadesde, fechadesde, 0, ckSincronizados.isChecked());
+                            if(eliminado > 0){
+                                comprobanteAdapter.listPedidosInv.clear();
+                                comprobanteAdapter.notifyDataSetChanged();
+                            }
+                            break;
                     }
 
                     if(eliminado > 0){

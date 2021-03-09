@@ -37,7 +37,7 @@
             android:id="@+id/svBusqueda"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:queryHint="Buscar producto"
+            app:queryHint="Filtrar"
             app:iconifiedByDefault="false"
             android:background="@drawable/border1"
             android:layout_margin="5dp"/>

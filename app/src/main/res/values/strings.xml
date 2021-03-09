@@ -102,6 +102,10 @@
         );
         ALTER TABLE cliente ADD COLUMN establecimientoid INTEGER DEFAULT 0;
         ALTER TABLE cliente ADD COLUMN parroquiaid INTEGER DEFAULT 0;
+        ALTER TABLE cliente ADD COLUMN fecharegistro VARCHAR(25) DEFAULT \'\';
+        ALTER TABLE cliente ADD COLUMN fechamodificacion VARCHAR(25) DEFAULT \'\';
+        ALTER TABLE cliente ADD COLUMN longdater INTEGER DEFAULT 0;
+        ALTER TABLE cliente ADD COLUMN longdatem INTEGER DEFAULT 0;
     </string>
 
     <string name="dbLote">

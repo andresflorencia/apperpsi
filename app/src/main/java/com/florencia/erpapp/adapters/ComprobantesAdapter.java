@@ -427,6 +427,9 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                                 notifyDataSetChanged();
                             }else if(tipobusqueda.equals("PI")) {
                                 id = listPedidosInv.get(getAdapterPosition()).idpedido;
+                                values = new ContentValues();
+                                values.put("estadomovil", -1);
+                                values.put("estado", "A");
                                 actualizado = PedidoInventario.Update(id, values);
                                 listPedidosInv.remove(getAdapterPosition());
                                 notifyDataSetChanged();

@@ -37,4 +37,7 @@ public interface ComprobanteInterface {
 
     @POST("savetransferencia")
     Call<JsonObject> saveTransferencia(@Body Map<String,Object> transacciones);
+
+    @POST("loadpedidosinv")
+    Call<JsonObject> LoadPedidosInv(@Body Map<String,Object> pedidos);
 }

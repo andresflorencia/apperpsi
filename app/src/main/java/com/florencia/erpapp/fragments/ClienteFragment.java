@@ -53,8 +53,12 @@ public class ClienteFragment extends Fragment implements SearchView.OnQueryTextL
     ProgressDialog pgCargando;
     private SwipeRefreshLayout swipeRefreshClientes;
     public static final int CLIENTE_FRAGMENT = 1;
+    String _fecha = "";
     public ClienteFragment() {
         // Required empty public constructor
+    }
+    public ClienteFragment(String fecha){
+        _fecha = fecha;
     }
 
     @Override
@@ -75,7 +79,6 @@ public class ClienteFragment extends Fragment implements SearchView.OnQueryTextL
             pgCargando.setTitle("Cargando clientes");
             pgCargando.setMessage("Espere un momento...");
             pgCargando.setCancelable(false);
-
 
             //Inicio Refrescar el contenido del RecyclerView
             swipeRefreshClientes.setColorSchemeResources(R.color.colorend_splash, R.color.colorAccent, R.color.colorMoradito);
@@ -107,7 +110,7 @@ public class ClienteFragment extends Fragment implements SearchView.OnQueryTextL
                         @Override
                         public void run() {
                             try {
-                                lstClientes = Cliente.getClientes(SQLite.usuario.IdUsuario);
+                                lstClientes = Cliente.getClientes(SQLite.usuario.IdUsuario,_fecha);
                                 if (lstClientes == null || lstClientes.size() == 0) {
                                     imgFondo.setVisibility(View.VISIBLE);
                                     lyContainer.setVisibility(View.GONE);
