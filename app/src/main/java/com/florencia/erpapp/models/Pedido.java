@@ -15,7 +15,8 @@ import java.util.List;
 
 public class Pedido {
     public Integer idpedido, codigosistema, estado, usuarioid, parroquiaid, establecimientoid, secuencial;
-    public String fechapedido, fechacelular, observacion, categoria, secuencialpedido, nip, codigoestablecimiento, puntoemision, tipotransaccion;
+    public String fechapedido, fechacelular, observacion, categoria, secuencialpedido, nip, codigoestablecimiento,
+            puntoemision, tipotransaccion, secuencialsistema;
     public Double total, subtotal, subtotaliva, porcentajeiva, descuento, lat, lon;
     public List<DetallePedido> detalle;
     public Cliente cliente;
@@ -50,6 +51,7 @@ public class Pedido {
         this.lat = 0d;
         this.lon = 0d;
         this.longdate = 0l;
+        this.secuencialsistema = "";
     }
 
     public static boolean Update(Integer idcomprobante, ContentValues values) {
@@ -72,13 +74,14 @@ public class Pedido {
             sqLiteDatabase.execSQL("INSERT OR REPLACE INTO " +
                             "pedido(idpedido, codigosistema, clienteid, estado, usuarioid, parroquiaid, establecimientoid, secuencial, " +
                             "fechapedido, fechacelular, observacion, categoria, secuencialpedido, nip, " +
-                            "total, subtotal, subtotaliva, porcentajeiva, descuento, lat, lon, codigoestablecimiento, puntoemision, tipotransaccion, longdate) " +
-                            "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                            "total, subtotal, subtotaliva, porcentajeiva, descuento, lat, lon, codigoestablecimiento, puntoemision, " +
+                            "tipotransaccion, longdate, secuencialsistema) " +
+                            "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     new String[]{this.idpedido == 0?null:this.idpedido.toString(), this.codigosistema.toString(), this.cliente.idcliente.toString(), this.estado.toString(),
                             this.usuarioid.toString(), this.parroquiaid.toString(), this.establecimientoid.toString(), this.secuencial.toString(),
                             this.fechapedido, this.fechacelular, this.observacion, this.categoria, this.secuencialpedido, this.nip, this.total.toString(),
                             this.subtotal.toString(), this.subtotaliva.toString(), this.porcentajeiva.toString(), this.descuento.toString(), this.lat.toString(), this.lon.toString(),
-                            this.codigoestablecimiento, this.puntoemision, this.tipotransaccion, this.longdate.toString()});
+                            this.codigoestablecimiento, this.puntoemision, this.tipotransaccion, this.longdate.toString(), this.secuencialsistema});
             if (this.idpedido == 0)
                 this.idpedido = SQLite.sqlDB.getLastId();
             else
@@ -268,6 +271,7 @@ public class Pedido {
             Item.puntoemision = cursor.getString(22);
             Item.tipotransaccion = cursor.getString(23);
             Item.longdate = cursor.getLong(24);
+            Item.secuencialsistema = cursor.getString(25);
             Item.detalle = DetallePedido.getDetalle(Item.idpedido);
         } catch (Exception ec) {
             ec.printStackTrace();

@@ -344,7 +344,7 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                             "1.- Después de eliminado no podrá sincronizarse y ya no será visible.\n" +
                             "2.- Este registro solo se eliminará de su dispositivo.");
                     builder.setIcon(R.drawable.ic_delete2);
-                    builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                    builder.setPositiveButton(activity.getResources().getString(R.string.Confirm), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             int eliminado = 0;
@@ -387,7 +387,7 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                             }
                         }
                     });
-                    builder.setNegativeButton("No", null);
+                    builder.setNegativeButton(activity.getResources().getString(R.string.Cancel), null);
                     builder.show();
                     return false;
                 }
@@ -408,7 +408,7 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                     builder.setMessage("¿Está seguro que desea anular este documento?\n" +
                             "Nota: Después de anulado no podrá sincronizarse y ya no será visible.");
                     builder.setIcon(R.drawable.ic_delete2);
-                    builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                    builder.setPositiveButton(activity.getResources().getString(R.string.Confirm), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             boolean actualizado = false;
@@ -442,7 +442,7 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                             }
                         }
                     });
-                    builder.setNegativeButton("No", null);
+                    builder.setNegativeButton(activity.getResources().getString(R.string.Cancel), null);
                     builder.show();
                 }
             });

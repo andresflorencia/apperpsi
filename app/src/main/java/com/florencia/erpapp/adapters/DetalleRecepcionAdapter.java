@@ -40,7 +40,7 @@ public class DetalleRecepcionAdapter extends RecyclerView.Adapter<DetalleRecepci
     public DetalleRecepcionAdapter(Activity activity, List<DetalleComprobante> detalleComprobante, String categoria, boolean visualizacion, String tipotransaccion) {
         this.detalleComprobante = detalleComprobante;
         this.activity = activity;
-        this.categoria = categoria.equals("")?"A":categoria;
+        this.categoria = categoria.equals("")?"0":categoria;
         this.visualizacion = visualizacion;
         this.tipotransaccion = tipotransaccion;
         this.rootView = activity.findViewById(android.R.id.content);
@@ -105,8 +105,8 @@ public class DetalleRecepcionAdapter extends RecyclerView.Adapter<DetalleRecepci
                         ((TextView)view.findViewById(R.id.lblTitle)).setText(detalleComprobante.get(getAdapterPosition()).producto.nombreproducto);
                         ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Está seguro que desea eliminar este ítem?");
                         ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_delete2);
-                        ((Button)view.findViewById(R.id.btnCancel)).setText("Cancelar");
-                        ((Button)view.findViewById(R.id.btnYes)).setText("Si");
+                        ((Button)view.findViewById(R.id.btnCancel)).setText(activity.getResources().getString(R.string.Cancel));
+                        ((Button)view.findViewById(R.id.btnYes)).setText(activity.getResources().getString(R.string.Confirm));
                         final AlertDialog alertDialog = builder.create();
                         view.findViewById(R.id.btnYes).setOnClickListener(new View.OnClickListener() {
                             @Override

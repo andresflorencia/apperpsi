@@ -77,6 +77,8 @@
         );
         ALTER TABLE producto ADD COLUMN establecimientoid INTEGER DEFAULT 0;
         ALTER TABLE producto ADD COLUMN tipo VARCHAR(5) DEFAULT \'P\';
+        ALTER TABLE producto ADD COLUMN clasificacionid INTEGER DEFAULT 0;
+        ALTER TABLE producto ADD COLUMN nombreclasificacion VARCHAR(50) DEFAULT \'Sin clasificación\';
     </string>
 
     <string name="dbCliente">
@@ -106,6 +108,7 @@
         ALTER TABLE cliente ADD COLUMN fechamodificacion VARCHAR(25) DEFAULT \'\';
         ALTER TABLE cliente ADD COLUMN longdater INTEGER DEFAULT 0;
         ALTER TABLE cliente ADD COLUMN longdatem INTEGER DEFAULT 0;
+        ALTER TABLE cliente ADD COLUMN nombrecategoria VARCHAR(100) DEFAULT \'\';
     </string>
 
     <string name="dbLote">
@@ -201,6 +204,7 @@
             CONSTRAINT uksecuencial UNIQUE(usuarioid, clienteid, secuencialpedido)
         );
         ALTER TABLE pedido ADD COLUMN longdate INTEGER DEFAULT 0;
+        ALTER TABLE pedido ADD COLUMN secuencialsistema VARCHAR(20) DEFAULT \'\';
     </string>
     <string name="dbDetallePedido">
         CREATE TABLE IF NOT EXISTS detallepedido(
@@ -249,6 +253,19 @@
             precio DOUBLE
         );
         ALTER TABLE reglaprecio ADD COLUMN longdate INTEGER DEFAULT 0;
+    </string>
+
+    <string name="dbPrecioCategoria">
+        CREATE TABLE IF NOT EXISTS preciocategoria(
+            idproductocategoria INTEGER PRIMARY KEY,
+            productoid INTEGER,
+            establecimientoid INTEGER,
+            categoriaid INTEGER,
+            valor DOUBLE,
+            nombrecategoria VARCHAR(100),
+            prioridad VARCHAR(5),
+            aplicacredito VARCHAR(5)
+        );
     </string>
 
     <string name="dbProvincia">
@@ -308,10 +325,25 @@
         );
     </string>
 
+    <string name="dbUbicacion">
+        CREATE TABLE IF NOT EXISTS ubicacion(
+            idubicacion INTEGER PRIMARY KEY AUTOINCREMENT,
+            usuarioid INTEGER,
+            lat DOUBLE,
+            lon DOUBLE,
+            estado INTEGER DEFAULT 0,
+            fechaapp VARCHAR(25),
+            rucempresa VARCHAR(25)
+        );
+    </string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="update"><![CDATA[<u>Actualizar</u>]]></string>
     <string name="leyendaConsumidorFinal"><![CDATA[*Si no especifica el cliente, la factura se guardará con <strong>CONSUMIDOR FINAL</strong>]]></string>
     <string name="Cancel">No</string>
     <string name="Confirm">Si</string>
+
+    <string name="textFecha"><![CDATA[<strong>Fecha Registro: </strong>]]></string>
+    <string name="textCategoria"><![CDATA[<strong>Categoría: </strong>]]></string>
 </resources>

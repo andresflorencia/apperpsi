@@ -100,7 +100,7 @@ public class Regla {
         ArrayList<Regla> Items = new ArrayList<>();
         sqLiteDatabase = SQLite.sqlDB.getReadableDatabase();
         Cursor cursor = sqLiteDatabase.rawQuery(
-                "SELECT * FROM reglaprecio WHERE productoid = ? AND establecimientoid IN (?,?) AND longdate >= ? ORDER BY cantidad DESC",
+                "SELECT * FROM reglaprecio WHERE productoid = ? AND establecimientoid IN (?,?) AND longdate >= ? ORDER BY cantidad DESC, establecimientoid DESC",
                 new String[]{idproducto.toString(), establecimientoid.toString(), "0", lToday.toString()});
         Regla Item;
         if (cursor.moveToFirst()) {
@@ -129,7 +129,7 @@ public class Regla {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
             sqLiteDatabase.delete("reglaprecio", "productoid = ? and establecimientoid = ?",where);
             sqLiteDatabase.close();
-            Log.d("TAGREGLA","RELETE REGLAS OK");
+            Log.d("TAGREGLA","DELETE REGLAS OK");
             return true;
         } catch (SQLException ex){
             Log.d("TAGREGLA", ex.getMessage());

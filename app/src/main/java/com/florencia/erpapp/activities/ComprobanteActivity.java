@@ -128,8 +128,8 @@ public class ComprobanteActivity extends AppCompatActivity {
                         cliente = Cliente.get(0);
                         if(cliente == null)
                             cliente = Cliente.get("9999999999999");
-                        detalleAdapter.categoria = "A";
-                        detalleAdapter.CambiarPrecio("A");
+                        detalleAdapter.categoria = "0";
+                        detalleAdapter.CambiarPrecio("0");
                         detalleAdapter.notifyDataSetChanged();
                         return true;
                     }else if(event.getRawX() <= txtCliente.getTotalPaddingLeft()
@@ -243,7 +243,7 @@ public class ComprobanteActivity extends AppCompatActivity {
         }
 
         detalleProductos = new ArrayList<>();
-        detalleAdapter = new DetalleComprobanteAdapter(this, detalleProductos, cliente.categoria.equals("")?"A":cliente.categoria, idcomprobante>0);
+        detalleAdapter = new DetalleComprobanteAdapter(this, detalleProductos, cliente.categoria.equals("")?"0":cliente.categoria, idcomprobante>0);
         rvDetalle.setAdapter(detalleAdapter);
 
         if(idcomprobante>0){
@@ -556,8 +556,8 @@ public class ComprobanteActivity extends AppCompatActivity {
             ((TextView)view.findViewById(R.id.lblTitle)).setText("Imprimir");
             ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Desea imprimir este documento?");
             ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_printer_white);
-            ((Button)view.findViewById(R.id.btnCancel)).setText("Cancelar");
-            ((Button)view.findViewById(R.id.btnConfirm)).setText("Si");
+            ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
+            ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
             final AlertDialog alertDialog = builder.create();
             view.findViewById(R.id.btnConfirm).setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -755,13 +755,22 @@ public class ComprobanteActivity extends AppCompatActivity {
                 case REQUEST_BUSQUEDA:
                     detalleAdapter.visualizacion=false;
                     for(DetalleComprobante miP:productBusqueda) {
-                        detalleAdapter.detalleComprobante.add(miP);
+                        boolean agregar = true;
+                        for(DetalleComprobante miD:detalleAdapter.detalleComprobante){
+                            if(miP.producto.idproducto.equals(miD.producto.idproducto)) {
+                                miD.cantidad += miP.cantidad;
+                                agregar = false;
+                                break;
+                            }
+                        }
+                        if(agregar)
+                            detalleAdapter.detalleComprobante.add(miP);
                     }
                     comprobante.detalle.clear();
                     comprobante.detalle.addAll(detalleAdapter.detalleComprobante);
                     comprobante.getTotal();
                     this.setSubtotales(comprobante.total, comprobante.subtotal, comprobante.subtotaliva);
-                    detalleAdapter.CambiarPrecio(cliente.categoria.equals("")?"A":cliente.categoria);
+                    detalleAdapter.CambiarPrecio(cliente.categoria.equals("")?"0":cliente.categoria);
                     detalleAdapter.CalcularTotal();
                     detalleAdapter.notifyDataSetChanged();
                     Log.d("TAGPRODUCTO",String.valueOf(detalleAdapter.detalleComprobante.size()));
@@ -828,8 +837,8 @@ public class ComprobanteActivity extends AppCompatActivity {
             ((TextView)view.findViewById(R.id.lblTitle)).setText("Cerrar");
             ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Desea salir de la ventana de facturación?");
             ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_check_white);
-            ((Button)view.findViewById(R.id.btnCancel)).setText("Cancelar");
-            ((Button)view.findViewById(R.id.btnConfirm)).setText("Si");
+            ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
+            ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
             final AlertDialog alertDialog = builder.create();
             view.findViewById(R.id.btnConfirm).setOnClickListener(new View.OnClickListener() {
                 @Override

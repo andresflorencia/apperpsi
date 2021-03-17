@@ -79,7 +79,7 @@ public class InfoDialogFragment extends AppCompatDialogFragment {
                                 txtCorreo.setText(cliente.email.equals("")?"N/A":cliente.email);
                                 txtDireccion.setText(cliente.direccion.equals("")?"N/A":cliente.direccion);
                                 txtContacto.setText(cliente.fono1.equals("") && cliente.fono2.equals("")?"N/A":cliente.fono1.concat(" - ").concat(cliente.fono2));
-                                txtCategoria.setText(cliente.categoria.equals("")?"Sin categoría":"Categoría: ".concat(cliente.categoria));
+                                txtCategoria.setText(cliente.nombrecategoria.equals("")?"Sin categoría":"Categoría: ".concat(cliente.nombrecategoria));
                             }
                             pbCargando.setVisibility(View.GONE);
                         }

@@ -227,7 +227,7 @@ public class ListaComprobantesActivity extends AppCompatActivity implements Sear
 
         toolbar.setTitleTextColor(Color.WHITE);
         toolbar.setSubtitleTextColor(Color.WHITE);
-        toolbar.setBackgroundColor(getResources().getColor(R.color.colorGreenLight));
+        toolbar.setBackgroundColor(getResources().getColor(R.color.colorDate));
         super.onResume();
     }
 
@@ -277,7 +277,7 @@ public class ListaComprobantesActivity extends AppCompatActivity implements Sear
                     "2.- Estos registros solo se eliminarán de su dispositivo.");
             builder.setIcon(R.drawable.ic_delete2);
             builder.setView(ckSincronizados);
-            builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(getResources().getString(R.string.Confirm), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     int eliminado = 0;
@@ -318,7 +318,7 @@ public class ListaComprobantesActivity extends AppCompatActivity implements Sear
                     }
                 }
             });
-            builder.setNegativeButton("No", null);
+            builder.setNegativeButton(getResources().getString(R.string.Cancel), null);
             builder.show();
         }catch (Exception e){
             Log.d("TAG", e.getMessage());

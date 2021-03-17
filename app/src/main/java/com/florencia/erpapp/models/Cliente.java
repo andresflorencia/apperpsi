@@ -23,7 +23,7 @@ public class Cliente {
     public Double lat, lon;
     public String categoria;
     public Integer usuarioid;
-    public String fono1, fono2, email, observacion, ruc, fecharegistro, fechamodificacion;
+    public String fono1, fono2, email, observacion, ruc, fecharegistro, fechamodificacion, nombrecategoria;
     public Integer codigosistema, actualizado, establecimientoid, parroquiaid;
     public Long longdater, longdatem;
 
@@ -38,7 +38,7 @@ public class Cliente {
         this.direccion= "";
         this.lat = 0d;
         this.lon = 0d;
-        this.categoria= "";
+        this.categoria= "0";
         this.usuarioid= 0;
         this.fono1 = "";
         this.fono2 ="";
@@ -53,6 +53,7 @@ public class Cliente {
         this.fechamodificacion = "";
         this.longdater = 0l;
         this.longdatem = 0l;
+        this.nombrecategoria = "";
     }
 
     public static boolean removeClientes(Integer idUsuario) {
@@ -76,24 +77,25 @@ public class Cliente {
                 this.sqLiteDatabase.execSQL("INSERT INTO " +
                         "cliente(tiponip, nip, razonsocial, nombrecomercial, direccion, lat, lon, categoria, " +
                                 "usuarioid, fono1, fono2, email, observacion, ruc, codigosistema, actualizado, " +
-                                "establecimientoid, parroquiaid, fecharegistro, fechamodificacion, longdater, longdatem) " +
-                        "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                                "establecimientoid, parroquiaid, fecharegistro, fechamodificacion, longdater, longdatem," +
+                                "nombrecategoria) " +
+                        "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                         new String[]{ this.tiponip, this.nip, this.razonsocial, this.nombrecomercial, this.direccion,
-                                this.lat.toString(), this.lon.toString(), this.categoria.equals("")?"A":this.categoria, this.usuarioid.toString(), this.fono1,
+                                this.lat.toString(), this.lon.toString(), this.categoria.equals("")?"0":this.categoria, this.usuarioid.toString(), this.fono1,
                                 this.fono2, this.email, this.observacion, this.ruc, this.codigosistema.toString(), this.actualizado.toString(),
                                 this.establecimientoid.toString(), this.parroquiaid.toString(), this.fecharegistro, this.fechamodificacion,
-                                this.longdater.toString(), this.longdatem.toString()});
+                                this.longdater.toString(), this.longdatem.toString(), this.nombrecategoria});
             else
                 this.sqLiteDatabase.execSQL("INSERT OR REPLACE INTO " +
                                 "cliente(idcliente, tiponip, nip, razonsocial, nombrecomercial, direccion, lat, lon, categoria, " +
                                 "usuarioid, fono1, fono2, email, observacion, ruc, codigosistema, actualizado, establecimientoid, " +
-                                "parroquiaid, fecharegistro, fechamodificacion, longdater, longdatem) " +
-                                "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                                "parroquiaid, fecharegistro, fechamodificacion, longdater, longdatem, nombrecategoria) " +
+                                "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                         new String[]{ this.idcliente.toString(), this.tiponip, this.nip, this.razonsocial, this.nombrecomercial, this.direccion,
-                                this.lat.toString(), this.lon.toString(), this.categoria.equals("")?"A":this.categoria, this.usuarioid.toString(), this.fono1,
+                                this.lat.toString(), this.lon.toString(), this.categoria.equals("")?"0":this.categoria, this.usuarioid.toString(), this.fono1,
                                 this.fono2, this.email, this.observacion, this.ruc, this.codigosistema.toString(), this.actualizado.toString(),
                                 this.establecimientoid.toString(), this.parroquiaid.toString(), this.fecharegistro, this.fechamodificacion,
-                                this.longdater.toString(), this.longdatem.toString()});
+                                this.longdater.toString(), this.longdatem.toString(), this.nombrecategoria});
             if (this.idcliente == 0) this.idcliente = SQLite.sqlDB.getLastId();
 
             this.sqLiteDatabase.close();
@@ -158,6 +160,7 @@ public class Cliente {
             Item.fechamodificacion = cursor.getString(20);
             Item.longdater = cursor.getLong(21);
             Item.longdatem = cursor.getLong(22);
+            Item.nombrecategoria = cursor.getString(23);
         } catch (SQLiteException ec) {
             Log.d("TAGCLIENTE", ec.getMessage());
         }

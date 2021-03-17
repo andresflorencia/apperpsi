@@ -10,9 +10,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -35,5 +37,7 @@ public interface UsuarioInterface {
 
     @GET
     Call<ResponseBody> downloadApk(@Url String url);
-}
 
+    @POST("loadubicacion")
+    Call<JsonObject> loadUbicacion(@Body Map<String,Object> ubicaciones);
+}

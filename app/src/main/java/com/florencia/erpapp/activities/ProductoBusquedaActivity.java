@@ -20,11 +20,14 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.florencia.erpapp.R;
+import com.florencia.erpapp.adapters.ClasificacionAdapter;
 import com.florencia.erpapp.adapters.ClienteAdapter;
 import com.florencia.erpapp.adapters.ProductoAdapter;
+import com.florencia.erpapp.models.Categoria;
 import com.florencia.erpapp.models.Producto;
 import com.florencia.erpapp.services.SQLite;
 import com.florencia.erpapp.utils.Utils;
+import com.google.gson.JsonArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,9 +35,11 @@ import java.util.List;
 public class ProductoBusquedaActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
     ImageView imgFondo;
-    RecyclerView rvProductos;
-    List<Producto> lstProductos= new ArrayList<>();
-    ProductoAdapter productoAdapter;
+    RecyclerView rvProductos, rvCategorias;
+    List<Producto> lstProductos = new ArrayList<>();
+    List<Categoria> categorias = new ArrayList<>();
+    public ProductoAdapter productoAdapter;
+    ClasificacionAdapter clasificacionAdapter;
     SearchView svBusqueda;
     LinearLayout lyContainer;
     ProgressDialog pgCargando;
@@ -51,9 +56,19 @@ public class ProductoBusquedaActivity extends AppCompatActivity implements Searc
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        init();
+        if(getIntent().getExtras()!=null){
+            tipobusqueda = getIntent().getExtras().getString("tipobusqueda","01");
+        }
 
+        CargarDatos();
+
+    }
+
+    private void init(){
         pgCargando = new ProgressDialog(this);
         rvProductos = findViewById(R.id.rvProductos);
+        rvCategorias = findViewById(R.id.rvCategorias);
         imgFondo = findViewById(R.id.imgFondo);
         lyContainer = findViewById(R.id.lyContainer);
         svBusqueda = findViewById(R.id.svBusqueda);
@@ -63,12 +78,6 @@ public class ProductoBusquedaActivity extends AppCompatActivity implements Searc
         pgCargando.setTitle("Cargando productos");
         pgCargando.setMessage("Espere un momento...");
         pgCargando.setCancelable(false);
-
-        if(getIntent().getExtras()!=null){
-            tipobusqueda = getIntent().getExtras().getString("tipobusqueda","01");
-        }
-
-        CargarDatos();
 
     }
 
@@ -90,6 +99,7 @@ public class ProductoBusquedaActivity extends AppCompatActivity implements Searc
             Thread th = new Thread(){
                 @Override
                 public void run(){
+                    categorias = Producto.getCategorias(SQLite.usuario.sucursal.IdEstablecimiento);
                     switch (tipobusqueda) {
                         case "01":
                         case "PC":
@@ -110,6 +120,8 @@ public class ProductoBusquedaActivity extends AppCompatActivity implements Searc
                             } else {
                                 imgFondo.setVisibility(View.GONE);
                                 lyContainer.setVisibility(View.VISIBLE);
+                                clasificacionAdapter = new ClasificacionAdapter(ProductoBusquedaActivity.this, categorias);
+                                rvCategorias.setAdapter(clasificacionAdapter);
                                 productoAdapter = new ProductoAdapter(toolbar,lstProductos, tipobusqueda, ProductoBusquedaActivity.this);
                                 rvProductos.setAdapter(productoAdapter);
                             }
@@ -133,7 +145,7 @@ public class ProductoBusquedaActivity extends AppCompatActivity implements Searc
         String titulo="Productos" ;
         toolbar.setTitle(titulo);
         toolbar.setTitleTextColor(Color.WHITE);
-        toolbar.setBackgroundColor(getResources().getColor(R.color.colorGreenLight));
+        toolbar.setBackgroundColor(getResources().getColor(R.color.colorDate));
         //toolbar.getNavigationIcon().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
         super.onResume();
     }

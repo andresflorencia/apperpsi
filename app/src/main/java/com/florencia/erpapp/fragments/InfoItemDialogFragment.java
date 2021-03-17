@@ -79,17 +79,12 @@ public class InfoItemDialogFragment extends AppCompatDialogFragment {
                                 txtNombre.setText(producto.nombreproducto);
                                 String text = "";
 
-                                text = text.concat("<h5><strong>Código: </strong> ").concat(producto.codigoproducto).concat("</h5>")
-                                    .concat("<h5><strong>Tipo:</strong> "+ (producto.tipo.equalsIgnoreCase("S")?"SERVICIO":"PRODUCTO") +"</h5>")
-                                    .concat("<h5>Precio Referencia: " + Utils.FormatoMoneda(producto.pvp,2) + "</h5>")
-                                    .concat("<br><h5><strong>Precios Categoría:</strong></h5><ul>")
-                                    .concat("<li><strong> PVP - A:</strong> " + Utils.FormatoMoneda(producto.pvp1, 2) + "</li>")
-                                    .concat("<li><strong> PVP - B:</strong> " + Utils.FormatoMoneda(producto.pvp2, 2) + "</li>")
-                                    .concat("<li><strong> PVP - C:</strong> " + Utils.FormatoMoneda(producto.pvp3, 2) + "</li>")
-                                    .concat("<li><strong> PVP - D:</strong> " + Utils.FormatoMoneda(producto.pvp4, 2) + "</li>")
-                                    .concat("<li><strong> PVP - E:</strong> " + Utils.FormatoMoneda(producto.pvp5, 2) + "</li></ul>")
-                                    .concat(producto.unidadesporcaja > 0?"<br><h5><strong>U/Caja:</strong> " + producto.unidadesporcaja + "</h5>":"<br>")
-                                    .concat(producto.tipo.equalsIgnoreCase("S")?"":"<h5>Stock: " + producto.stock + "</h5>");
+                                text = text.concat("<strong>Código: </strong> ").concat(producto.codigoproducto).concat("<br>")
+                                    .concat("<strong>Tipo:</strong> "+ (producto.tipo.equalsIgnoreCase("S")?"SERVICIO":"PRODUCTO").concat("<br>"))
+                                    .concat("<strong>Clasificación: </strong> ").concat(producto.nombreclasificacion).concat("<br>")
+                                    .concat("<strong>Precio Referencia: </strong> ").concat(Utils.FormatoMoneda(producto.pvp,2).concat("<br>"))
+                                    .concat(producto.unidadesporcaja > 0?"<strong>U/Caja:</strong> ".concat(producto.unidadesporcaja.toString()):"").concat("<br>")
+                                    .concat(producto.tipo.equalsIgnoreCase("S")?"":"<strong>Stock: </strong> ".concat(producto.stock.toString()).concat("<br>"));
 
                                 if(producto.lotes.size()>0){
                                     text += "<br><h5>Lotes</h5><ol>";
@@ -100,7 +95,7 @@ public class InfoItemDialogFragment extends AppCompatDialogFragment {
                                 if(producto.reglas.size()>0){
                                     text += "<br><h5>Regla de Precios</h5><ol>";
                                     for(Regla regla:producto.reglas)
-                                        text = text.concat("<li><strong>Cant > </strong> " + regla.cantidad + " <strong> PVP: </strong>" + Utils.FormatoMoneda(regla.precio,2) + " <strong> Fec. Max. </strong>" + regla.fechamaxima);
+                                        text = text.concat("<li><strong>Cant ≥ </strong> " + regla.cantidad + " <strong> PVP: </strong>" + Utils.FormatoMoneda(regla.precio,2) + " <strong> Fec. Max. </strong>" + regla.fechamaxima);
                                     text += "</ol>";
                                 }
 

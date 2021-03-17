@@ -2,6 +2,7 @@ package com.florencia.erpapp.fragments;
 
 import android.app.DatePickerDialog;
 import android.app.PendingIntent;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -39,6 +40,7 @@ import com.florencia.erpapp.activities.ComprobanteActivity;
 import com.florencia.erpapp.adapters.ResumenAdapter;
 import com.florencia.erpapp.interfaces.ProductoInterface;
 import com.florencia.erpapp.interfaces.UsuarioInterface;
+import com.florencia.erpapp.models.Ubicacion;
 import com.florencia.erpapp.services.SQLite;
 import com.florencia.erpapp.utils.Constants;
 import com.florencia.erpapp.utils.DownloadFile;
@@ -48,6 +50,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.io.File;
@@ -62,7 +65,10 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -373,7 +379,6 @@ public class PrincipalFragment extends Fragment implements View.OnClickListener,
             Log.d(TAG, e.getMessage());
         }
     }
-
 
     public class DownloadFile2 extends AsyncTask<String, Integer, Boolean> {
 

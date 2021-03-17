@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
 import com.florencia.erpapp.services.SQLite;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,29 +19,13 @@ import java.util.List;
 public class Producto
 {
     public Integer idproducto;
-    public String codigoproducto;
-    public String nombreproducto;
-    public String detalleproducto;
-    public Double pvp;
-    public Integer unidadid;
-    public Integer unidadesporcaja;
-    public Integer iva;
-    public Integer ice;
-    public Double factorconversion;
-    public Double pvp1;
-    public Double pvp2;
-    public Double pvp3;
-    public Double pvp4;
-    public Double pvp5;
-    public Double stock;
-    public Double porcentajeiva;
-    public String numerolote;
-    public Double preciocosto;
-    public String fechavencimiento;
+    public String codigoproducto, nombreproducto, detalleproducto, tipo, nombreclasificacion;
+    public Integer unidadid, unidadesporcaja, iva, ice, establecimientoid, clasificacionid;
+    public Double factorconversion, pvp, pvp1, pvp2, pvp3, pvp4, pvp5, stock, porcentajeiva, preciocosto;
+    public String numerolote, fechavencimiento;
     public List<Lote> lotes;
-    public Integer establecimientoid;
-    public String tipo;
     public List<Regla> reglas;
+    public List<PrecioCategoria> precioscategoria;
 
     public static SQLiteDatabase sqLiteDatabase;
 
@@ -68,6 +54,9 @@ public class Producto
         this.tipo = "";
         this.lotes = new ArrayList<>();
         this.reglas = new ArrayList<>();
+        this.precioscategoria = new ArrayList<>();
+        this.clasificacionid = 0;
+        this.nombreclasificacion = "";
     }
 
     public Double getPrecioSugerido(){
@@ -80,17 +69,20 @@ public class Producto
             this.sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
             this.sqLiteDatabase.execSQL("INSERT OR REPLACE INTO " +
                     "producto(idproducto, codigoproducto, nombreproducto, pvp, unidadid, unidadesporcaja, iva," +
-                    "ice, factorconversion, pvp1, pvp2, pvp3, pvp4, pvp5, stock, porcentajeiva, establecimientoid, tipo) " +
-                    "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    "ice, factorconversion, pvp1, pvp2, pvp3, pvp4, pvp5, stock, porcentajeiva, establecimientoid, " +
+                    "tipo, clasificacionid, nombreclasificacion) " +
+                    "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     new String[]{this.idproducto.toString(), this.codigoproducto, this.nombreproducto, this.pvp.toString(),
                             this.unidadid.toString(), this.unidadesporcaja.toString(), this.iva.toString(),
                             this.ice.toString(), this.factorconversion.toString(), this.pvp1.toString(), this.pvp2.toString(),
                             this.pvp3.toString(), this.pvp4.toString(), this.pvp5.toString(), this.stock.toString(),
-                            this.porcentajeiva.toString(), this.establecimientoid.toString(), this.tipo});
+                            this.porcentajeiva.toString(), this.establecimientoid.toString(), this.tipo, this.clasificacionid.toString(),
+                            this.nombreclasificacion});
             this.sqLiteDatabase.close();
             Log.d("TAGPRODUCTO","SAVE PRODUCTO OK");
             Lote.InsertMultiple(this.idproducto, this.establecimientoid, this.lotes);
             Regla.InsertMultiple(this.idproducto, this.establecimientoid, this.reglas);
+            PrecioCategoria.InsertMultiple(this.idproducto, this.establecimientoid, this.precioscategoria);
             return true;
         } catch (SQLException ex){
             Log.d("TAGPRODUCTO",ex.getMessage());
@@ -120,8 +112,11 @@ public class Producto
             Item.porcentajeiva = cursor.getDouble(15);
             Item.establecimientoid = cursor.getInt(16);
             Item.tipo = cursor.getString(17);
+            Item.clasificacionid = cursor.getInt(18);
+            Item.nombreclasificacion = cursor.getString(19);
             Item.lotes = Lote.getAll(Item.idproducto, Item.establecimientoid);
             Item.reglas = Regla.getAll(Item.idproducto, Item.establecimientoid);
+            Item.precioscategoria = PrecioCategoria.getAll(Item.idproducto, Item.establecimientoid);
         }catch (Exception e){
             Log.d("TAGPRODUCTO","Asigna(): " +e.getMessage());
         }finally {}
@@ -150,14 +145,16 @@ public class Producto
             Item.porcentajeiva = cursor.getDouble(15);
             Item.establecimientoid = cursor.getInt(16);
             Item.tipo = cursor.getString(17);
+            Item.clasificacionid = cursor.getInt(18);
+            Item.nombreclasificacion = cursor.getString(19);
             Lote milote = new Lote();
-            milote.productoid = cursor.getInt(18);
-            milote.numerolote = cursor.getString(19);
-            milote.stock = cursor.getDouble(20);
-            milote.preciocosto = cursor.getDouble(21);
-            milote.fechavencimiento = cursor.getString(22);
-            milote.longdate = cursor.getLong(23);
-            milote.establecimientoid = cursor.getInt(24);
+            milote.productoid = cursor.getInt(20);
+            milote.numerolote = cursor.getString(21);
+            milote.stock = cursor.getDouble(22);
+            milote.preciocosto = cursor.getDouble(23);
+            milote.fechavencimiento = cursor.getString(24);
+            milote.longdate = cursor.getLong(25);
+            milote.establecimientoid = cursor.getInt(26);
             Item.lotes.add(milote);
             //Item.lotes = Lote.getAll(Item.idproducto, Item.establecimientoid);
         }catch (Exception e){
@@ -247,6 +244,35 @@ public class Producto
         return Items;
     }
 
+    public static List<Categoria> getCategorias(Integer establecimientoid){
+        List<Categoria> categorias = new ArrayList<>();
+        try {
+            sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
+            Cursor cursor = sqLiteDatabase.rawQuery("SELECT DISTINCT clasificacionid, nombreclasificacion FROM producto " +
+                            "WHERE establecimientoid = ? GROUP BY clasificacionid, nombreclasificacion ORDER BY nombreclasificacion",
+                    new String[]{establecimientoid.toString()});
+            Categoria micategoria = new Categoria();
+            micategoria.categoriaid = -1;
+            micategoria.nombrecategoria = "Todos";
+            micategoria.seleccionado = true;
+            categorias.add(micategoria);
+
+            if (cursor.moveToFirst()) {
+                do {
+                    micategoria = new Categoria();
+                    micategoria.categoriaid = cursor.getInt(0);
+                    micategoria.nombrecategoria = cursor.getString(1);
+                    categorias.add(micategoria);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            sqLiteDatabase.close();
+        }catch (Exception e){
+            Log.d("TAGPRODUCTO", "getCategorias(): ".concat(e.getMessage()));
+        }
+        return categorias;
+    }
+
     public double getPrecio(int pos){
         double[] precios = {
                 this.pvp1,
@@ -269,19 +295,6 @@ public class Producto
         precios.put("R", this.pvp); //Precio referencia
         //Arrays.sort(precios);
         return precios.get(categoria);
-    }
-
-    public double CalculaPrecio(double q) {
-        double valor = 0;
-        if (q > 19.99)
-            valor = this.getPrecio(0);
-        else if (q > 9.99)
-            valor = this.getPrecio(1);
-        else if (q > 4.49) valor = this.getPrecio(2);
-        else valor = this.getPrecio(3);
-        /*if(this.PorcentajeIva > 0)
-            valor = valor + (valor * this.PorcentajeIva / 100);*/
-        return valor;
     }
 
     public String Codigo() {

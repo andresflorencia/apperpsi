@@ -418,8 +418,8 @@ public class RecepcionActivity extends AppCompatActivity {
                 ((TextView)view.findViewById(R.id.lblTitle)).setText("Guardar recepción");
                 ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Está seguro que desea recibir esta transferencia?");
                 ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_save);
-                ((Button)view.findViewById(R.id.btnCancel)).setText("Cancelar");
-                ((Button)view.findViewById(R.id.btnConfirm)).setText("Si");
+                ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
+                ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
                 final AlertDialog alertDialog = builder.create();
                 view.findViewById(R.id.btnConfirm).setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -627,8 +627,8 @@ public class RecepcionActivity extends AppCompatActivity {
             ((TextView)view.findViewById(R.id.lblTitle)).setText("Imprimir");
             ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Desea imprimir este documento?");
             ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_save);
-            ((Button)view.findViewById(R.id.btnCancel)).setText("Cancelar");
-            ((Button)view.findViewById(R.id.btnConfirm)).setText("Si");
+            ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
+            ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
             final AlertDialog alertDialog = builder.create();
             view.findViewById(R.id.btnConfirm).setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -886,8 +886,8 @@ public class RecepcionActivity extends AppCompatActivity {
             ((TextView)view.findViewById(R.id.lblTitle)).setText("Cerrar");
             ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Desea salir de la ventana de recepción?");
             ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_check_white);
-            ((Button)view.findViewById(R.id.btnCancel)).setText("Cancelar");
-            ((Button)view.findViewById(R.id.btnConfirm)).setText("Si");
+            ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
+            ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
             final AlertDialog alertDialog = builder.create();
             view.findViewById(R.id.btnConfirm).setOnClickListener(new View.OnClickListener() {
                 @Override

@@ -3,6 +3,7 @@ package com.florencia.erpapp.activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.app.Activity;
@@ -12,7 +13,9 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -56,8 +59,8 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
     View rootView;
     boolean isReturn = false, band = false;
 
-    TextView lblMessage, lblTitle, lblInfoPersonal, lblInfoContacto;
-    LinearLayout lyInfoPersonal, lyInfoContacto;
+    TextView lblMessage, lblTitle, lblInfoPersonal, lblInfoContacto, lblInfoAdicional, lblInfo;
+    LinearLayout lyInfoPersonal, lyInfoContacto, lyInfoAdicional;
     BottomSheetDialog btsDialog;
     Button btnPositive, btnNegative;
     View viewSeparator;
@@ -68,6 +71,7 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
     List<Parroquia> parroquias = new ArrayList<>();
     Provincia provActual = new Provincia();
     Canton canActual = new Canton();
+    CardView cvInfo;
 
     public ClienteActivity(){}
 
@@ -132,6 +136,14 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
                                 txtFono2.setText(miCliente.fono2);
                                 txtCorreo.setText(miCliente.email);
                                 txtObservacion.setText(miCliente.observacion);
+                                cvInfo.setVisibility(View.VISIBLE);
+                                String _sInfo = getResources().getString(R.string.textFecha).concat(" ").concat(miCliente.fecharegistro);
+                                _sInfo = _sInfo.concat("<br>").concat(getResources().getString(R.string.textCategoria)).concat("").concat(miCliente.nombrecategoria);
+
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                                    lblInfo.setText(Html.fromHtml(_sInfo, Html.FROM_HTML_MODE_COMPACT));
+                                else
+                                    lblInfo.setText(Html.fromHtml(_sInfo));
 
                                 if(miCliente.tiponip != null){
                                     for(int i =0; i < cbTipoDocumento.getCount();i++){
@@ -179,6 +191,9 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
             case R.id.lblInfoContacto:
                 Utils.EfectoLayout(lyInfoContacto, lblInfoContacto);
                 break;
+            case R.id.lblInfoAdicional:
+                Utils.EfectoLayout(lyInfoAdicional, lblInfoAdicional);
+                break;
         }
     }
 
@@ -197,16 +212,22 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
         txtObservacion = findViewById(R.id.txtObservacion);
         lblInfoPersonal = findViewById(R.id.lblInfoPersonal);
         lblInfoContacto = findViewById(R.id.lblInfoContacto);
+        lblInfoAdicional = findViewById(R.id.lblInfoAdicional);
         lyInfoPersonal = findViewById(R.id.lyInfoPersonal);
         lyInfoContacto = findViewById(R.id.lyInfoContacto);
+        lyInfoAdicional = findViewById(R.id.lyInfoAdicional);
         cbProvincia = findViewById(R.id.cbProvincia);
         cbCanton = findViewById(R.id.cbCanton);
         cbParroquia = findViewById(R.id.cbParroquia);
+        lblInfo = findViewById(R.id.lblInfo);
+        cvInfo = findViewById(R.id.cvInfo);
+        cvInfo.setVisibility(View.GONE);
         LlenarTipoNIP();
         txtNIP.setOnFocusChangeListener(this);
         btnObtenerDireccion.setOnClickListener(this::onClick);
         lblInfoPersonal.setOnClickListener(this::onClick);
         lblInfoContacto.setOnClickListener(this::onClick);
+        lblInfoAdicional.setOnClickListener(this::onClick);
 
         if(SQLite.gpsTracker==null)
             SQLite.gpsTracker = new GPSTracker(this);
@@ -299,8 +320,8 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
                 ((TextView)view.findViewById(R.id.lblTitle)).setText("Guardar cliente");
                 ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Está seguro que desea guardar los datos del cliente?");
                 ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_save);
-                ((Button)view.findViewById(R.id.btnCancel)).setText("Cancelar");
-                ((Button)view.findViewById(R.id.btnConfirm)).setText("Si");
+                ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
+                ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
                 final AlertDialog alertDialog = builder.create();
                 view.findViewById(R.id.btnConfirm).setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -430,6 +451,7 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
             txtDireccion.setText("");
             txtObservacion.setText("");
             toolbar.setTitle("Nuevo Registro");
+            cvInfo.setVisibility(View.GONE);
         }catch (Exception e){
             Log.d("TAGCLIENTE", "LimpiarDatos(): " + e.getMessage());
         }
@@ -456,8 +478,8 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
             ((TextView)view.findViewById(R.id.lblTitle)).setText("Cerrar");
             ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Desea salir de la ventana de cliente?");
             ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_check_white);
-            ((Button)view.findViewById(R.id.btnCancel)).setText("Cancelar");
-            ((Button)view.findViewById(R.id.btnConfirm)).setText("Si");
+            ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
+            ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
             final AlertDialog alertDialog = builder.create();
             view.findViewById(R.id.btnConfirm).setOnClickListener(new View.OnClickListener() {
                 @Override

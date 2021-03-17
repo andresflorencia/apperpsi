@@ -29,6 +29,16 @@
         <item name="android:navigationBarColor">@color/colornavheader</item>
     </style>
 
+    <style name="ProductTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/black_overlay2</item>
+        <item name="colorPrimaryDark">@color/colorDate</item>
+        <item name="colorAccent">@color/colorDate</item>
+        <item name="android:windowActionBar">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:navigationBarColor">@color/colorDate</item>
+    </style>
+
     <style name="AlertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
     </style>

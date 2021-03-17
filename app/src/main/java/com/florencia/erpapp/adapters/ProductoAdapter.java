@@ -55,6 +55,7 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.Produc
     String tipobusqueda;
     ProductoBusquedaActivity activity;
     View rootView;
+    Integer clasificacionid = -1; //TODOS
 
     public ProductoAdapter(Toolbar toolbar, List<Producto> listProductos, String tipobusqueda, ProductoBusquedaActivity activity) {
         this.toolbar = toolbar;
@@ -85,14 +86,16 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.Produc
     public void filter(final String busqueda){
         listProductos.clear();
         if(busqueda.length()==0){
-            listProductos.addAll(orginalItems);
+            //listProductos.addAll(orginalItems);
+            filter_by_clasif(clasificacionid);
         }else{
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 List<Producto> collect = orginalItems.stream()
                         .filter(i -> i.nombreproducto.toLowerCase()
                                 .concat(i.codigoproducto.toLowerCase())
                                 .concat(i.numerolote.toLowerCase())
-                                .contains(busqueda.toLowerCase()))
+                                .contains(busqueda.toLowerCase()) &&
+                                (clasificacionid != -1?i.clasificacionid:1) == (clasificacionid != -1?clasificacionid:1))
                         .collect(Collectors.<Producto>toList());
                 listProductos.addAll(collect);
             }else{
@@ -100,12 +103,39 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.Produc
                     if(i.nombreproducto.toLowerCase()
                             .concat(i.codigoproducto.toLowerCase())
                             .concat(i.numerolote.toLowerCase())
-                            .contains(busqueda.toLowerCase()))
+                            .contains(busqueda.toLowerCase()) &&
+                            (clasificacionid != -1?i.clasificacionid:1) == (clasificacionid != -1?clasificacionid:1))
                         listProductos.add(i);
                 }
             }
         }
         notifyDataSetChanged();
+    }
+
+    public void filter_by_clasif(final Integer clasificacionid){
+        try{
+            this.clasificacionid = clasificacionid;
+            listProductos.clear();
+            if(clasificacionid.equals(-1)){
+                listProductos.addAll(orginalItems);
+            }else {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    List<Producto> collect = orginalItems.stream()
+                            .filter(i -> i.clasificacionid
+                                    .equals(clasificacionid))
+                            .collect(Collectors.<Producto>toList());
+                    listProductos.addAll(collect);
+                } else {
+                    for (Producto i : orginalItems) {
+                        if (i.clasificacionid.equals(clasificacionid))
+                            listProductos.add(i);
+                    }
+                }
+            }
+            notifyDataSetChanged();
+        }catch (Exception e){
+            Log.d("TAGPRODUCTOADAPTER", "filter_by_clasif(): " + e.getMessage());
+        }
     }
 
     class ProductoViewHolder extends RecyclerView.ViewHolder{

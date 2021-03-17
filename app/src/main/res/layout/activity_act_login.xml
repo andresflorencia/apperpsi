@@ -5,7 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.actLogin">
+    tools:context=".activities.actLogin"
+    android:background="@color/colorGrayLight2">
 
     <ImageButton
         android:id="@+id/btnConfig"
@@ -28,96 +29,107 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <LinearLayout
+                <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical">
-
-                    <com.makeramen.roundedimageview.RoundedImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="200dp"
-                        android:src="@drawable/login"
-                        app:riv_corner_radius="10dp"
-                        android:layout_marginVertical="10dp"/>
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textStyle="bold"
-                        android:text="Inicio de Sesión"
-                        android:gravity="center"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-                        android:textAllCaps="true"
-                        android:layout_marginTop="20dp"/>
+                    android:layout_gravity="center"
+                    android:elevation="10dp"
+                    app:cardCornerRadius="7dp"
+                    android:layout_marginHorizontal="15dp">
 
                     <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:padding="20dp"
-                    android:orientation="vertical">
-
-
-                    <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/border_radius_spinner"
-                        android:paddingHorizontal="10dp">
-                        <EditText
-                            android:id="@+id/etUser"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:layout_gravity="center">
+                            <com.makeramen.roundedimageview.RoundedImageView
+                                android:layout_width="match_parent"
+                                android:layout_height="200dp"
+                                android:src="@drawable/login"
+                                app:riv_corner_radius="10dp"
+                                android:layout_marginVertical="10dp"/>
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textStyle="bold"
+                                android:text="Inicio de Sesión"
+                                android:gravity="center"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                                android:textAllCaps="true"
+                                android:layout_marginTop="20dp"/>
+
+                            <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:drawablePadding="10dp"
-                            android:ems="10"
-                            android:inputType="textPersonName"
-                            android:paddingRight="10dp"
-                            android:paddingLeft="10dp"
-                            android:hint="Usuario"
-                            android:text=""/>
-                    </com.google.android.material.textfield.TextInputLayout>
+                            android:layout_height="match_parent"
+                            android:padding="20dp"
+                            android:orientation="vertical">
 
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/border_radius_spinner"
-                        android:layout_marginTop="10dp"
-                        app:passwordToggleEnabled="true"
-                        android:paddingHorizontal="10dp">
 
-                        <EditText
-                            android:id="@+id/etPassword"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:drawablePadding="10dp"
-                            android:ems="10"
-                            android:inputType="textPassword"
-                            android:paddingRight="10dp"
-                            android:hint="Contraseña"
-                            android:drawableLeft="@drawable/ic_lock"/>
+                            <com.google.android.material.textfield.TextInputLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/border_radius_spinner"
+                                android:paddingHorizontal="10dp">
+                                <EditText
+                                    android:id="@+id/etUser"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:drawablePadding="10dp"
+                                    android:ems="10"
+                                    android:inputType="textPersonName"
+                                    android:paddingRight="10dp"
+                                    android:paddingLeft="10dp"
+                                    android:hint="Usuario"
+                                    android:text=""/>
+                            </com.google.android.material.textfield.TextInputLayout>
 
-                    </com.google.android.material.textfield.TextInputLayout>
+                            <com.google.android.material.textfield.TextInputLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/border_radius_spinner"
+                                android:layout_marginTop="10dp"
+                                app:passwordToggleEnabled="true"
+                                android:paddingHorizontal="10dp">
 
-                    <Button
-                        android:id="@+id/btnLogin"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp"
-                        android:text="Iniciar"
-                        android:textSize="18sp"
-                        android:textColor="@color/colorWhite"
-                        android:background="@drawable/bg_btn_login"/>
+                                <EditText
+                                    android:id="@+id/etPassword"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:drawablePadding="10dp"
+                                    android:ems="10"
+                                    android:inputType="textPassword"
+                                    android:paddingRight="10dp"
+                                    android:paddingLeft="10dp"
+                                    android:hint="Contraseña"
+                                    android:drawableLeft="@drawable/ic_lock"/>
 
-                    <!--<com.google.android.material.button.MaterialButton
-                        android:layout_marginTop="10dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="INICIAR"
-                        android:background="@drawable/bg_btn_login"
-                        android:layout_marginHorizontal="10dp"
-                        app:cornerRadius="30dp"
-                        android:shadowColor="@color/colorPrimaryDark"
-                        android:elevation="5dp"/>-->
-                </LinearLayout>
-                </LinearLayout>
+                            </com.google.android.material.textfield.TextInputLayout>
+
+                            <Button
+                                android:id="@+id/btnLogin"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="20dp"
+                                android:text="Ingresar"
+                                android:textSize="18sp"
+                                android:textColor="@color/colorWhite"
+                                android:background="@drawable/bg_btn_login"/>
+
+                            <!--<com.google.android.material.button.MaterialButton
+                                android:layout_marginTop="10dp"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="INICIAR"
+                                android:background="@drawable/bg_btn_login"
+                                android:layout_marginHorizontal="10dp"
+                                app:cornerRadius="30dp"
+                                android:shadowColor="@color/colorPrimaryDark"
+                                android:elevation="5dp"/>-->
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
             </ScrollView>
         </LinearLayout>
 

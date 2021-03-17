@@ -37,6 +37,7 @@ import com.shasin.notificationbanner.Banner;
 
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class DetalleComprobanteAdapter  extends RecyclerView.Adapter<DetalleComprobanteAdapter.ProductoViewHolder>{
@@ -50,7 +51,7 @@ public class DetalleComprobanteAdapter  extends RecyclerView.Adapter<DetalleComp
     public DetalleComprobanteAdapter(ComprobanteActivity activity, List<DetalleComprobante> detalleComprobante, String categoria, boolean visualizacion) {
         this.detalleComprobante = detalleComprobante;
         this.activity = activity;
-        this.categoria = categoria.equals("")?"A":categoria;
+        this.categoria = (categoria.equals("") || categoria.equals("A"))?"0":categoria;
         this.visualizacion = visualizacion;
         this.rootView = activity.findViewById(android.R.id.content);
     }
@@ -93,10 +94,17 @@ public class DetalleComprobanteAdapter  extends RecyclerView.Adapter<DetalleComp
 
     public void CambiarPrecio(String categoria){
         try{
-            if(categoria.equals(""))
-                categoria = "A";
+            if(categoria.equals("") || categoria.equalsIgnoreCase("A"))
+                categoria = "0";
             for(DetalleComprobante miDetalle:this.detalleComprobante){
-                miDetalle.getPrecio(categoria);
+                Double cant_ut = 0d;
+                for (DetalleComprobante dc:this.detalleComprobante) {
+                    if(miDetalle.producto.idproducto.equals(dc.producto.idproducto))
+                        cant_ut += dc.cantidad;
+                }
+                Log.d("TAGDETALLE", "Cant: " + miDetalle.producto.nombreproducto + " -> " + cant_ut);
+                miDetalle.getPrecio(miDetalle.producto.reglas, miDetalle.producto.precioscategoria,
+                        categoria, cant_ut, miDetalle.precio);
                 /*miDetalle.precio = miDetalle.producto.getPrecio(categoria);
                 Double ptemp = miDetalle.precio;//GUARDAMOS EL PRECIO DE LA CATEGORIA
                 if(miDetalle.producto.reglas.size()>0){
@@ -165,8 +173,8 @@ public class DetalleComprobanteAdapter  extends RecyclerView.Adapter<DetalleComp
                         ((TextView)view.findViewById(R.id.lblTitle)).setText(detalleComprobante.get(getAdapterPosition()).producto.nombreproducto);
                         ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Está seguro que desea eliminar este ítem?");
                         ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_delete2);
-                        ((Button)view.findViewById(R.id.btnCancel)).setText("Cancelar");
-                        ((Button)view.findViewById(R.id.btnYes)).setText("Si");
+                        ((Button)view.findViewById(R.id.btnCancel)).setText(activity.getResources().getString(R.string.Cancel));
+                        ((Button)view.findViewById(R.id.btnYes)).setText(activity.getResources().getString(R.string.Confirm));
                         final AlertDialog alertDialog = builder.create();
                         view.findViewById(R.id.btnYes).setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -206,18 +214,30 @@ public class DetalleComprobanteAdapter  extends RecyclerView.Adapter<DetalleComp
                                 tvSubtotal.setText(Utils.FormatoMoneda(0d, 2));
                                 detalleComprobante.get(getAdapterPosition()).cantidad = 0d;
                             } else {
+                                DetalleComprobante det = detalleComprobante.get(getAdapterPosition());
                                 Double cant = Double.parseDouble(s.toString().trim());
-                                if (cant > detalleComprobante.get(getAdapterPosition()).producto.stock
-                                        && !visualizacion && detalleComprobante.get(getAdapterPosition()).producto.tipo.equalsIgnoreCase("P")) {
-                                    Banner.make(rootView,activity,Banner.INFO, "El stock disponible es: " + detalleComprobante.get(getAdapterPosition()).producto.stock, Banner.BOTTOM,2000).show();
-                                    detalleComprobante.get(getAdapterPosition()).cantidad = detalleComprobante.get(getAdapterPosition()).producto.stock;
+                                if (cant > det.producto.stock
+                                        && !visualizacion && det.producto.tipo.equalsIgnoreCase("P")) {
+                                    Banner.make(rootView,activity,Banner.INFO, "«" + det.producto.nombreproducto + "» El stock disponible es: " + det.producto.stock, Banner.BOTTOM,4500).show();
+                                    detalleComprobante.get(getAdapterPosition()).cantidad = det.producto.stock;
                                     tvCantidad.setText(detalleComprobante.get(getAdapterPosition()).cantidad.toString());
                                     tvCantidad.clearFocus();
                                     tvCantidad.requestFocus();
                                 } else {
                                     detalleComprobante.get(getAdapterPosition()).cantidad = cant;
-                                    if(!visualizacion)
-                                        tvPrecio.setText(Utils.FormatoMoneda(detalleComprobante.get(getAdapterPosition()).getPrecio(categoria),2));
+                                    if(!visualizacion) {
+                                        Double cant_t = 0d;
+                                        for(DetalleComprobante deta:detalleComprobante){
+                                            if(det.producto.idproducto.equals(deta.producto.idproducto))
+                                                cant_t += deta.cantidad;
+                                        }
+                                        Double precio = detalleComprobante.get(getAdapterPosition()).getPrecio(det.producto.reglas, det.producto.precioscategoria, categoria, cant_t,det.precio);
+                                        tvPrecio.setText(Utils.FormatoMoneda(precio,2));
+                                        for(DetalleComprobante deta:detalleComprobante){
+                                            if(det.producto.idproducto.equals(deta.producto.idproducto))
+                                                deta.precio = precio;
+                                        }
+                                    }
                                     //notifyDataSetChanged();
                                     //CambiarPrecio(categoria);
                                 }
@@ -226,6 +246,8 @@ public class DetalleComprobanteAdapter  extends RecyclerView.Adapter<DetalleComp
                             CalcularTotal();
                         }catch (Exception e){
                             Banner.make(rootView,activity,Banner.ERROR,"Ingrese un valor válido.", Banner.BOTTOM,2000).show();
+                        }finally {
+                            //notifyDataSetChanged();
                         }
                     }
                 });

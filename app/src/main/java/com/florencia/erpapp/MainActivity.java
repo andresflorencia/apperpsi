@@ -1,6 +1,7 @@
 package com.florencia.erpapp;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,6 +14,9 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.app.ProgressDialog;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -21,7 +25,9 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -44,13 +50,17 @@ import com.florencia.erpapp.fragments.PrincipalFragment;
 import com.florencia.erpapp.interfaces.ClienteInterface;
 import com.florencia.erpapp.interfaces.ComprobanteInterface;
 import com.florencia.erpapp.interfaces.ProductoInterface;
+import com.florencia.erpapp.interfaces.UsuarioInterface;
 import com.florencia.erpapp.models.Cliente;
 import com.florencia.erpapp.models.Comprobante;
 import com.florencia.erpapp.models.Pedido;
 import com.florencia.erpapp.models.PedidoInventario;
 import com.florencia.erpapp.models.Permiso;
 import com.florencia.erpapp.models.Producto;
+import com.florencia.erpapp.models.Ubicacion;
+import com.florencia.erpapp.models.Usuario;
 import com.florencia.erpapp.services.GPSTracker;
+import com.florencia.erpapp.services.JobServiceGPS;
 import com.florencia.erpapp.services.SQLite;
 import com.florencia.erpapp.utils.CheckInternet;
 import com.florencia.erpapp.utils.Constants;
@@ -91,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
     private Gson gson = new Gson();
     private ProgressDialog pbProgreso;
     private OkHttpClient okHttpClient;
+    private final static int ID_SERVICE_LOCATION =1000;
     View rootView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
             cliente_cf.nip = "9999999999999";
             cliente_cf.razonsocial = "CONSUMIDOR FINAL";
             cliente_cf.direccion = "N/D";
-            cliente_cf.categoria = "A";
+            cliente_cf.categoria = "0";
             cliente_cf.actualizado = 0;
             cliente_cf.codigosistema = 0;
             cliente_cf.usuarioid = SQLite.usuario.IdUsuario;
@@ -154,6 +165,8 @@ public class MainActivity extends AppCompatActivity {
 
         pbProgreso = new ProgressDialog(this);
 
+        Utils.verificarPermisos(this);
+
         okHttpClient = new OkHttpClient().newBuilder()
                 .connectTimeout(60, TimeUnit.SECONDS)
                 .readTimeout(60, TimeUnit.SECONDS)
@@ -162,6 +175,19 @@ public class MainActivity extends AppCompatActivity {
 
         if(SQLite.gpsTracker==null)
             SQLite.gpsTracker = new GPSTracker(this);
+
+        if (!SQLite.gpsTracker.checkGPSEnabled()) {
+            SQLite.gpsTracker.showSettingsAlert(this);
+        }
+
+        //SUBIR LA LISTA DE UBICACIONES PENDIENTES
+        Thread th = new Thread(){
+            @Override
+            public void run() {
+                loadUbicacion();}
+        };
+        th.start();
+        IniciarServicio();
     }
 
     public void agregaFragment(String backStateName){
@@ -240,13 +266,14 @@ public class MainActivity extends AppCompatActivity {
                             ((TextView)view.findViewById(R.id.lblTitle)).setText("Salir");
                             ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Está seguro que desea cerrar sesión?");
                             ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_exit);
-                            ((Button)view.findViewById(R.id.btnCancel)).setText("Cancelar");
-                            ((Button)view.findViewById(R.id.btnConfirm)).setText("Si");
+                            ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
+                            ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
                             final android.app.AlertDialog alertDialog = builder.create();
                             view.findViewById(R.id.btnConfirm).setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
                                     if(SQLite.usuario.CerrarSesionLocal(getApplicationContext())) {
+                                        DetenerServicio();
                                         Intent i = new Intent(MainActivity.this, actLogin.class);
                                         startActivity(i);
                                         alertDialog.dismiss();
@@ -405,6 +432,7 @@ public class MainActivity extends AppCompatActivity {
                                         miCliente.parroquiaid = clie.get("parroquiaid").isJsonNull()?0:clie.get("parroquiaid").getAsInt();
                                         miCliente.fecharegistro = clie.has("fechareg")?clie.get("fechareg").getAsString():"";
                                         miCliente.longdater = Utils.longDate(miCliente.fecharegistro);
+                                        miCliente.nombrecategoria = clie.has("nombrecategoria")?clie.get("nombrecategoria").getAsString():"";
 
                                         if(miCliente.Save() || miCliente.nip.equals("9999999999999"))
                                             numClientUpdate++;
@@ -499,6 +527,7 @@ public class MainActivity extends AppCompatActivity {
             post.put("usuario",SQLite.usuario.Usuario);
             post.put("clave",SQLite.usuario.Clave);
             post.put("comprobantes", listComprobantes);
+            post.put("establecimientoid", SQLite.usuario.sucursal.IdEstablecimiento);
             String json = post.toString();
             Log.d("TAGJSON", json);
             Call<JsonObject> call=null;
@@ -517,6 +546,25 @@ public class MainActivity extends AppCompatActivity {
                             JsonObject obj = response.body();
                             if (!obj.get("haserror").getAsBoolean()) {
                                 JsonArray jsonComprobantesUpdate = obj.getAsJsonArray("comprobantesupdate");
+
+                                if(obj.has("productos")) {
+                                    JsonArray jsonProductos = obj.getAsJsonArray("productos");
+                                    if (jsonProductos != null) {
+                                        Producto.Delete(SQLite.usuario.sucursal.IdEstablecimiento);
+                                        int num = 1;
+                                        for (JsonElement pro : jsonProductos) {
+                                            JsonObject prod = pro.getAsJsonObject();
+                                            Producto miProducto = new Gson().fromJson(prod, Producto.class);
+                                            if (miProducto != null) {
+                                                if (miProducto.Save()) {
+                                                    num++;
+                                                    Log.d("TAG", prod.get("nombreproducto").getAsString());
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
                                 if(jsonComprobantesUpdate!=null){
                                     int numUpdate = 0;
                                     ContentValues values;
@@ -658,6 +706,7 @@ public class MainActivity extends AppCompatActivity {
                                         values = new ContentValues();
                                         values.put("codigosistema", upd.get("codigosistema_pedido").getAsInt());
                                         values.put("estado", upd.get("codigosistema_pedido").getAsInt());
+                                        values.put("secuencialsistema", upd.get("secuencialsistema").getAsString());
                                         if(Pedido.Update(upd.get("idpedido").getAsInt(), values))
                                             numUpdate++;
                                     }
@@ -976,7 +1025,6 @@ public class MainActivity extends AppCompatActivity {
         try {
             for (int i = 0; i < navigation.getMenu().size(); i++) {
                 MenuItem menuItem = navigation.getMenu().getItem(i);
-                Log.d("TAGPERMISO", menuItem.getTitleCondensed().toString());
                 if (menuItem.hasSubMenu()) {
                     /*for (int j = 0; j < menuItem.getSubMenu().size(); j++) {
                         MenuItem menuSubItem = menuItem.getSubMenu().getItem(j);
@@ -996,8 +1044,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onResume() {
-        toolbar.getNavigationIcon().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
         super.onResume();
+        toolbar.getNavigationIcon().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
     }
 
     private static long presionado;
@@ -1032,4 +1080,128 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void IniciarServicio(){
+        try {
+            ComponentName componentName = new ComponentName(getApplicationContext(), JobServiceGPS.class);
+            JobInfo info;
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
+                info = new JobInfo.Builder(ID_SERVICE_LOCATION, componentName)
+                        .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                        .setPersisted(true)
+                        .setMinimumLatency(5*1000)
+                        .build();
+            }else{
+                info = new JobInfo.Builder(ID_SERVICE_LOCATION, componentName)
+                        .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                        .setPersisted(true)
+                        .setPeriodic(5*1000)
+                        .build();
+            }
+            JobScheduler scheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
+            int result = scheduler.schedule(info);
+            if(result == JobScheduler.RESULT_SUCCESS)
+                Log.d("TAG", "Completado correctamente");
+            else
+                Log.d("TAG", "Ha ocurrido un error en el job!!!");
+        }catch (Exception e){
+            Log.d("TAG", e.getMessage());
+        }
+    }
+
+    private void DetenerServicio(){
+        try {
+            JobScheduler schedule = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
+            schedule.cancel(ID_SERVICE_LOCATION);
+            Log.d("TAG", "Job Cancelado por el usuario!");
+        }catch (Exception e){
+            Log.d("TAG",e.getMessage());
+        }
+    }
+
+    private boolean VerificaServicio(){
+        boolean result = false;
+        try {
+            JobScheduler schedule = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
+            JobInfo jInfo = null;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                jInfo = schedule.getPendingJob(ID_SERVICE_LOCATION);
+            }
+            if(jInfo!=null){
+                result = true;
+                Log.d("TAG","EL SERVICIO ESTA INICIADO");
+            }else
+                Log.d("TAG","EL SERVICIO NO ESTÀ INICIADO");
+        }catch (Exception e){
+            Log.d("TAG",e.getMessage());
+        }
+        return result;
+    }
+
+    private void loadUbicacion(){
+        try{
+            Map<String,Object> datos = new HashMap<>();
+            List<Ubicacion> ubicaciones = Ubicacion.getListSC(SQLite.usuario.IdUsuario);
+            if(ubicaciones == null) {
+                Log.d("TAGMAIN", "La lista es nula");
+                return;
+            }
+            if(ubicaciones.size()==0) {
+                Log.d("TAGMAIN", "La lista está vacía");
+                return;
+            }
+            datos.put("ubicaciones",ubicaciones);
+            Gson gson = new GsonBuilder()
+                    .setLenient()
+                    .create();
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(SQLite.configuracion.url_ws)
+                    .addConverterFactory(GsonConverterFactory.create(gson))
+                    .client(okHttpClient)
+                    .build();
+            UsuarioInterface miInterface = retrofit.create(UsuarioInterface.class);
+
+            Call<JsonObject> call = null;
+            call = miInterface.loadUbicacion(datos);
+            call.enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    if (!response.isSuccessful()) {
+                        return;
+                    }
+                    try {
+                        if (response.body() != null) {
+                            JsonObject obj = response.body();
+                            if (!obj.get("haserror").getAsBoolean()) {
+                                JsonArray jsonUpdate = obj.getAsJsonArray("ubicacionesupdate");
+                                if (jsonUpdate != null) {
+                                    int numUpdate = 0;
+                                    ContentValues values;
+                                    for (JsonElement ele : jsonUpdate) {
+                                        JsonObject upd = ele.getAsJsonObject();
+
+                                        values = new ContentValues();
+                                        values.put("estado", upd.get("codigosistema").getAsInt());
+                                        if (Ubicacion.Update(upd.get("idubicacion").getAsInt(), values))
+                                            numUpdate++;
+                                    }
+                                    Log.d("TAGMAIN", "Se subieron " + numUpdate + "/" + jsonUpdate.size() + " ubicaciones");
+                                }else
+                                    Log.d("TAGMAIN", "Error: El webservice no devolvió valores");
+                            }else
+                                Log.d("TAGMAIN", "Error: " + obj.get("message").getAsString());
+                        }
+                    } catch (Exception e) {
+                        Log.d("TAGMAIN1", e.getMessage());
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    Log.d("TAGMAIN2", t.getMessage());
+                }
+            });
+        }catch (Exception e){
+            Log.d("TAGMAIN3", e.getMessage());
+        }
+    }
 }

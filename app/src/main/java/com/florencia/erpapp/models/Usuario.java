@@ -145,6 +145,7 @@ public class Usuario {
             Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM usuario WHERE usuario = ? and clave = ?", new String[]{ User, Password });
             if (cursor.moveToFirst()) {
                 Item = AsignaDatos(cursor);
+                Item.CapturarPosicion();
             }
             cursor.close();
             sqLiteDatabase.close();
@@ -292,7 +293,8 @@ public class Usuario {
                 .putString("usuario", this.Usuario)
                 .putString("pin", this.Pin)
                 .putString("ultimaconexion", conexionactual)
-                .putString("conexionactual", Utils.getDateFormat("dd MMM yyyy HH:mm"));
+                .putString("conexionactual", Utils.getDateFormat("dd MMM yyyy HH:mm"))
+                .putString("rucempresa", this.sucursal.RUC);
         return editor.commit();
     }
 
@@ -324,7 +326,6 @@ public class Usuario {
             }
 
             if (mipermiso != null) {
-                Log.d("TAGPERMISO",opcion);
                 switch (permiso) {
                     case "lectura":
                         retorno = mipermiso.permisoimpresion.equals("t");
@@ -346,6 +347,41 @@ public class Usuario {
         }
 
         return  retorno;
+    }
+
+    public void CapturarPosicion() {
+        final Handler handler = new Handler();
+        final Usuario usuario = this;
+        Timer timer = new Timer();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                handler.post(new Runnable() {
+                    public void run() {
+                        try {
+                            //Ejecuta tu AsyncTask!
+                            @SuppressLint("StaticFieldLeak") AsyncTask myTask = new AsyncTask() {
+                                @Override
+                                protected Object doInBackground(Object[] objects) {
+                                    if(SQLite.gpsTracker != null) {
+                                        SQLite.gpsTracker.getLastKnownLocation();
+                                        SQLite.gpsTracker.updateGPSCoordinates();
+                                        Ubicacion.Save(usuario.IdUsuario, usuario.sucursal.RUC,
+                                                SQLite.gpsTracker.getLatitude(), SQLite.gpsTracker.getLongitude());
+                                        Log.d("addPosition", "Agregando position local");
+                                    }
+                                    return null;
+                                }
+                            };
+                            myTask.execute();
+                        } catch (Exception e) {
+                            Log.d("erroraddPosition", e.getMessage());
+                        }
+                    }
+                });
+            }
+        };
+        timer.schedule(task, 0, 1000 * 60 * 15);
     }
 }
 

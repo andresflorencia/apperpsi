@@ -41,7 +41,7 @@ public class DetallePedidoAdapter extends RecyclerView.Adapter<DetallePedidoAdap
     public DetallePedidoAdapter(PedidoActivity activity, List<DetallePedido> detallePedido, String categoria, boolean visualizacion) {
         this.detallePedido = detallePedido;
         this.activity = activity;
-        this.categoria = categoria.equals("")?"A":categoria;
+        this.categoria = categoria.equals("")?"0":categoria;
         this.visualizacion = visualizacion;
         this.rootView = activity.findViewById(android.R.id.content);
     }
@@ -84,11 +84,12 @@ public class DetallePedidoAdapter extends RecyclerView.Adapter<DetallePedidoAdap
 
     public void CambiarPrecio(String categoria){
         try{
-            if(categoria.equals(""))
-                categoria = "A";
+            if(categoria.equals("") || categoria.equalsIgnoreCase("A"))
+                categoria = "0";
             for(DetallePedido miDetalle:this.detallePedido){
                 //miDetalle.precio = miDetalle.producto.getPrecio(categoria);
-                miDetalle.getPrecio(categoria);
+                miDetalle.getPrecio(miDetalle.producto.reglas, miDetalle.producto.precioscategoria,
+                        categoria, miDetalle.cantidad, miDetalle.precio);
             }
             notifyDataSetChanged();
         }catch (Exception e){
@@ -144,8 +145,8 @@ public class DetallePedidoAdapter extends RecyclerView.Adapter<DetallePedidoAdap
                         ((TextView)view.findViewById(R.id.lblTitle)).setText(detallePedido.get(getAdapterPosition()).producto.nombreproducto);
                         ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Está seguro que desea eliminar este ítem?");
                         ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_delete2);
-                        ((Button)view.findViewById(R.id.btnCancel)).setText("Cancelar");
-                        ((Button)view.findViewById(R.id.btnYes)).setText("Si");
+                        ((Button)view.findViewById(R.id.btnCancel)).setText(activity.getResources().getString(R.string.Cancel));
+                        ((Button)view.findViewById(R.id.btnYes)).setText(activity.getResources().getString(R.string.Confirm));
                         final AlertDialog alertDialog = builder.create();
                         view.findViewById(R.id.btnYes).setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -181,6 +182,7 @@ public class DetallePedidoAdapter extends RecyclerView.Adapter<DetallePedidoAdap
                                 tvSubtotal.setText(Utils.FormatoMoneda(0d, 2));
                                 detallePedido.get(getAdapterPosition()).cantidad = 0d;
                             } else {
+                                DetallePedido det = detallePedido.get(getAdapterPosition());
                                 Double cant = Double.parseDouble(s.toString().trim());
                                 if (cant <= 0 && !visualizacion) {
                                     //Utils.showMessage(activity, "Especifique una cantidad mayor a 0");
@@ -191,8 +193,10 @@ public class DetallePedidoAdapter extends RecyclerView.Adapter<DetallePedidoAdap
                                     tvCantidad.requestFocus();
                                 } else {
                                     detallePedido.get(getAdapterPosition()).cantidad = cant;
-                                    if(!visualizacion)
-                                        tvPrecio.setText(Utils.FormatoMoneda(detallePedido.get(getAdapterPosition()).getPrecio(categoria),2));
+                                    if(!visualizacion) {
+                                        Double precio = detallePedido.get(getAdapterPosition()).getPrecio(det.producto.reglas, det.producto.precioscategoria, categoria, det.cantidad, det.precio);
+                                        tvPrecio.setText(Utils.FormatoMoneda(precio, 2));
+                                    }
                                 }
                                 tvSubtotal.setText(Utils.FormatoMoneda(detallePedido.get(getAdapterPosition()).Subtotal(), 2));
                             }

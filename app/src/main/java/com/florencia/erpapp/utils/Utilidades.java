@@ -51,6 +51,8 @@ public class Utilidades {
         SQLite.sqlDB.SQLEstructura(context.getString(R.string.dbParroquia));
         SQLite.sqlDB.SQLEstructura(context.getString(R.string.dbPedidoInv));
         SQLite.sqlDB.SQLEstructura(context.getString(R.string.dbDetallePedidoInv));
+        SQLite.sqlDB.SQLEstructura(context.getString(R.string.dbPrecioCategoria));
+        SQLite.sqlDB.SQLEstructura(context.getString(R.string.dbUbicacion));
     }
 
     public static String[] getDateTime() {

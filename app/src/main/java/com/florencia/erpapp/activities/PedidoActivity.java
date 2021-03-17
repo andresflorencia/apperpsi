@@ -124,8 +124,8 @@ public class PedidoActivity extends AppCompatActivity {
                     if(event.getRawX() >= txtCliente.getRight() - txtCliente.getTotalPaddingRight()) {
                         txtCliente.setText("");
                         cliente = new Cliente();
-                        detalleAdapter.categoria = "A";
-                        detalleAdapter.CambiarPrecio("A");
+                        detalleAdapter.categoria = "0";
+                        detalleAdapter.CambiarPrecio("0");
                         return true;
                     }else if(event.getRawX() <= txtCliente.getTotalPaddingLeft()
                             && cliente.idcliente>0 && !cliente.nip.contains("999999999")){
@@ -226,7 +226,7 @@ public class PedidoActivity extends AppCompatActivity {
         }
 
         detalleProductos = new ArrayList<>();
-        detalleAdapter = new DetallePedidoAdapter(this, detalleProductos, cliente.categoria.equals("")?"A":cliente.categoria, idpedido>0);
+        detalleAdapter = new DetallePedidoAdapter(this, detalleProductos, cliente.categoria.equals("")?"0":cliente.categoria, idpedido>0);
         rvDetalle.setAdapter(detalleAdapter);
 
         if(idpedido>0){
@@ -407,8 +407,8 @@ public class PedidoActivity extends AppCompatActivity {
                 ((TextView)view.findViewById(R.id.lblTitle)).setText("Guardar pedido");
                 ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Está seguro que desea guardar este pedido?");
                 ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_save);
-                ((Button)view.findViewById(R.id.btnCancel)).setText("Cancelar");
-                ((Button)view.findViewById(R.id.btnConfirm)).setText("Si");
+                ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
+                ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
                 final AlertDialog alertDialog = builder.create();
                 view.findViewById(R.id.btnConfirm).setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -473,7 +473,7 @@ public class PedidoActivity extends AppCompatActivity {
             pedido.fechacelular = Utils.getDateFormat("yyyy-MM-dd HH:mm:ss");
             pedido.fechapedido = btnFecha.getTag().toString().trim().equals("")?Utils.getDateFormat("yyyy-MM-dd"):btnFecha.getTag().toString().trim();
             pedido.usuarioid = SQLite.usuario.IdUsuario;
-            pedido.categoria = cliente.categoria.equals("")?"A":cliente.categoria;
+            pedido.categoria = cliente.categoria.equals("")?"0":cliente.categoria;
             pedido.parroquiaid = SQLite.usuario.ParroquiaID;
             pedido.longdate = Utils.longDate(Utils.getDateFormat("yyyy-MM-dd"));
 
@@ -487,7 +487,7 @@ public class PedidoActivity extends AppCompatActivity {
                 builder.setTitle("Imprimir");
                 builder.setMessage("¿Desea imprimir el comprobante?");
                 builder.setIcon(R.drawable.ic_printer);
-                builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                builder.setPositiveButton(getResources().getString(R.string.Confirm), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
@@ -501,7 +501,7 @@ public class PedidoActivity extends AppCompatActivity {
                         }
                     }
                 });
-                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                builder.setNegativeButton(getResources().getString(R.string.Cancel), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) { LimpiarDatos();}
                 });
@@ -667,13 +667,23 @@ public class PedidoActivity extends AppCompatActivity {
             switch (requestCode) {
                 case REQUEST_BUSQUEDA:
                     detalleAdapter.visualizacion=false;
-                    for(DetallePedido miP:productBusqueda)
-                        detalleAdapter.detallePedido.add(miP);
+                    for(DetallePedido miP:productBusqueda) {
+                        boolean agregar = true;
+                        for(DetallePedido miD:detalleAdapter.detallePedido){
+                            if(miP.producto.idproducto.equals(miD.producto.idproducto)) {
+                                miD.cantidad += miP.cantidad;
+                                agregar = false;
+                                break;
+                            }
+                        }
+                        if(agregar)
+                            detalleAdapter.detallePedido.add(miP);
+                    }
                     pedido.detalle.clear();
                     pedido.detalle.addAll(detalleAdapter.detallePedido);
                     pedido.getTotal();
                     this.setSubtotales(pedido.total, pedido.subtotal, pedido.subtotaliva);
-                    detalleAdapter.CambiarPrecio(cliente.categoria.equals("")?"A":cliente.categoria);
+                    detalleAdapter.CambiarPrecio(cliente.categoria.equals("")?"0":cliente.categoria);
                     detalleAdapter.CalcularTotal();
                     detalleAdapter.notifyDataSetChanged();
                     Log.d("TAGPRODUCTO",String.valueOf(detalleAdapter.detallePedido.size()));

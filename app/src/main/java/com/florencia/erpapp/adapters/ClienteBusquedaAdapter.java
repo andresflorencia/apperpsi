@@ -69,6 +69,7 @@ public class ClienteBusquedaAdapter extends RecyclerView.Adapter<ClienteBusqueda
                         .filter(i -> i.nip.concat(i.razonsocial.toLowerCase())
                                 .concat(i.nombrecomercial.toLowerCase())
                                 .concat(i.direccion.toLowerCase()
+                                .concat(i.nombrecategoria.toLowerCase())
                                 ).contains(busqueda.toLowerCase()))
                         .collect(Collectors.<Cliente>toList());
                 listClients.addAll(collect);
@@ -77,6 +78,7 @@ public class ClienteBusquedaAdapter extends RecyclerView.Adapter<ClienteBusqueda
                     if(i.nip.concat(i.razonsocial.toLowerCase())
                             .concat(i.nombrecomercial.toLowerCase())
                             .concat(i.direccion.toLowerCase()
+                            .concat(i.nombrecategoria.toLowerCase())
                             ).contains(busqueda.toLowerCase()))
                         listClients.add(i);
                 }
@@ -103,7 +105,7 @@ public class ClienteBusquedaAdapter extends RecyclerView.Adapter<ClienteBusqueda
             tvRazonSocial.setText(cliente.nip + " - "+ cliente.razonsocial);
             tvNombreComercial.setText(cliente.nombrecomercial);
             tvDireccion.setText(cliente.direccion);
-            tvContacto.setText(cliente.fono1 + " - " + cliente.fono2 +" - Categoría: " + cliente.categoria);
+            tvContacto.setText(cliente.fono1 + " - " + cliente.fono2 +" - Categoría: " + cliente.nombrecategoria);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

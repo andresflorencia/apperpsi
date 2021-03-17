@@ -44,7 +44,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="5dp">
+                        android:padding="5dp"
+                        android:layout_marginBottom="5dp">
                         <TextView
                             android:id="@+id/lblInfoPersonal"
                             android:layout_width="match_parent"
@@ -269,118 +270,161 @@
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:cardCornerRadius="6dp"
-                app:cardElevation="5dp"
-                android:layout_marginHorizontal="10dp"
-                android:layout_marginBottom="5dp">
-                <LinearLayout
+                <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="5dp">
-                    <TextView
-                        android:id="@+id/lblInfoContacto"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Información de Contacto"
-                        android:layout_margin="5dp"
-                        android:textColor="@color/colorDate"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:drawableRight="@drawable/ic_row_up"/>
-
+                    app:cardCornerRadius="6dp"
+                    app:cardElevation="5dp"
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_marginBottom="5dp">
                     <LinearLayout
-                        android:id="@+id/lyInfoContacto"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
-                        <LinearLayout
+                        android:orientation="vertical"
+                        android:padding="5dp"
+                        android:layout_marginBottom="5dp">
+                        <TextView
+                            android:id="@+id/lblInfoContacto"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_marginTop="3dp">
-                            <com.google.android.material.textfield.TextInputLayout
-                                android:layout_width="0dp"
-                                android:layout_weight="1"
+                            android:text="Información de Contacto"
+                            android:layout_margin="5dp"
+                            android:textColor="@color/colorDate"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:drawableRight="@drawable/ic_row_up"/>
+
+                        <LinearLayout
+                            android:id="@+id/lyInfoContacto"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+                            <LinearLayout
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:hint="Celular"
-                                android:textColorHint="@color/texthint"
-                                android:background="@drawable/border_radius_spinner"
-                                android:paddingHorizontal="5dp"
-                                android:layout_marginRight="2dp">
-                                <EditText
-                                    android:id="@+id/txtfono1"
-                                    android:layout_width="match_parent"
-                                    android:inputType="phone"
-                                    android:textAlignment="center"
-                                    android:layout_height="35dp" android:hint=""
+                                android:orientation="horizontal"
+                                android:layout_marginTop="3dp">
+                                <com.google.android.material.textfield.TextInputLayout
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_height="wrap_content"
+                                    android:hint="Celular"
+                                    android:textColorHint="@color/texthint"
+                                    android:background="@drawable/border_radius_spinner"
                                     android:paddingHorizontal="5dp"
-                                    android:background="@null"
-                                    android:selectAllOnFocus="true"/>
-                            </com.google.android.material.textfield.TextInputLayout>
+                                    android:layout_marginRight="2dp">
+                                    <EditText
+                                        android:id="@+id/txtfono1"
+                                        android:layout_width="match_parent"
+                                        android:inputType="phone"
+                                        android:textAlignment="center"
+                                        android:layout_height="35dp" android:hint=""
+                                        android:paddingHorizontal="5dp"
+                                        android:background="@null"
+                                        android:selectAllOnFocus="true"/>
+                                </com.google.android.material.textfield.TextInputLayout>
+                                <com.google.android.material.textfield.TextInputLayout
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_height="wrap_content"
+                                    android:hint="Convencional"
+                                    android:textColorHint="@color/texthint"
+                                    android:background="@drawable/border_radius_spinner"
+                                    android:paddingHorizontal="5dp"
+                                    android:layout_marginLeft="2dp">
+                                    <EditText
+                                        android:id="@+id/txtfono2"
+                                        android:layout_width="match_parent"
+                                        android:inputType="phone"
+                                        android:textAlignment="center"
+                                        android:layout_height="35dp"
+                                        android:hint=""
+                                        android:paddingHorizontal="5dp"
+                                        android:background="@null"
+                                        android:selectAllOnFocus="true"/>
+                                </com.google.android.material.textfield.TextInputLayout>
+                            </LinearLayout>
                             <com.google.android.material.textfield.TextInputLayout
-                                android:layout_width="0dp"
-                                android:layout_weight="1"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:hint="Convencional"
+                                android:hint="Correo"
                                 android:textColorHint="@color/texthint"
                                 android:background="@drawable/border_radius_spinner"
-                                android:paddingHorizontal="5dp"
-                                android:layout_marginLeft="2dp">
+                                android:layout_marginTop="5dp"
+                                android:paddingHorizontal="5dp">
                                 <EditText
-                                    android:id="@+id/txtfono2"
+                                    android:id="@+id/txtCorreo"
                                     android:layout_width="match_parent"
-                                    android:inputType="phone"
-                                    android:textAlignment="center"
+                                    android:inputType="textEmailAddress"
                                     android:layout_height="35dp"
                                     android:hint=""
-                                    android:paddingHorizontal="5dp"
                                     android:background="@null"
                                     android:selectAllOnFocus="true"/>
                             </com.google.android.material.textfield.TextInputLayout>
-                        </LinearLayout>
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="Correo"
-                            android:textColorHint="@color/texthint"
-                            android:background="@drawable/border_radius_spinner"
-                            android:layout_marginTop="5dp"
-                            android:paddingHorizontal="5dp">
-                            <EditText
-                                android:id="@+id/txtCorreo"
-                                android:layout_width="match_parent"
-                                android:inputType="textEmailAddress"
-                                android:layout_height="35dp"
-                                android:hint=""
-                                android:background="@null"
-                                android:selectAllOnFocus="true"/>
-                        </com.google.android.material.textfield.TextInputLayout>
 
-                        <com.google.android.material.textfield.TextInputLayout
+                            <com.google.android.material.textfield.TextInputLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="Observación"
+                                android:textColorHint="@color/texthint"
+                                android:background="@drawable/border_radius_spinner"
+                                android:layout_marginTop="5dp"
+                                android:paddingHorizontal="5dp">
+                                <EditText
+                                    android:id="@+id/txtObservacion"
+                                    android:lines="3"
+                                    android:layout_width="match_parent"
+                                    android:maxLines="3"
+                                    android:inputType="textMultiLine|textCapCharacters"
+                                    android:layout_height="wrap_content"
+                                    android:background="@null"/>
+                            </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cvInfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:cardCornerRadius="6dp"
+                    app:cardElevation="5dp"
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_marginVertical="5dp">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="5dp"
+                        android:layout_marginBottom="5dp">
+                        <TextView
+                            android:id="@+id/lblInfoAdicional"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Observación"
-                            android:textColorHint="@color/texthint"
-                            android:background="@drawable/border_radius_spinner"
-                            android:layout_marginTop="5dp"
-                            android:paddingHorizontal="5dp">
-                            <EditText
-                                android:id="@+id/txtObservacion"
-                                android:lines="3"
-                                android:layout_width="match_parent"
-                                android:maxLines="3"
-                                android:inputType="textMultiLine|textCapCharacters"
-                                android:layout_height="wrap_content"
-                                android:background="@null"/>
-                        </com.google.android.material.textfield.TextInputLayout>
+                            android:text="Información Adicional"
+                            android:layout_margin="5dp"
+                            android:textColor="@color/colorDate"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:drawableRight="@drawable/ic_row_up"/>
+
+                        <LinearLayout
+                            android:id="@+id/lyInfoAdicional"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_marginHorizontal="5dp">
+                                <TextView
+                                    android:id="@+id/lblInfo"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="Fecha Registro: "
+                                    style="@style/TextAppearance.AppCompat.Widget.PopupMenu.Small"/>
+                        </LinearLayout>
                     </LinearLayout>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
+                </androidx.cardview.widget.CardView>
             </LinearLayout>
         </ScrollView>
     </LinearLayout>

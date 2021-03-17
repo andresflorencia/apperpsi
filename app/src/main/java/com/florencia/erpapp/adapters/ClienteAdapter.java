@@ -73,6 +73,7 @@ public class ClienteAdapter extends RecyclerView.Adapter<ClienteAdapter.ClienteV
                         .filter(i -> i.nip.concat(i.razonsocial.toLowerCase())
                                 .concat(i.nombrecomercial.toLowerCase())
                                 .concat(i.direccion.toLowerCase()
+                                .concat(i.nombrecategoria.toLowerCase())
                                 ).contains(busqueda.toLowerCase()))
                         .collect(Collectors.<Cliente>toList());
                 listClients.addAll(collect);
@@ -81,6 +82,7 @@ public class ClienteAdapter extends RecyclerView.Adapter<ClienteAdapter.ClienteV
                     if(i.nip.concat(i.razonsocial.toLowerCase())
                             .concat(i.nombrecomercial.toLowerCase())
                             .concat(i.direccion.toLowerCase()
+                            .concat(i.nombrecategoria.toLowerCase())
                             ).contains(busqueda.toLowerCase()))
                         listClients.add(i);
                 }
@@ -115,7 +117,7 @@ public class ClienteAdapter extends RecyclerView.Adapter<ClienteAdapter.ClienteV
             tvRazonSocial.setText(cliente.nip + " - "+ cliente.razonsocial);
             tvNombreComercial.setText(cliente.nombrecomercial);
             tvDireccion.setText(cliente.direccion);
-            tvContacto.setText(cliente.fono1 + " - " + cliente.fono2 + " - Categoría: " + cliente.categoria);
+            tvContacto.setText(cliente.fono1 + " - " + cliente.fono2 + " - Categoría: " + cliente.nombrecategoria);
             //btnEdit.setTag(cliente.idcliente);
             //btnNewDocument.setTag(cliente.idcliente);
             if((cliente.codigosistema == 0 || cliente.actualizado == 1) && !cliente.nip.contains("999999999")) {

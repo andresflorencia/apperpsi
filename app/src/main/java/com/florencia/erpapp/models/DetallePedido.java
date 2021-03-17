@@ -118,4 +118,41 @@ public class DetallePedido {
         }
         return this.precio;
     }
+
+    public Double getPrecio(List<Regla> reglas, List<PrecioCategoria> categorias, String categcliente, Double cantidad, Double precio_act){
+        try {
+            this.precio = precio_act;
+            Double precioregla = 0d;
+            Double ptemp = this.precio;//GUARDAMOS EL PRECIO DE LA CATEGORIA
+            if (reglas.size() > 0) {
+                for (Regla r : reglas) {
+                    if (cantidad >= r.cantidad) {
+                        this.precio = r.precio;
+                        precioregla = r.precio;
+                        break;
+                    }
+                }
+            }
+            PrecioCategoria categ_temp = null;
+            for (PrecioCategoria cat: categorias) {
+                if(cat.categoriaid == Integer.valueOf(categcliente)){
+                    precio_act = cat.valor;
+                    categ_temp = cat;
+                    break;
+                }
+            }
+
+            //SI PRECIO DE CATEGORIA ES MENOR AL PRECIO DE ALGUNA REGLAPRECIO, CONSERVAMOS EL DE LA CATEGORIA
+            if (this.precio > precio_act)
+                this.precio = ptemp;
+
+            if(categ_temp != null){
+                if(precioregla == 0 || categ_temp.prioridad.equalsIgnoreCase("t"))
+                    this.precio = categ_temp.valor;
+            }
+        }catch (Exception e){
+            Log.d("TAGDETALLECOMPROBANTE", "getPrecio2(): " + e.getMessage());
+        }
+        return this.precio;
+    }
 }
