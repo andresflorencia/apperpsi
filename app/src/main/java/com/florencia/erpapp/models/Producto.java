@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.os.Build;
 import android.util.Log;
 
 import com.florencia.erpapp.services.SQLite;
@@ -15,6 +16,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 public class Producto
 {
@@ -61,6 +65,14 @@ public class Producto
 
     public Double getPrecioSugerido(){
         Double pvpR = this.getPrecio("R");
+        if(this.precioscategoria.size()>0){
+            for (PrecioCategoria pc:this.precioscategoria) {
+                if(pc.categoriaid.equals(0)){
+                    pvpR = pc.valor;
+                    break;
+                }
+            }
+        }
         return pvpR + (pvpR*this.porcentajeiva/100);
     }
 

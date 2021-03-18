@@ -291,7 +291,7 @@
             CONSTRAINT ukparroquia UNIQUE(idparroquia)
         );
     </string>
-    
+
     <string name="dbPedidoInv">
         CREATE TABLE IF NOT EXISTS pedidoinv(
             idpedido INTEGER PRIMARY KEY AUTOINCREMENT,

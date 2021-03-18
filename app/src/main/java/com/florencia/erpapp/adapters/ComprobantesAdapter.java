@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,14 +15,17 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.florencia.erpapp.R;
 import com.florencia.erpapp.activities.ComprobanteActivity;
+import com.florencia.erpapp.activities.ListaComprobantesActivity;
 import com.florencia.erpapp.activities.PedidoActivity;
 import com.florencia.erpapp.activities.PedidoInventarioActivity;
 import com.florencia.erpapp.activities.RecepcionActivity;
 import com.florencia.erpapp.activities.TransferenciaActivity;
+import com.florencia.erpapp.fragments.InfoFacturaDialogFragment;
 import com.florencia.erpapp.models.Comprobante;
 import com.florencia.erpapp.models.Pedido;
 import com.florencia.erpapp.models.PedidoInventario;
@@ -42,12 +46,12 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
     private List<Comprobante> orginalItems = new ArrayList<>();
     private List<Pedido> orginalItemsP = new ArrayList<>();
     private List<PedidoInventario> orginalItemsPI = new ArrayList<>();
-    Activity activity;
+    ListaComprobantesActivity activity;
     String tipobusqueda;
     View rootView;
     Boolean retornar;
 
-    public ComprobantesAdapter(Activity activity, List<Comprobante> listComprobantes, List<Pedido> listPedidos, List<PedidoInventario> listPedidosInv, String tipobusqueda, Boolean retornar) {
+    public ComprobantesAdapter(ListaComprobantesActivity activity, List<Comprobante> listComprobantes, List<Pedido> listPedidos, List<PedidoInventario> listPedidosInv, String tipobusqueda, Boolean retornar) {
         this.activity = activity;
         this.listComprobantes= listComprobantes;
         this.listPedidos = listPedidos;
@@ -187,7 +191,7 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
     class ComprobanteViewHolder extends RecyclerView.ViewHolder{
 
         TextView tvNombreCliente, tvNumeroComprobante, tvTotal, tvFecha;
-        ImageButton btnAnular;
+        ImageButton btnAnular, btnPreview;
 
         ComprobanteViewHolder(@NonNull View itemView){
             super(itemView);
@@ -196,6 +200,7 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
             tvTotal = itemView.findViewById(R.id.tv_Total);
             tvFecha = itemView.findViewById(R.id.tv_Fecha);
             btnAnular = itemView.findViewById(R.id.btnAnular);
+            btnPreview = itemView.findViewById(R.id.btnPreview);
         }
 
         void bindComprobante(final Comprobante comprobante, final Pedido pedido, final PedidoInventario pedidoinv){
@@ -205,6 +210,7 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                     tvNumeroComprobante.setText("N°: " + comprobante.codigotransaccion);
                     tvTotal.setText("Total: " + Utils.FormatoMoneda(comprobante.total, 2));
                     tvFecha.setText("Fecha: " + comprobante.fechadocumento);
+                    btnPreview.setVisibility(View.VISIBLE);
 
                     if (comprobante.estado == 0 && comprobante.codigosistema == 0) {
                         btnAnular.setVisibility(View.VISIBLE);
@@ -222,7 +228,7 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                     tvNumeroComprobante.setText("N°: " + pedido.secuencialpedido);
                     tvTotal.setText("Total: " + Utils.FormatoMoneda(pedido.total, 2));
                     tvFecha.setText("F. Pedido: " + pedido.fechapedido + "\nF. Regist: " + pedido.fechacelular);
-
+                    btnPreview.setVisibility(View.VISIBLE);
                     if (pedido.estado == 1 && pedido.codigosistema == 0) {
                         btnAnular.setVisibility(View.VISIBLE);
                         btnAnular.setImageResource(R.drawable.ic_delete2);
@@ -274,9 +280,7 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                 Log.d("TAGCOMPROBANTEADAPTER", "bindComprobante(): " + e.getMessage());
             }
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            itemView.setOnClickListener(v -> {
                     int idcomprobante=0;
                     if(tipobusqueda.equals("01")
                             || tipobusqueda.equals("8,23") || tipobusqueda.equals("23,8")
@@ -315,87 +319,83 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                         activity.startActivity(i);
                     }
                 }
-            });
+            );
 
 
-            itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    String secuencial = "";
-                    switch (tipobusqueda) {
-                        case "01":
-                        case "4,20":
-                        case "20,4":
-                        case "8,23":
-                        case "23,8":
-                            secuencial = listComprobantes.get(getAdapterPosition()).codigotransaccion;
-                            break;
-                        case "PC":
-                            secuencial = listPedidos.get(getAdapterPosition()).secuencialpedido;
-                            break;
-                        case "PI":
-                            secuencial = listPedidosInv.get(getAdapterPosition()).codigopedido;
-                            break;
-                    }
-                    AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-                    builder.setTitle("Eliminar documento «" + secuencial + "»");
-                    builder.setMessage("¿Está seguro que desea eliminar este documento?\n" +
-                            "Nota:\n" +
-                            "1.- Después de eliminado no podrá sincronizarse y ya no será visible.\n" +
-                            "2.- Este registro solo se eliminará de su dispositivo.");
-                    builder.setIcon(R.drawable.ic_delete2);
-                    builder.setPositiveButton(activity.getResources().getString(R.string.Confirm), new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            int eliminado = 0;
-                            String numdoc = "";
-                            switch (tipobusqueda) {
-                                case "01":
-                                case "4,20":
-                                case "20,4":
-                                case "8,23":
-                                case "23,8":
-                                    eliminado = Comprobante.Delete(listComprobantes.get(getAdapterPosition()).idcomprobante, "", "", 0, false);
-                                    if(eliminado > 0){
-                                        numdoc = listComprobantes.get(getAdapterPosition()).codigotransaccion;
-                                        listComprobantes.remove(getAdapterPosition());
-                                        notifyDataSetChanged();
-                                    }
-                                    break;
-                                case "PC":
-                                    eliminado = Pedido.Delete(listPedidos.get(getAdapterPosition()).idpedido, "", "", 0, false);
-                                    if(eliminado > 0){
-                                        numdoc = listPedidos.get(getAdapterPosition()).secuencialpedido;
-                                        listPedidos.remove(getAdapterPosition());
-                                        notifyDataSetChanged();
-                                    }
-                                    break;
-                                case "PI":
-                                    eliminado = PedidoInventario.Delete(listPedidosInv.get(getAdapterPosition()).idpedido, "", "", 0, false);
-                                    if(eliminado > 0){
-                                        numdoc = listPedidosInv.get(getAdapterPosition()).codigopedido;
-                                        listPedidosInv.remove(getAdapterPosition());
-                                        notifyDataSetChanged();
-                                    }
-                                    break;
-                            }
-
-                            if(eliminado > 0){
-                                Banner.make(rootView,activity,Banner.SUCCESS, "Documento «"+numdoc+"» eliminado correctamente.", Banner.BOTTOM,3000).show();
-                            }else{
-                                Banner.make(rootView,activity,Banner.ERROR, Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM,3000).show();
-                            }
+            itemView.setOnLongClickListener(v -> {
+                        String secuencial = "";
+                        switch (tipobusqueda) {
+                            case "01":
+                            case "4,20":
+                            case "20,4":
+                            case "8,23":
+                            case "23,8":
+                                secuencial = listComprobantes.get(getAdapterPosition()).codigotransaccion;
+                                break;
+                            case "PC":
+                                secuencial = listPedidos.get(getAdapterPosition()).secuencialpedido;
+                                break;
+                            case "PI":
+                                secuencial = listPedidosInv.get(getAdapterPosition()).codigopedido;
+                                break;
                         }
-                    });
-                    builder.setNegativeButton(activity.getResources().getString(R.string.Cancel), null);
-                    builder.show();
-                    return false;
-                }
-            });
+                        AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                        builder.setTitle("Eliminar documento «" + secuencial + "»");
+                        builder.setMessage("¿Está seguro que desea eliminar este documento?\n" +
+                                "Nota:\n" +
+                                "1.- Después de eliminado no podrá sincronizarse y ya no será visible.\n" +
+                                "2.- Este registro solo se eliminará de su dispositivo.");
+                        builder.setIcon(R.drawable.ic_delete2);
+                        builder.setPositiveButton(activity.getResources().getString(R.string.Confirm), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                int eliminado = 0;
+                                String numdoc = "";
+                                switch (tipobusqueda) {
+                                    case "01":
+                                    case "4,20":
+                                    case "20,4":
+                                    case "8,23":
+                                    case "23,8":
+                                        eliminado = Comprobante.Delete(listComprobantes.get(getAdapterPosition()).idcomprobante, "", "", 0, false);
+                                        if (eliminado > 0) {
+                                            numdoc = listComprobantes.get(getAdapterPosition()).codigotransaccion;
+                                            listComprobantes.remove(getAdapterPosition());
+                                            notifyDataSetChanged();
+                                        }
+                                        break;
+                                    case "PC":
+                                        eliminado = Pedido.Delete(listPedidos.get(getAdapterPosition()).idpedido, "", "", 0, false);
+                                        if (eliminado > 0) {
+                                            numdoc = listPedidos.get(getAdapterPosition()).secuencialpedido;
+                                            listPedidos.remove(getAdapterPosition());
+                                            notifyDataSetChanged();
+                                        }
+                                        break;
+                                    case "PI":
+                                        eliminado = PedidoInventario.Delete(listPedidosInv.get(getAdapterPosition()).idpedido, "", "", 0, false);
+                                        if (eliminado > 0) {
+                                            numdoc = listPedidosInv.get(getAdapterPosition()).codigopedido;
+                                            listPedidosInv.remove(getAdapterPosition());
+                                            notifyDataSetChanged();
+                                        }
+                                        break;
+                                }
 
-            btnAnular.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+                                if (eliminado > 0) {
+                                    Banner.make(rootView, activity, Banner.SUCCESS, "Documento «" + numdoc + "» eliminado correctamente.", Banner.BOTTOM, 3000).show();
+                                } else {
+                                    Banner.make(rootView, activity, Banner.ERROR, Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM, 3000).show();
+                                }
+                            }
+                        });
+                        builder.setNegativeButton(activity.getResources().getString(R.string.Cancel), null);
+                        builder.show();
+                        return false;
+                    }
+            );
+
+            btnAnular.setOnClickListener(v -> {
                     String secuencial = "";
                     if(tipobusqueda.equals("01"))
                         secuencial = listComprobantes.get(getAdapterPosition()).codigotransaccion;
@@ -445,8 +445,24 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                     builder.setNegativeButton(activity.getResources().getString(R.string.Cancel), null);
                     builder.show();
                 }
-            });
+            );
 
+            btnPreview.setOnClickListener(v -> {
+                        DialogFragment dialogFragment = new InfoFacturaDialogFragment();
+                        Bundle bundle = new Bundle();
+                        switch (tipobusqueda) {
+                            case "01":
+                                bundle.putInt("id", listComprobantes.get(getAdapterPosition()).idcomprobante);
+                                break;
+                            case "PC":
+                                bundle.putInt("id", listPedidos.get(getAdapterPosition()).idpedido);
+                                break;
+                        }
+                        bundle.putString("tipobusqueda", tipobusqueda);
+                        dialogFragment.setArguments(bundle);
+                        dialogFragment.show(activity.getSupportFragmentManager(), "dialog");
+                    }
+            );
         }
     }
 }

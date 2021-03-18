@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -20,6 +21,7 @@ import com.florencia.erpapp.R;
 import com.florencia.erpapp.models.Lote;
 import com.florencia.erpapp.models.Producto;
 import com.florencia.erpapp.models.Regla;
+import com.florencia.erpapp.services.GPSTracker;
 import com.florencia.erpapp.services.SQLite;
 import com.florencia.erpapp.utils.Utils;
 
@@ -29,7 +31,9 @@ import com.florencia.erpapp.utils.Utils;
 public class InfoItemDialogFragment extends AppCompatDialogFragment {
 
     private View view;
-    private TextView txtNombre, txtInfo;
+    private TextView txtNombre, txtInfoRight, txtInfoLeft, lblNumLote, lblFecVenc, lblStock, lblReglasPrecio,
+            lblCant, lblValido, lblPrecio;
+    private LinearLayout lyLotes, lyReglasPrecio;
     private ProgressBar pbCargando;
     private ImageButton btnCerrar;
     Producto producto = new Producto();
@@ -44,8 +48,18 @@ public class InfoItemDialogFragment extends AppCompatDialogFragment {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_info_item_dialog, container, false);
 
-        txtNombre = (TextView)view.findViewById(R.id.txtNombre);
-        txtInfo = (TextView)view.findViewById(R.id.txtInfo);
+        txtNombre = view.findViewById(R.id.txtNombre);
+        txtInfoRight = view.findViewById(R.id.txtInfoRight);
+        txtInfoLeft = view.findViewById(R.id.txtInfoLeft);
+        lblNumLote = view.findViewById(R.id.lblNumLote);
+        lblFecVenc = view.findViewById(R.id.lblFecVenc);
+        lblStock = view.findViewById(R.id.lblStock);
+        lblReglasPrecio = view.findViewById(R.id.lblReglasPrecio);
+        lblCant = view.findViewById(R.id.lblCant);
+        lblValido = view.findViewById(R.id.lblValido);
+        lblPrecio = view.findViewById(R.id.lblPrecio);
+        lyLotes = view.findViewById(R.id.lyLotes);
+        lyReglasPrecio = view.findViewById(R.id.lyReglasPrecio);
         pbCargando = view.findViewById(R.id.pbCargando);
         btnCerrar = view.findViewById(R.id.btnCerrar);
 
@@ -77,32 +91,47 @@ public class InfoItemDialogFragment extends AppCompatDialogFragment {
                         public void run() {
                             if(producto != null){
                                 txtNombre.setText(producto.nombreproducto);
-                                String text = "";
+                                String textLeft = "", textRight = "";
 
-                                text = text.concat("<strong>Código: </strong> ").concat(producto.codigoproducto).concat("<br>")
-                                    .concat("<strong>Tipo:</strong> "+ (producto.tipo.equalsIgnoreCase("S")?"SERVICIO":"PRODUCTO").concat("<br>"))
-                                    .concat("<strong>Clasificación: </strong> ").concat(producto.nombreclasificacion).concat("<br>")
-                                    .concat("<strong>Precio Referencia: </strong> ").concat(Utils.FormatoMoneda(producto.pvp,2).concat("<br>"))
-                                    .concat(producto.unidadesporcaja > 0?"<strong>U/Caja:</strong> ".concat(producto.unidadesporcaja.toString()):"").concat("<br>")
-                                    .concat(producto.tipo.equalsIgnoreCase("S")?"":"<strong>Stock: </strong> ".concat(producto.stock.toString()).concat("<br>"));
+                                textLeft = textLeft.concat("Código:\n")
+                                    .concat("Tipo:\n")
+                                    .concat("Clasificación:\n")
+                                    .concat("PVP Normal:\n")
+                                    .concat("IVA:\n")
+                                    .concat(producto.unidadesporcaja > 0?"U/Caja:\n":"")
+                                    .concat(producto.tipo.equalsIgnoreCase("S")?"":"Stock:\n")
+                                    .concat(producto.lotes.size()>0?"\n\nLOTES:":"");
+
+                                textRight = textRight.concat(producto.codigoproducto).concat("\n")
+                                        .concat(producto.tipo.equalsIgnoreCase("S")?"SERVICIO":"PRODUCTO").concat("\n")
+                                        .concat(producto.nombreclasificacion).concat("\n")
+                                        .concat(Utils.FormatoMoneda(producto.getPrecioSugerido(),2).concat("\n"))
+                                        .concat(producto.porcentajeiva>0?"Si":"No").concat("\n")
+                                        .concat(producto.unidadesporcaja > 0?producto.unidadesporcaja.toString()+"\n":"")
+                                        .concat(producto.tipo.equalsIgnoreCase("S")?"":producto.stock.toString());
+
+                                txtInfoLeft.setText(textLeft);
+                                txtInfoRight.setText(textRight);
 
                                 if(producto.lotes.size()>0){
-                                    text += "<br><h5>Lotes</h5><ol>";
-                                    for(Lote lote:producto.lotes)
-                                        text = text.concat("<li><strong>N°:</strong> " + (lote.numerolote.equals("")?"Sin Lote":lote.numerolote) + " <strong> Venc.: </strong>" + lote.fechavencimiento + " <strong> Stock: </strong>" + lote.stock);
-                                    text += "</ol>";
-                                }
-                                if(producto.reglas.size()>0){
-                                    text += "<br><h5>Regla de Precios</h5><ol>";
-                                    for(Regla regla:producto.reglas)
-                                        text = text.concat("<li><strong>Cant ≥ </strong> " + regla.cantidad + " <strong> PVP: </strong>" + Utils.FormatoMoneda(regla.precio,2) + " <strong> Fec. Max. </strong>" + regla.fechamaxima);
-                                    text += "</ol>";
-                                }
+                                    for(Lote lote:producto.lotes) {
+                                        lblNumLote.setText(lblNumLote.getText().toString().concat(lote.numerolote.equals("")?"Sin Lote":lote.numerolote).concat("\n"));
+                                        lblFecVenc.setText(lblFecVenc.getText().toString().concat(lote.fechavencimiento).concat("\n"));
+                                        lblStock.setText(lblStock.getText().toString().concat(Utils.RoundDecimal(lote.stock,2).toString()).concat("\n"));
+                                    }
+                                }else
+                                    lyLotes.setVisibility(View.GONE);
 
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                                    txtInfo.setText(Html.fromHtml(text, Html.FROM_HTML_MODE_COMPACT));
-                                else
-                                    txtInfo.setText(Html.fromHtml(text));
+                                if(producto.reglas.size()>0){
+                                    for(Regla regla:producto.reglas) {
+                                        lblCant.setText(lblCant.getText().toString().concat(Utils.RoundDecimal(regla.cantidad,2).toString()).concat("\n"));
+                                        lblValido.setText(lblValido.getText().toString().concat(regla.fechamaxima).concat("\n"));
+                                        lblPrecio.setText(lblPrecio.getText().toString().concat(Utils.FormatoMoneda(regla.precio,2)).concat("\n"));
+                                    }
+                                }else {
+                                    lyReglasPrecio.setVisibility(View.GONE);
+                                    lblReglasPrecio.setVisibility(View.GONE);
+                                }
                             }
                             pbCargando.setVisibility(View.GONE);
                         }
