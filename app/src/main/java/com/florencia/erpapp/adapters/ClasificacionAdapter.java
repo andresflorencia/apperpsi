@@ -70,9 +70,7 @@ public class ClasificacionAdapter extends RecyclerView.Adapter<ClasificacionAdap
                 itemView.setBackgroundResource(R.drawable.bg_white);
             }
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            itemView.setOnClickListener(v -> {
                     Categoria miC = categorias.get(getAdapterPosition());
                     categorias.get(getAdapterPosition()).seleccionado = true;
                     for(Categoria c:categorias){
@@ -81,8 +79,7 @@ public class ClasificacionAdapter extends RecyclerView.Adapter<ClasificacionAdap
                     }
                     notifyDataSetChanged();
                     activity.productoAdapter.filter_by_clasif(miC.categoriaid);
-                }
-            });
+                });
         }
 
     }

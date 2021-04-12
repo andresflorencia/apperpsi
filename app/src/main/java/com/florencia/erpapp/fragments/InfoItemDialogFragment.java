@@ -1,6 +1,7 @@
 package com.florencia.erpapp.fragments;
 
 
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -19,6 +20,7 @@ import android.widget.TextView;
 
 import com.florencia.erpapp.R;
 import com.florencia.erpapp.models.Lote;
+import com.florencia.erpapp.models.PrecioCategoria;
 import com.florencia.erpapp.models.Producto;
 import com.florencia.erpapp.models.Regla;
 import com.florencia.erpapp.services.GPSTracker;
@@ -69,13 +71,10 @@ public class InfoItemDialogFragment extends AppCompatDialogFragment {
                 BuscarDatos(id);
         }
 
-        btnCerrar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getDialog().dismiss();
-            }
-        });
+        btnCerrar.setOnClickListener(v -> getDialog().dismiss());
 
+        if(getDialog().getWindow()!=null)
+            getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(0));
         return view;
     }
 
@@ -86,9 +85,7 @@ public class InfoItemDialogFragment extends AppCompatDialogFragment {
                 public void run(){
                     pbCargando.setVisibility(View.VISIBLE);
                     producto = Producto.get(id, SQLite.usuario.sucursal.IdEstablecimiento);
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
+                    getActivity().runOnUiThread(() -> {
                             if(producto != null){
                                 txtNombre.setText(producto.nombreproducto);
                                 String textLeft = "", textRight = "";
@@ -134,8 +131,7 @@ public class InfoItemDialogFragment extends AppCompatDialogFragment {
                                 }
                             }
                             pbCargando.setVisibility(View.GONE);
-                        }
-                    });
+                        });
                 }
             };
             th.start();

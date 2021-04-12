@@ -35,7 +35,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".activities.PedidoInventarioActivity"></activity>
+        <activity android:name=".activities.DepositoActivity"
+            android:theme="@style/ClienteTheme"/>
+        <activity android:name=".activities.PedidoInventarioActivity"
+            android:theme="@style/ClienteTheme"/>
         <activity android:name=".activities.ConfigActivity" />
         <activity
             android:name=".activities.TransferenciaActivity"
@@ -86,7 +89,9 @@
             android:theme="@style/ClienteTheme" />
         <activity
             android:name=".activities.actLogin"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize|adjustPan"
+            android:screenOrientation="portrait">
 
             <!--
             <intent-filter>
@@ -111,16 +116,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.provider"
+            android:authorities="${applicationId}.services.GenericFileProvider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths" />
         </provider>
+
         <service
             android:name=".services.JobServiceGPS"
             android:permission="android.permission.BIND_JOB_SERVICE" />

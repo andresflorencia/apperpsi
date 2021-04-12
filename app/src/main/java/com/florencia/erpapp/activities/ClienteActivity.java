@@ -101,9 +101,7 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
             Thread th = new Thread(){
                 @Override
                 public void run(){
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
+                    runOnUiThread(() -> {
                             if(id>0)
                                 miCliente = Cliente.get(id);
                             else if(!nip.equals(""))
@@ -158,7 +156,7 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
                                 toolbar.setTitle("Modificación");
                             }
                         }
-                    });
+                    );
                 }
             };
             th.start();
@@ -323,18 +321,14 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
                 ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
                 ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
                 final AlertDialog alertDialog = builder.create();
-                view.findViewById(R.id.btnConfirm).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+                view.findViewById(R.id.btnConfirm).setOnClickListener(
+                    v -> {
                         GuardarDatos();
                         alertDialog.dismiss();
                     }
-                });
+                );
 
-                view.findViewById(R.id.btnCancel).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) { alertDialog.dismiss();}
-                });
+                view.findViewById(R.id.btnCancel).setOnClickListener(v -> alertDialog.dismiss());
 
                 if(alertDialog.getWindow()!=null)
                     alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
@@ -398,7 +392,7 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
             && !SQLite.usuario.VerificaPermiso(this,Constants.REGISTRO_CLIENTE, "escritura")){
                 Banner.make(rootView, this, Banner.ERROR,"No tiene permisos para registrar nuevos clientes.", Banner.BOTTOM, 3000).show();
                 return false;
-        }else if(miCliente.idcliente>0
+        }else if(miCliente.codigosistema>0
             && !SQLite.usuario.VerificaPermiso(this,Constants.REGISTRO_CLIENTE, "modificacion")){
             Banner.make(rootView, this, Banner.ERROR,"No tiene permisos para modificar datos.", Banner.BOTTOM, 3000).show();
                 return false;
@@ -481,17 +475,9 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
             ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
             ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
             final AlertDialog alertDialog = builder.create();
-            view.findViewById(R.id.btnConfirm).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    finish();
-                }
-            });
+            view.findViewById(R.id.btnConfirm).setOnClickListener(v -> finish());
 
-            view.findViewById(R.id.btnCancel).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) { alertDialog.dismiss();}
-            });
+            view.findViewById(R.id.btnCancel).setOnClickListener(v -> alertDialog.dismiss());
 
             if(alertDialog.getWindow()!=null)
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));

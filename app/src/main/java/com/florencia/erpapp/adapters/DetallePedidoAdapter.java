@@ -135,9 +135,7 @@ public class DetallePedidoAdapter extends RecyclerView.Adapter<DetallePedidoAdap
 
                 CalcularTotal();
 
-                btnDelete.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+                btnDelete.setOnClickListener(v -> {
                         AlertDialog.Builder builder = new AlertDialog.Builder(activity, R.style.AlertDialogTheme);
                         View view = LayoutInflater.from(activity).inflate(R.layout.layout_warning_dialog,
                                 (ConstraintLayout) activity.findViewById(R.id.lyDialogContainer));
@@ -167,8 +165,7 @@ public class DetallePedidoAdapter extends RecyclerView.Adapter<DetallePedidoAdap
                         if(alertDialog.getWindow()!=null)
                             alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
                         alertDialog.show();
-                    }
-                });
+                    });
 
                 tvCantidad.addTextChangedListener(new TextWatcher() {
                     @Override
@@ -211,16 +208,13 @@ public class DetallePedidoAdapter extends RecyclerView.Adapter<DetallePedidoAdap
                     }
                 });
 
-                btnInfo.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+                btnInfo.setOnClickListener(v -> {
                         DialogFragment dialogFragment = new InfoItemDialogFragment();
                         Bundle bundle = new Bundle();
                         bundle.putInt("idproducto", detallePedido.get(getAdapterPosition()).producto.idproducto);
                         dialogFragment.setArguments(bundle);
                         dialogFragment.show(activity.getSupportFragmentManager(), "dialog");
-                    }
-                });
+                    });
 
             }catch (Exception e){
                 Log.d("TAGPRODUCTO",e.getMessage());

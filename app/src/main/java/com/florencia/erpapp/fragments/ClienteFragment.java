@@ -83,16 +83,13 @@ public class ClienteFragment extends Fragment implements SearchView.OnQueryTextL
             //Inicio Refrescar el contenido del RecyclerView
             swipeRefreshClientes.setColorSchemeResources(R.color.colorend_splash, R.color.colorAccent, R.color.colorMoradito);
             swipeRefreshClientes.setOnRefreshListener(
-                    new SwipeRefreshLayout.OnRefreshListener() {
-                        @Override
-                        public void onRefresh() {
-                            try {
-                                CargarDatos(true);
-                            } catch (Exception e) {
-                                Log.d("TAGCLIENTEFRAGMENT", "SwipeRefresh(): " + e.getMessage());
-                            }
-                        }
-                    });
+                () -> {
+                    try {
+                        CargarDatos(true);
+                    } catch (Exception e) {
+                        Log.d("TAGCLIENTEFRAGMENT", "SwipeRefresh(): " + e.getMessage());
+                    }
+                });
             //Fin Refrescar el contenido del RecyclerView
 
         }catch (Exception e){
@@ -106,9 +103,7 @@ public class ClienteFragment extends Fragment implements SearchView.OnQueryTextL
             Thread th = new Thread() {
                 @Override
                 public void run() {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
+                    getActivity().runOnUiThread(() -> {
                             try {
                                 lstClientes = Cliente.getClientes(SQLite.usuario.IdUsuario,_fecha);
                                 if (lstClientes == null || lstClientes.size() == 0) {
@@ -130,8 +125,7 @@ public class ClienteFragment extends Fragment implements SearchView.OnQueryTextL
                             }catch (Exception e){
                                 Log.d("TAGCLIENTEFRAGMENT", "CargaDatos(): " + e.getMessage());
                             }
-                        }
-                    });
+                        });
                 }
             };
             th.start();

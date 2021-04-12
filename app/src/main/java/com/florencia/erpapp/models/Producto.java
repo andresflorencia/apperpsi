@@ -216,11 +216,16 @@ public class Producto
         }
     }
 
-    public static ArrayList<Producto> getAll(Integer idestablecimiento){
+    public static ArrayList<Producto> getAll(Integer idestablecimiento, boolean isVenta){
         ArrayList<Producto> Items = new ArrayList<Producto>();
         try {
             sqLiteDatabase = SQLite.sqlDB.getReadableDatabase();
-            Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM producto WHERE establecimientoid = ? ORDER BY stock DESC, nombreproducto", new String[]{idestablecimiento.toString()});
+            String query = "SELECT * FROM producto WHERE establecimientoid = ? ";
+            if(isVenta)
+                query += " AND (tipo = 'S' OR stock > 0) ";
+            Cursor cursor = sqLiteDatabase.rawQuery(
+                    query + "ORDER BY stock DESC, nombreproducto",
+                    new String[]{idestablecimiento.toString()});
             Producto Item;
             if (cursor.moveToFirst()) {
                 do {

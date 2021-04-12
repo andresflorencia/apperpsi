@@ -173,18 +173,14 @@ public class PedidoInventarioActivity extends AppCompatActivity implements View.
                 ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
                 ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
                 final AlertDialog alertDialog = builder.create();
-                view.findViewById(R.id.btnConfirm).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+                view.findViewById(R.id.btnConfirm).setOnClickListener(
+                    v -> {
                         GuardarDatos();
                         alertDialog.dismiss();
                     }
-                });
+                );
 
-                view.findViewById(R.id.btnCancel).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) { alertDialog.dismiss();}
-                });
+                view.findViewById(R.id.btnCancel).setOnClickListener(v -> alertDialog.dismiss());
 
                 if(alertDialog.getWindow()!=null)
                     alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
@@ -302,9 +298,7 @@ public class PedidoInventarioActivity extends AppCompatActivity implements View.
                 public void run() {
                     pedido = new PedidoInventario();
                     pedido = PedidoInventario.get(idpedido);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
+                    runOnUiThread(() -> {
                             if (pedido != null) {
                                 toolbar.setTitle(pedido.codigopedido);
                                 toolbar.setSubtitle("");
@@ -326,8 +320,7 @@ public class PedidoInventarioActivity extends AppCompatActivity implements View.
                                 Banner.make(rootView,PedidoInventarioActivity.this, Banner.ERROR,"Ocurrió un error al obtener los datos para este pedido.", Banner.BOTTOM, 3000).show();
                             }
                             pgCargando.dismiss();
-                        }
-                    });
+                        });
                 }
             };
             th.start();
@@ -391,17 +384,9 @@ public class PedidoInventarioActivity extends AppCompatActivity implements View.
             ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
             ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
             final AlertDialog alertDialog = builder.create();
-            view.findViewById(R.id.btnConfirm).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    finish();
-                }
-            });
+            view.findViewById(R.id.btnConfirm).setOnClickListener(v -> finish());
 
-            view.findViewById(R.id.btnCancel).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) { alertDialog.dismiss();}
-            });
+            view.findViewById(R.id.btnCancel).setOnClickListener(v -> alertDialog.dismiss());
 
             if(alertDialog.getWindow()!=null)
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));

@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.florencia.erpapp.R;
 import com.florencia.erpapp.adapters.ClasificacionAdapter;
@@ -27,6 +28,7 @@ import com.florencia.erpapp.models.Categoria;
 import com.florencia.erpapp.models.Producto;
 import com.florencia.erpapp.services.SQLite;
 import com.florencia.erpapp.utils.Utils;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.JsonArray;
 
 import java.util.ArrayList;
@@ -34,18 +36,19 @@ import java.util.List;
 
 public class ProductoBusquedaActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
-    ImageView imgFondo;
     RecyclerView rvProductos, rvCategorias;
     List<Producto> lstProductos = new ArrayList<>();
     List<Categoria> categorias = new ArrayList<>();
     public ProductoAdapter productoAdapter;
     ClasificacionAdapter clasificacionAdapter;
     SearchView svBusqueda;
-    LinearLayout lyContainer;
+    LinearLayout lyContainer, lyLoading;
     ProgressDialog pgCargando;
     ProgressBar pbCargando;
     public Toolbar toolbar;
     String tipobusqueda = "01";
+    public FloatingActionButton btnConfirmar;
+    public TextView txtCounter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,16 +72,19 @@ public class ProductoBusquedaActivity extends AppCompatActivity implements Searc
         pgCargando = new ProgressDialog(this);
         rvProductos = findViewById(R.id.rvProductos);
         rvCategorias = findViewById(R.id.rvCategorias);
-        imgFondo = findViewById(R.id.imgFondo);
         lyContainer = findViewById(R.id.lyContainer);
         svBusqueda = findViewById(R.id.svBusqueda);
         svBusqueda.setOnQueryTextListener(this);
         pbCargando = findViewById(R.id.pbCargando);
+        lyLoading = findViewById(R.id.lyLoading);
+        btnConfirmar = findViewById(R.id.btnConfirmar);
+        txtCounter = findViewById(R.id.txtCounter);
 
         pgCargando.setTitle("Cargando productos");
         pgCargando.setMessage("Espere un momento...");
         pgCargando.setCancelable(false);
 
+        btnConfirmar.setOnClickListener(v->Confirmar());
     }
 
     @Override
@@ -96,6 +102,8 @@ public class ProductoBusquedaActivity extends AppCompatActivity implements Searc
         try {
             //pgCargando.show();
             pbCargando.setVisibility(View.VISIBLE);
+            lyLoading.setVisibility(View.VISIBLE);
+            svBusqueda.setEnabled(false);
             Thread th = new Thread(){
                 @Override
                 public void run(){
@@ -104,31 +112,29 @@ public class ProductoBusquedaActivity extends AppCompatActivity implements Searc
                         case "01":
                         case "PC":
                         case "PI":
-                            lstProductos = Producto.getAll(SQLite.usuario.sucursal.IdEstablecimiento);
+                            lstProductos = Producto.getAll(SQLite.usuario.sucursal.IdEstablecimiento, tipobusqueda.equals("01"));
                             break;
                         case "4,20":
                         case "20,4":
                             lstProductos = Producto.getForTransferencia(SQLite.usuario.sucursal.IdEstablecimiento);
                             break;
                     }
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
+                    runOnUiThread(() -> {
                             if (lstProductos == null || lstProductos.size() == 0) {
-                                imgFondo.setVisibility(View.VISIBLE);
+                                lyLoading.setVisibility(View.VISIBLE);
                                 lyContainer.setVisibility(View.GONE);
                             } else {
-                                imgFondo.setVisibility(View.GONE);
-                                lyContainer.setVisibility(View.VISIBLE);
                                 clasificacionAdapter = new ClasificacionAdapter(ProductoBusquedaActivity.this, categorias);
                                 rvCategorias.setAdapter(clasificacionAdapter);
                                 productoAdapter = new ProductoAdapter(toolbar,lstProductos, tipobusqueda, ProductoBusquedaActivity.this);
                                 rvProductos.setAdapter(productoAdapter);
+                                lyLoading.setVisibility(View.GONE);
+                                lyContainer.setVisibility(View.VISIBLE);
+                                svBusqueda.setEnabled(true);
                             }
                             //pgCargando.dismiss();
                             pbCargando.setVisibility(View.GONE);
-                        }
-                    });
+                        });
                 }
             };
             th.start();
@@ -137,6 +143,24 @@ public class ProductoBusquedaActivity extends AppCompatActivity implements Searc
             //pgCargando.dismiss();
             Log.d("TAGCLIENTE",e.getMessage());
         }
+    }
+
+    private void Confirmar(){
+        if(tipobusqueda.equals("01")) {
+            ComprobanteActivity.productBusqueda.clear();
+            ComprobanteActivity.productBusqueda.addAll(productoAdapter.productosSelected);
+        }else if(tipobusqueda.equals("PC")){
+            PedidoActivity.productBusqueda.clear();
+            PedidoActivity.productBusqueda.addAll(productoAdapter.productosSelectedP);
+        }else if(tipobusqueda.equals("4,20") ||tipobusqueda.equals("20,4")){
+            TransferenciaActivity.productBusqueda.clear();
+            TransferenciaActivity.productBusqueda.addAll(productoAdapter.productosSelected);
+        }else if(tipobusqueda.equals("PI")){
+            PedidoInventarioActivity.productBusqueda.clear();
+            PedidoInventarioActivity.productBusqueda.addAll(productoAdapter.productosSelectedPI);
+        }
+        setResult(RESULT_OK);
+        finish();
     }
 
     @Override
@@ -161,21 +185,7 @@ public class ProductoBusquedaActivity extends AppCompatActivity implements Searc
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.option_select:
-                if(tipobusqueda.equals("01")) {
-                    ComprobanteActivity.productBusqueda.clear();
-                    ComprobanteActivity.productBusqueda.addAll(productoAdapter.productosSelected);
-                }else if(tipobusqueda.equals("PC")){
-                    PedidoActivity.productBusqueda.clear();
-                    PedidoActivity.productBusqueda.addAll(productoAdapter.productosSelectedP);
-                }else if(tipobusqueda.equals("4,20") ||tipobusqueda.equals("20,4")){
-                    TransferenciaActivity.productBusqueda.clear();
-                    TransferenciaActivity.productBusqueda.addAll(productoAdapter.productosSelected);
-                }else if(tipobusqueda.equals("PI")){
-                    PedidoInventarioActivity.productBusqueda.clear();
-                    PedidoInventarioActivity.productBusqueda.addAll(productoAdapter.productosSelectedPI);
-                }
-                setResult(RESULT_OK);
-                finish();
+                Confirmar();
                 break;
         }
         return super.onOptionsItemSelected(item);

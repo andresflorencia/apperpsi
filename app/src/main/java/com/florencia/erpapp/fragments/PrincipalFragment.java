@@ -2,7 +2,6 @@ package com.florencia.erpapp.fragments;
 
 import android.app.DatePickerDialog;
 import android.app.PendingIntent;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -10,10 +9,8 @@ import android.content.pm.PackageInstaller;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
@@ -24,11 +21,9 @@ import android.provider.DocumentsContract;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -36,21 +31,15 @@ import android.widget.TextView;
 import com.florencia.erpapp.BuildConfig;
 import com.florencia.erpapp.MainActivity;
 import com.florencia.erpapp.R;
-import com.florencia.erpapp.activities.ComprobanteActivity;
 import com.florencia.erpapp.adapters.ResumenAdapter;
-import com.florencia.erpapp.interfaces.ProductoInterface;
-import com.florencia.erpapp.interfaces.UsuarioInterface;
-import com.florencia.erpapp.models.Ubicacion;
+import com.florencia.erpapp.interfaces.IUsuario;
 import com.florencia.erpapp.services.SQLite;
 import com.florencia.erpapp.utils.Constants;
-import com.florencia.erpapp.utils.DownloadFile;
-import com.florencia.erpapp.utils.FileDownloader;
 import com.florencia.erpapp.utils.Utils;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.io.File;
@@ -62,13 +51,8 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -130,7 +114,7 @@ public class PrincipalFragment extends Fragment implements View.OnClickListener,
                 .readTimeout(60, TimeUnit.SECONDS)
                 .writeTimeout(60, TimeUnit.SECONDS)
                 .build();
-
+        verificarVersion();
         return view;
     }
 
@@ -144,18 +128,16 @@ public class PrincipalFragment extends Fragment implements View.OnClickListener,
         day = Integer.valueOf(fecha[2]);
         month = Integer.valueOf(fecha[1]) - 1;
         year = Integer.valueOf(fecha[0]);
-        dtpDialog = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int day) {
-                String dia = (day >= 0 && day < 10 ? "0" + (day) : String.valueOf(day));
-                String mes = (month >= 0 && month < 10 ? "0" + (month + 1) : String.valueOf(month + 1));
+        dtpDialog = new DatePickerDialog(getContext(), (v, y, m, d)-> {
+                String dia = (d >= 0 && d < 10 ? "0" + (d) : String.valueOf(d));
+                String mes = (m >= 0 && m < 10 ? "0" + (m + 1) : String.valueOf(m + 1));
 
-                String mitextoU = year + "-" + mes + "-" + dia;
+                String mitextoU = y + "-" + mes + "-" + dia;
                 btnFecha.setTag(mitextoU);
-                btnFecha.setText(dia + "-" + Utils.getMes(month, true) + "-" + year);
+                btnFecha.setText(dia + "-" + Utils.getMes(m, true) + "-" + y);
                 BuscaResumen(mitextoU);
             }
-        }, year, month, day);
+        , year, month, day);
         dtpDialog.show();
     }
 
@@ -192,7 +174,7 @@ public class PrincipalFragment extends Fragment implements View.OnClickListener,
                     //progressBar.setVisibility(View.VISIBLE);
                     //new DownloadFile2().execute(SQLite.configuracion.url_ws.concat(Constants.URL_DOWNLOAD_APK), "erpv_" + SQLite.newversion + ".apk",
                       //      getActivity().getExternalFilesDir(null).toString());
-                    DescargaApk();
+                    Utils.DescargaApk(v.getContext(), SQLite.linkdescarga);
                     /*Log.d(TAG,"PATH(): " + getActivity().getExternalFilesDir(null).toString());
                     new DownloadFile().execute(SQLite.configuracion.url_ws.concat(Constants.URL_DOWNLOAD_APK), "erp-realese.apk",
                             getActivity().getExternalFilesDir(null).toString());
@@ -215,26 +197,12 @@ public class PrincipalFragment extends Fragment implements View.OnClickListener,
         return false;
     }
 
-    private void DescargaApk() {
-        try {
-            Log.d(TAG, SQLite.linkdescarga);
-            //Uri uri = Uri.parse(SQLite.configuracion.url_ws.concat(Constants.URL_DOWNLOAD_APK));
-            Uri uri = Uri.parse(SQLite.linkdescarga);
-            Intent i = new Intent(Intent.ACTION_VIEW);
-            i.setDataAndType(uri, "text/html");
-            i.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            startActivity(i);
-        } catch (Exception e) {
-            Log.d(TAG, e.getMessage());
-        }
-    }
-
     public void getApk(Context context) {
         Retrofit.Builder retrofit = new Retrofit.Builder()
                 .baseUrl(SQLite.configuracion.url_ws)
                 .client(okHttpClient);
         Retrofit retro = retrofit.build();
-        UsuarioInterface interfa = retro.create(UsuarioInterface.class);
+        IUsuario interfa = retro.create(IUsuario.class);
 
         Call<ResponseBody> call = interfa.downloadApk(SQLite.configuracion.url_ws.concat(Constants.URL_DOWNLOAD_APK));
         try {
@@ -328,11 +296,11 @@ public class PrincipalFragment extends Fragment implements View.OnClickListener,
         toolbar.setTitleTextColor(Color.WHITE);
         BuscaResumen(""); //Utils.getDateFormat("yyyy-MM-dd"));
         lblVersion.setText("v".concat(BuildConfig.VERSION_NAME));
-        verificarVersion(getContext());
+        //verificarVersion(getContext());
         super.onResume();
     }
 
-    private void verificarVersion(final Context context) {
+    private void verificarVersion() {
         try {
             Gson gson = new GsonBuilder()
                     .setLenient()
@@ -342,7 +310,7 @@ public class PrincipalFragment extends Fragment implements View.OnClickListener,
                     .addConverterFactory(GsonConverterFactory.create(gson))
                     .client(okHttpClient)
                     .build();
-            UsuarioInterface miInterface = retrofit.create(UsuarioInterface.class);
+            IUsuario miInterface = retrofit.create(IUsuario.class);
 
             Call<JsonObject> call = null;
             call = miInterface.getLastVersion();
@@ -362,6 +330,7 @@ public class PrincipalFragment extends Fragment implements View.OnClickListener,
                                     lblUpdate.setVisibility(View.VISIBLE);
                                     lblVersion.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_END);
                                     lblUpdate.setText(Html.fromHtml(getResources().getString(R.string.update)));
+                                    ((MainActivity) getActivity()).ShowModalUpdate(SQLite.linkdescarga);
                                 }
                             }
                         }
@@ -373,6 +342,7 @@ public class PrincipalFragment extends Fragment implements View.OnClickListener,
                 @Override
                 public void onFailure(Call<JsonObject> call, Throwable t) {
                     Log.d(TAG, t.getMessage());
+                    call.cancel();
                 }
             });
         } catch (Exception e) {

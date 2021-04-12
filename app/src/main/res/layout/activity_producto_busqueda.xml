@@ -20,11 +20,12 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <LinearLayout
+        android:id="@+id/lyLoading"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:orientation="vertical"
-        android:visibility="gone">
+        android:visibility="visible">
         <ProgressBar
             android:id="@+id/pbCargando"
             android:layout_width="50dp"
@@ -33,12 +34,13 @@
             android:indeterminate="true"
             android:visibility="visible"
             android:layout_gravity="center"/>
-        <ImageView
-            android:id="@+id/imgFondo"
+        <TextView
             android:layout_width="match_parent"
-            android:layout_height="220dp"
-            android:src="@drawable/empty_cart"
-            android:layout_gravity="center"/>
+            android:layout_height="wrap_content"
+            android:text="Cargando productos"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            style="@style/TextAppearance.AppCompat.Headline"/>
     </LinearLayout>
 
     <LinearLayout
@@ -71,4 +73,40 @@
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
     </LinearLayout>
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom">
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/btnConfirmar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:layout_margin="5dp"
+            android:src="@drawable/ic_check_white"
+            app:elevation="10dp"
+            app:showMotionSpec="@anim/alpha"
+            android:visibility="gone"
+            app:fabSize="normal"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+        <TextView
+            android:id="@+id/txtCounter"
+            android:visibility="gone"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:text="1"
+            android:textSize="11sp"
+            android:gravity="center"
+            android:elevation="10dp"
+            android:textColor="@color/colorWhite"
+            android:background="@drawable/bg_round_red"
+            android:padding="2dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginRight="2dp"
+            app:layout_constraintTop_toTopOf="@id/btnConfirmar"
+            app:layout_constraintEnd_toEndOf="@id/btnConfirmar"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

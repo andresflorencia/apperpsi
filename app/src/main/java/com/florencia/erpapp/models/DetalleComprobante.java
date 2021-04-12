@@ -144,7 +144,8 @@ public class DetalleComprobante {
         return this.precio;
     }
 
-    public Double getPrecio(List<Regla> reglas, List<PrecioCategoria> categorias, String categcliente, Double cantidad, Double precio_act){
+    public Double getPrecio(List<Regla> reglas, List<PrecioCategoria> categorias,
+                            String categcliente, Double cantidad, Double precio_act, boolean credito){
         try {
             this.precio = precio_act;
             Double precioregla = 0d;
@@ -159,21 +160,26 @@ public class DetalleComprobante {
                 }
             }
             PrecioCategoria categ_temp = null;
+            Double pvpNormal = 0d;
             for (PrecioCategoria cat: categorias) {
+                if(cat.categoriaid == 0)
+                    pvpNormal = cat.valor;
                 if(cat.categoriaid == Integer.valueOf(categcliente)){
                     precio_act = cat.valor;
                     categ_temp = cat;
-                    break;
                 }
             }
 
             //SI PRECIO DE CATEGORIA ES MENOR AL PRECIO DE ALGUNA REGLAPRECIO, CONSERVAMOS EL DE LA CATEGORIA
             if (this.precio > precio_act)
-                this.precio = ptemp;
+                this.precio = precio_act;
 
             if(categ_temp != null){
-                if(precioregla == 0 || categ_temp.prioridad.equalsIgnoreCase("t"))
+                if(precioregla == 0 || categ_temp.prioridad.equalsIgnoreCase("t")
+                        || (categ_temp.aplicacredito.equalsIgnoreCase("t") && credito))
                     this.precio = categ_temp.valor;
+                if(categ_temp.aplicacredito.equalsIgnoreCase("f") && credito)
+                    this.precio = pvpNormal>precioregla && precioregla>0 ? precioregla : pvpNormal;
             }
         }catch (Exception e){
             Log.d("TAGDETALLECOMPROBANTE", "getPrecio2(): " + e.getMessage());

@@ -87,9 +87,7 @@ public class DetallePedidoInvAdapter extends RecyclerView.Adapter<DetallePedidoI
                 tilFechaVenc.setVisibility(View.GONE);
                 btnDelete.setVisibility(visualizacion ? View.GONE : View.VISIBLE);
 
-                btnDelete.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+                btnDelete.setOnClickListener(v -> {
                         AlertDialog.Builder builder = new AlertDialog.Builder(activity, R.style.AlertDialogTheme);
                         View view = LayoutInflater.from(activity).inflate(R.layout.layout_warning_dialog,
                                 (ConstraintLayout) activity.findViewById(R.id.lyDialogContainer));
@@ -118,8 +116,7 @@ public class DetallePedidoInvAdapter extends RecyclerView.Adapter<DetallePedidoI
                         if(alertDialog.getWindow()!=null)
                             alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
                         alertDialog.show();
-                    }
-                });
+                    });
 
                 tvCantidad.addTextChangedListener(new TextWatcher() {
                     @Override

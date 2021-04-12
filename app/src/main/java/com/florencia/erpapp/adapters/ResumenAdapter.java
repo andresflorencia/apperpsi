@@ -18,6 +18,7 @@ import com.florencia.erpapp.MainActivity;
 import com.florencia.erpapp.R;
 import com.florencia.erpapp.activities.ClienteActivity;
 import com.florencia.erpapp.activities.ComprobanteActivity;
+import com.florencia.erpapp.activities.DepositoActivity;
 import com.florencia.erpapp.activities.ListaComprobantesActivity;
 import com.florencia.erpapp.activities.PedidoActivity;
 import com.florencia.erpapp.activities.PedidoInventarioActivity;
@@ -95,9 +96,8 @@ public class ResumenAdapter extends RecyclerView.Adapter<ResumenAdapter.ResumenV
             else
                 tvCantidadNS.setVisibility(View.GONE);
 
-            btnNewDocument.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            btnNewDocument.setOnClickListener(
+                v -> {
                     JsonObject miDoc = jDatos.get(getAdapterPosition()).getAsJsonObject();
                     if(miDoc!=null){
                         Intent i = null;
@@ -120,16 +120,18 @@ public class ResumenAdapter extends RecyclerView.Adapter<ResumenAdapter.ResumenV
                             case "CLIENTES":
                                 i = new Intent(activity, ClienteActivity.class);
                                 break;
+                            case "DEPOSITOS":
+                                i = new Intent(activity, DepositoActivity.class);
+                                break;
                         }
                         if(i != null)
                             activity.startActivity(i);
                     }
                 }
-            });
+            );
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            itemView.setOnClickListener(
+                v -> {
                     JsonObject miDoc = jDatos.get(getAdapterPosition()).getAsJsonObject();
                     if(miDoc!=null){
                         if(!miDoc.get("documento").getAsString().equalsIgnoreCase("CLIENTES")
@@ -162,6 +164,9 @@ public class ResumenAdapter extends RecyclerView.Adapter<ResumenAdapter.ResumenV
                             case "PEDIDOS INVENTARIO":
                                 i.putExtra("tipobusqueda","PI");
                                 break;
+                            case "DEPOSITOS":
+                                i.putExtra("tipobusqueda", "DE");
+                                break;
                         }
                         if(miDoc.get("documento").getAsString().equalsIgnoreCase("CLIENTES")){
                             ((MainActivity)activity).fragment = new ClienteFragment(miDoc.get("cantidad").getAsInt()==0?"":fecha);
@@ -170,9 +175,8 @@ public class ResumenAdapter extends RecyclerView.Adapter<ResumenAdapter.ResumenV
                         }else
                             activity.startActivity(i);
                     }
-                }
-            });
 
+            });
         }
     }
 }

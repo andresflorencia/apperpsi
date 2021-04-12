@@ -1,9 +1,7 @@
 package com.florencia.erpapp;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -13,21 +11,22 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.Html;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -47,22 +46,20 @@ import com.florencia.erpapp.activities.TransferenciaActivity;
 import com.florencia.erpapp.activities.actLogin;
 import com.florencia.erpapp.fragments.ClienteFragment;
 import com.florencia.erpapp.fragments.PrincipalFragment;
-import com.florencia.erpapp.interfaces.ClienteInterface;
-import com.florencia.erpapp.interfaces.ComprobanteInterface;
-import com.florencia.erpapp.interfaces.ProductoInterface;
-import com.florencia.erpapp.interfaces.UsuarioInterface;
+import com.florencia.erpapp.interfaces.ICliente;
+import com.florencia.erpapp.interfaces.IComprobante;
+import com.florencia.erpapp.interfaces.IProducto;
+import com.florencia.erpapp.interfaces.IUsuario;
 import com.florencia.erpapp.models.Cliente;
 import com.florencia.erpapp.models.Comprobante;
+import com.florencia.erpapp.models.Ingreso;
 import com.florencia.erpapp.models.Pedido;
 import com.florencia.erpapp.models.PedidoInventario;
-import com.florencia.erpapp.models.Permiso;
 import com.florencia.erpapp.models.Producto;
 import com.florencia.erpapp.models.Ubicacion;
-import com.florencia.erpapp.models.Usuario;
 import com.florencia.erpapp.services.GPSTracker;
 import com.florencia.erpapp.services.JobServiceGPS;
 import com.florencia.erpapp.services.SQLite;
-import com.florencia.erpapp.utils.CheckInternet;
 import com.florencia.erpapp.utils.Constants;
 import com.florencia.erpapp.utils.Utils;
 import com.google.android.material.navigation.NavigationView;
@@ -74,6 +71,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.shasin.notificationbanner.Banner;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -99,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView txt_Usuario, txtInfo, txtUltimaConexion, txtSucursal, txtEmpresa, txtPerfil;
     private NavigationView navigation;
     private Gson gson = new Gson();
+    Retrofit retrofit;
     private ProgressDialog pbProgreso;
     private OkHttpClient okHttpClient;
     private final static int ID_SERVICE_LOCATION =1000;
@@ -173,6 +173,16 @@ public class MainActivity extends AppCompatActivity {
                 .writeTimeout(60, TimeUnit.SECONDS)
                 .build();
 
+        gson = new GsonBuilder()
+                .setLenient()
+                .create();
+
+        retrofit = new Retrofit.Builder()
+                .baseUrl(SQLite.configuracion.url_ws)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .client(okHttpClient)
+                .build();
+
         if(SQLite.gpsTracker==null)
             SQLite.gpsTracker = new GPSTracker(this);
 
@@ -212,9 +222,8 @@ public class MainActivity extends AppCompatActivity {
     public void initNavigationDrawer() {
         NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
 
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(MenuItem menuItem) {
+        navigationView.setNavigationItemSelectedListener(
+            (menuItem)-> {
                 boolean retorno=true;
                 int id = menuItem.getItemId();
                 //getSupportActionBar().setTitle(menuItem.getTitle());
@@ -269,23 +278,19 @@ public class MainActivity extends AppCompatActivity {
                             ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
                             ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
                             final android.app.AlertDialog alertDialog = builder.create();
-                            view.findViewById(R.id.btnConfirm).setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
+                            view.findViewById(R.id.btnConfirm).setOnClickListener(
+                                v -> {
                                     if(SQLite.usuario.CerrarSesionLocal(getApplicationContext())) {
                                         DetenerServicio();
-                                        Intent i = new Intent(MainActivity.this, actLogin.class);
-                                        startActivity(i);
+                                        Intent in = new Intent(MainActivity.this, actLogin.class);
+                                        startActivity(in);
                                         alertDialog.dismiss();
                                         finish();
                                     }
                                 }
-                            });
+                            );
 
-                            view.findViewById(R.id.btnCancel).setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) { alertDialog.dismiss();}
-                            });
+                            view.findViewById(R.id.btnCancel).setOnClickListener(v -> alertDialog.dismiss());
 
                             if(alertDialog.getWindow()!=null)
                                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
@@ -296,7 +301,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 return retorno;
             }
-        });
+        );
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
         ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close) {
@@ -325,6 +330,8 @@ public class MainActivity extends AppCompatActivity {
                 .setVisible(SQLite.usuario.VerificaPermiso(this,Constants.PEDIDO,"escritura"));
         menu.findItem(R.id.option_sincronizapedidos_inv)
                 .setVisible(SQLite.usuario.VerificaPermiso(this,Constants.PEDIDO_INVENTARIO,"escritura"));
+        menu.findItem(R.id.option_sincronizadepositos)
+                .setVisible(SQLite.usuario.VerificaPermiso(this,Constants.PUNTO_VENTA,"escritura"));
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -347,16 +354,19 @@ public class MainActivity extends AppCompatActivity {
             case R.id.option_sincronizapedidos_inv:
                 sincronizaPedidos_Inv(getApplicationContext());
                 break;
+            case R.id.option_sincronizadepositos:
+                sincronizaDepositos(getApplicationContext());
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
 
     private void sincronizaClientes(final Context context) {
         try{
-            if(!Utils.isOnlineNet(SQLite.configuracion.urlbase)) {
+            /*if(!Utils.isOnlineNet(SQLite.configuracion.urlbase)) {
                 Banner.make(rootView, MainActivity.this,Banner.ERROR, Constants.MSG_COMPROBAR_CONEXION_INTERNET, Banner.BOTTOM, 3000).show();
                 return;
-            }
+            }*/
 
             List<Cliente> listClientes = Cliente.getClientesSC(SQLite.usuario.IdUsuario);
             if(listClientes == null) {
@@ -368,15 +378,7 @@ public class MainActivity extends AppCompatActivity {
             pbProgreso.setCancelable(false);
             pbProgreso.show();
 
-            Gson gson = new GsonBuilder()
-                    .setLenient()
-                    .create();
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(SQLite.configuracion.url_ws)
-                    .addConverterFactory(GsonConverterFactory.create(gson))
-                    .client(okHttpClient)
-                    .build();
-            ClienteInterface miInterface = retrofit.create(ClienteInterface.class);
+            ICliente miInterface = retrofit.create(ICliente.class);
 
             Map<String,Object> post = new HashMap<>();
             post.put("usuario",SQLite.usuario.Usuario);
@@ -480,6 +482,7 @@ public class MainActivity extends AppCompatActivity {
                 public void onFailure(Call<JsonObject> call, Throwable t) {
                     Utils.showErrorDialog(MainActivity.this, "Error",t.getMessage());
                     Log.d("TAG", t.getMessage());
+                    call.cancel();
                     pbProgreso.dismiss();
                 }
             });
@@ -493,10 +496,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void sincronizaComprobantes(final Context context) {
         try{
-            if(!Utils.isOnlineNet(SQLite.configuracion.urlbase)) {
+            /*if(!Utils.isOnlineNet(SQLite.configuracion.urlbase)) {
                 Banner.make(rootView, this, Banner.ERROR, Constants.MSG_COMPROBAR_CONEXION_INTERNET, Banner.BOTTOM, 3000).show();
                 return;
-            }
+            }*/
 
             List<Comprobante> listComprobantes = Comprobante.getPorSincronizar(SQLite.usuario.IdUsuario);
             if(listComprobantes == null)
@@ -512,16 +515,7 @@ public class MainActivity extends AppCompatActivity {
             pbProgreso.setCancelable(false);
             pbProgreso.show();
 
-            Gson gson = new GsonBuilder()
-                    .setLenient()
-                    .create();
-
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(SQLite.configuracion.url_ws)
-                    .addConverterFactory(GsonConverterFactory.create(gson))
-                    .client(okHttpClient)
-                    .build();
-            ComprobanteInterface miInterface = retrofit.create(ComprobanteInterface.class);
+            IComprobante miInterface = retrofit.create(IComprobante.class);
 
             Map<String,Object> post = new HashMap<>();
             post.put("usuario",SQLite.usuario.Usuario);
@@ -627,6 +621,7 @@ public class MainActivity extends AppCompatActivity {
                 public void onFailure(Call<JsonObject> call, Throwable t) {
                     Utils.showErrorDialog(MainActivity.this, "Error",t.getMessage());
                     Log.d("TAG", t.getMessage());
+                    call.cancel();
                     pbProgreso.dismiss();
                 }
             });
@@ -640,10 +635,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void sincronizaPedidos(final Context context) {
         try{
-            if(!Utils.isOnlineNet(SQLite.configuracion.urlbase)) {
+            /*if(!Utils.isOnlineNet(SQLite.configuracion.urlbase)) {
                 Banner.make(rootView, this,Banner.ERROR, Constants.MSG_COMPROBAR_CONEXION_INTERNET, Banner.BOTTOM,3000).show();
                 return;
-            }
+            }*/
 
             List<Pedido> listPedidos = Pedido.getPorSincronizar(SQLite.usuario.IdUsuario);
             if(listPedidos == null)
@@ -659,16 +654,7 @@ public class MainActivity extends AppCompatActivity {
             pbProgreso.setCancelable(false);
             pbProgreso.show();
 
-            Gson gson = new GsonBuilder()
-                    .setLenient()
-                    .create();
-
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(SQLite.configuracion.url_ws)
-                    .addConverterFactory(GsonConverterFactory.create(gson))
-                    .client(okHttpClient)
-                    .build();
-            ComprobanteInterface miInterface = retrofit.create(ComprobanteInterface.class);
+            IComprobante miInterface = retrofit.create(IComprobante.class);
 
             Map<String,Object> post = new HashMap<>();
             post.put("usuario",SQLite.usuario.Usuario);
@@ -769,6 +755,7 @@ public class MainActivity extends AppCompatActivity {
                 public void onFailure(Call<JsonObject> call, Throwable t) {
                     Utils.showErrorDialog(MainActivity.this,"Error",t.getMessage());
                     Log.d("TAG", t.getMessage());
+                    call.cancel();
                     pbProgreso.dismiss();
                 }
             });
@@ -782,7 +769,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void contarproductos(Context context) {
         try {
-            Log.d("TAG", String.valueOf(Producto.getAll(SQLite.usuario.sucursal.IdEstablecimiento).size()));
+            //Log.d("TAG", String.valueOf(Producto.getAll(SQLite.usuario.sucursal.IdEstablecimiento).size()));
         }catch (Exception e){
             Log.d("TAG",e.getMessage());
         }
@@ -790,26 +777,17 @@ public class MainActivity extends AppCompatActivity {
 
     private void descargaProductos(final Context context){
         try{
-            if(!Utils.isOnlineNet(SQLite.configuracion.urlbase)) {
+            /*if(!Utils.isOnlineNet(SQLite.configuracion.urlbase)) {
                 Banner.make(rootView,MainActivity.this,Banner.ERROR, Constants.MSG_COMPROBAR_CONEXION_INTERNET, Banner.BOTTOM,3000).show();
                 return;
-            }
+            }*/
 
             pbProgreso.setTitle("Descargando productos");
             pbProgreso.setMessage("Espere un momento...");
             pbProgreso.setCancelable(false);
             pbProgreso.show();
 
-            Gson gson = new GsonBuilder()
-                    .setLenient()
-                    .create();
-
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(SQLite.configuracion.url_ws)
-                    .addConverterFactory(GsonConverterFactory.create(gson))
-                    .client(okHttpClient)
-                    .build();
-            ProductoInterface miInterface = retrofit.create(ProductoInterface.class);
+            IProducto miInterface = retrofit.create(IProducto.class);
 
             Call<JsonObject> call=null;
             call=miInterface.GetProductos(SQLite.usuario.Usuario,SQLite.usuario.Clave,SQLite.usuario.sucursal.IdEstablecimiento);
@@ -877,6 +855,7 @@ public class MainActivity extends AppCompatActivity {
                 public void onFailure(Call<JsonObject> call, Throwable t) {
                     Utils.showErrorDialog(MainActivity.this,"Error",t.getMessage());
                     Log.d("TAG", t.getMessage());
+                    call.cancel();
                     pbProgreso.dismiss();
                 }
             });
@@ -890,10 +869,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void sincronizaPedidos_Inv(final Context context) {
         try{
-            if(!Utils.isOnlineNet(SQLite.configuracion.urlbase)) {
+            /*if(!Utils.isOnlineNet(SQLite.configuracion.urlbase)) {
                 Banner.make(rootView, this,Banner.ERROR, Constants.MSG_COMPROBAR_CONEXION_INTERNET, Banner.BOTTOM,3000).show();
                 return;
-            }
+            }*/
 
             List<PedidoInventario> listPedidos = PedidoInventario.getPorSincronizar(SQLite.usuario.IdUsuario);
             if(listPedidos == null)
@@ -909,16 +888,7 @@ public class MainActivity extends AppCompatActivity {
             pbProgreso.setCancelable(false);
             pbProgreso.show();
 
-            Gson gson = new GsonBuilder()
-                    .setLenient()
-                    .create();
-
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(SQLite.configuracion.url_ws)
-                    .addConverterFactory(GsonConverterFactory.create(gson))
-                    .client(okHttpClient)
-                    .build();
-            ComprobanteInterface miInterface = retrofit.create(ComprobanteInterface.class);
+            IComprobante miInterface = retrofit.create(IComprobante.class);
 
             Map<String,Object> post = new HashMap<>();
             post.put("usuario",SQLite.usuario.Usuario);
@@ -1010,9 +980,146 @@ public class MainActivity extends AppCompatActivity {
                 public void onFailure(Call<JsonObject> call, Throwable t) {
                     Utils.showErrorDialog(MainActivity.this,"Error",t.getMessage());
                     Log.d("TAG", t.getMessage());
+                    call.cancel();
                     pbProgreso.dismiss();
                 }
             });
+        }catch (Exception e){
+            e.printStackTrace();
+            Log.d("TAG", e.getMessage());
+            Utils.showErrorDialog(this, "Error",e.getMessage());
+            pbProgreso.dismiss();
+        }
+    }
+
+    private void sincronizaDepositos(final Context context){
+        try{
+            List<Ingreso> listIngresos = Ingreso.getPorSincronizar(SQLite.usuario.IdUsuario);
+            if(listIngresos == null || listIngresos.size()==0){
+                Banner.make(rootView,this, Banner.INFO,"No hay comprobantes de depósitos por sincronizar.", Banner.BOTTOM,2000).show();
+                return;
+            }
+            for(Ingreso ingreso: listIngresos) {
+                if (ingreso.fotos == null)
+                    continue;
+                for (int i = 0; i < ingreso.fotos.size(); i++) {
+                    try {
+                        String ExternalDirectory = getExternalMediaDirs()[0] + File.separator + Constants.FOLDER_FILES;
+                        File miFile = new File(ExternalDirectory, ingreso.fotos.get(i).name);
+                        Uri path = Uri.fromFile(miFile);
+                        ingreso.fotos.get(i).bitmap = MediaStore.Images.Media.getBitmap(
+                                MainActivity.this.getContentResolver(),
+                                path);
+                        ingreso.fotos.get(i).image_base = Utils.convertImageToString(ingreso.fotos.get(i).bitmap);
+                    } catch (IOException e) {
+                        Log.d("TAGMAINACTIVITY", "NotFound(): " + e.getMessage());
+                    }
+                }
+            }
+
+            pbProgreso.setTitle("Sincronizando depósitos");
+            pbProgreso.setMessage("Espere un momento...");
+            pbProgreso.setCancelable(false);
+            pbProgreso.show();
+
+            IComprobante miInterface = retrofit.create(IComprobante.class);
+
+            Map<String,Object> post = new HashMap<>();
+            post.put("usuario",SQLite.usuario.Usuario);
+            post.put("clave",SQLite.usuario.Clave);
+            post.put("depositos", listIngresos);
+            post.put("periodo", SQLite.usuario.sucursal.periodo.toString() + SQLite.usuario.sucursal.mesactual);
+            post.put("periodoactual", SQLite.usuario.sucursal.periodo);
+            post.put("mesactual", SQLite.usuario.sucursal.mesactual);
+            post.put("establecimientoid", SQLite.usuario.sucursal.IdEstablecimiento);
+            Call<JsonObject> call = miInterface.LoadDepositos(post);
+
+            call.enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    if(!response.isSuccessful()){
+                        Banner.make(rootView,MainActivity.this,Banner.ERROR,"Código: " + response.code() + " - " + response.message(), Banner.BOTTOM,3000).show();
+                        pbProgreso.dismiss();
+                        return;
+                    }
+
+                    try {
+
+                        if (response.body() != null) {
+                            JsonObject obj = response.body();
+                            if (!obj.get("haserror").getAsBoolean()) {
+                                JsonArray jsonDepositosUpdate = obj.getAsJsonArray("depositosupdate");
+                                if(jsonDepositosUpdate!=null){
+                                    int numUpdate = 0;
+                                    ContentValues values;
+                                    for(JsonElement ele:jsonDepositosUpdate){
+                                        JsonObject upd = ele.getAsJsonObject();
+                                        values = new ContentValues();
+                                        values.put("codigosistema", upd.get("codigosistema_deposito").getAsInt());
+                                        values.put("estado", upd.get("codigosistema_deposito").getAsInt());
+                                        if(Ingreso.Update(upd.get("idingreso").getAsInt(), values))
+                                            numUpdate++;
+                                    }
+
+                                    if(obj.has("secuencial_dep")){
+                                        Integer secuencial_pe = obj.get("secuencial_dep").getAsInt();
+                                        Ingreso comprobante = new Ingreso();
+                                        comprobante.secuencial = secuencial_pe;
+                                        comprobante.establecimientoid = SQLite.usuario.sucursal.IdEstablecimiento;
+                                        comprobante.actualizasecuencial();
+                                    }
+
+                                    if(numUpdate == jsonDepositosUpdate.size()) {
+                                        Banner.make(rootView,MainActivity.this,Banner.SUCCESS, Constants.MSG_PROCESO_COMPLETADO
+                                                + "\nSe sincronizó " + numUpdate + " deposito(s)."
+                                                + "\n" + obj.get("message").getAsString(), Banner.BOTTOM, 3000).show();
+
+                                        try {
+                                            List<Fragment> fragments = fragmentManager.getFragments();
+                                            if (fragments != null) {
+                                                for (Fragment f : fragments) {
+                                                    if(f.getClass().getSimpleName().equalsIgnoreCase("principalfragment") && f.isVisible()) {
+                                                        fragment = f;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                            if(fragment!=null) {
+                                                if (fragment.getClass().getSimpleName().equalsIgnoreCase("principalfragment") ||
+                                                        (listaFragments.size() > 0 && listaFragments.get(listaFragments.size() - 1).toLowerCase().contains("principalfragment"))) {
+                                                    ((PrincipalFragment) fragment).BuscaResumen("");
+                                                }
+                                            }
+                                        }catch (Exception e){
+                                            Log.d("TAGMAIN", e.getMessage());
+                                        }
+                                    }else {
+                                        Banner.make(rootView, MainActivity.this, Banner.SUCCESS, Constants.MSG_PROCESO_NO_COMPLETADO
+                                                + "\nSe sincronizó " + numUpdate + "/" + jsonDepositosUpdate.size() + " deposito(s)."
+                                                + "\n" + obj.get("message").getAsString(), Banner.BOTTOM,3500).show();
+                                    }
+                                }
+
+                            } else
+                                Utils.showErrorDialog(MainActivity.this,"Error", obj.get("message").getAsString());
+                        } else {
+                            Banner.make(rootView,MainActivity.this,Banner.ERROR, Constants.MSG_USUARIO_CLAVE_INCORRECTO, Banner.BOTTOM,3000).show();
+                        }
+                    }catch (JsonParseException ex){
+                        Log.d("TAG", ex.getMessage());
+                    }
+                    pbProgreso.dismiss();
+                }
+
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    Utils.showErrorDialog(MainActivity.this,"Error",t.getMessage());
+                    Log.d("TAG", t.getMessage());
+                    call.cancel();
+                    pbProgreso.dismiss();
+                }
+            });
+
         }catch (Exception e){
             e.printStackTrace();
             Log.d("TAG", e.getMessage());
@@ -1150,15 +1257,8 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
             datos.put("ubicaciones",ubicaciones);
-            Gson gson = new GsonBuilder()
-                    .setLenient()
-                    .create();
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(SQLite.configuracion.url_ws)
-                    .addConverterFactory(GsonConverterFactory.create(gson))
-                    .client(okHttpClient)
-                    .build();
-            UsuarioInterface miInterface = retrofit.create(UsuarioInterface.class);
+
+            IUsuario miInterface = retrofit.create(IUsuario.class);
 
             Call<JsonObject> call = null;
             call = miInterface.loadUbicacion(datos);
@@ -1202,6 +1302,69 @@ public class MainActivity extends AppCompatActivity {
             });
         }catch (Exception e){
             Log.d("TAGMAIN3", e.getMessage());
+        }
+    }
+
+    private void verificarVersion(final Context context) {
+        try {
+            IUsuario miInterface = retrofit.create(IUsuario.class);
+
+            Call<JsonObject> call = null;
+            call = miInterface.getLastVersion();
+            call.enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    if (!response.isSuccessful()) {
+                        return;
+                    }
+                    try {
+                        if (response.body() != null) {
+                            JsonObject obj = response.body();
+                            if (obj.has("versionapp")) {
+                                if (!obj.get("versionapp").getAsString().equals(BuildConfig.VERSION_NAME)) {
+                                    SQLite.newversion = obj.get("versionapp").getAsString();
+                                    SQLite.linkdescarga = obj.get("linkapp").getAsString();
+                                    ShowModalUpdate(SQLite.linkdescarga);
+                                }
+                            }
+                        }
+                    } catch (Exception e) {
+                        Log.d("TAG", e.getMessage());
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    Log.d("TAG", t.getMessage());
+                }
+            });
+        } catch (Exception e) {
+            Log.d("TAG", e.getMessage());
+        }
+    }
+
+    public void ShowModalUpdate(String url){
+        try{
+            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogTheme);
+            View view = LayoutInflater.from(this).inflate(R.layout.layout_confirmation_dialog,
+                    (ConstraintLayout) findViewById(R.id.lyDialogContainer));
+            builder.setView(view);
+            builder.setCancelable(false);
+            ((TextView)view.findViewById(R.id.lblTitle)).setText("Actualización");
+            ((TextView)view.findViewById(R.id.lblMessage)).setText("Necesita actualizar la aplicación para continuar");
+            ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_check_white);
+            ((Button)view.findViewById(R.id.btnCancel)).setText("Cerrar");
+            ((Button)view.findViewById(R.id.btnConfirm)).setText("Descargar");
+            final AlertDialog alertDialog = builder.create();
+            view.findViewById(R.id.btnConfirm).setOnClickListener(v -> Utils.DescargaApk(MainActivity.this, url));
+
+            view.findViewById(R.id.btnCancel).setOnClickListener(v -> {alertDialog.dismiss(); finish();});
+
+            if(alertDialog.getWindow()!=null)
+                alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+            alertDialog.show();
+        }catch (Exception e){
+            Log.d("TAG", e.getMessage());
         }
     }
 }

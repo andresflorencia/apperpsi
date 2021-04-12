@@ -24,8 +24,9 @@ public class Cliente {
     public String categoria;
     public Integer usuarioid;
     public String fono1, fono2, email, observacion, ruc, fecharegistro, fechamodificacion, nombrecategoria;
-    public Integer codigosistema, actualizado, establecimientoid, parroquiaid;
+    public Integer codigosistema, actualizado, establecimientoid, parroquiaid, plazomaximo;
     public Long longdater, longdatem;
+    public Double montocredito, deudatotal, montodisponible;
 
     public static SQLiteDatabase sqLiteDatabase;
 
@@ -54,6 +55,10 @@ public class Cliente {
         this.longdater = 0l;
         this.longdatem = 0l;
         this.nombrecategoria = "";
+        this.montocredito = 0d;
+        this.deudatotal = 0d;
+        this.montodisponible = 0d;
+        this.plazomaximo = 0;
     }
 
     public static boolean removeClientes(Integer idUsuario) {
@@ -161,6 +166,9 @@ public class Cliente {
             Item.longdater = cursor.getLong(21);
             Item.longdatem = cursor.getLong(22);
             Item.nombrecategoria = cursor.getString(23);
+            Item.montocredito = cursor.getDouble(24);
+            Item.deudatotal = cursor.getDouble(25);
+            Item.plazomaximo = cursor.getInt(26);
         } catch (SQLiteException ec) {
             Log.d("TAGCLIENTE", ec.getMessage());
         }

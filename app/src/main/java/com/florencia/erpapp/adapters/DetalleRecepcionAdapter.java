@@ -95,9 +95,7 @@ public class DetalleRecepcionAdapter extends RecyclerView.Adapter<DetalleRecepci
                     btnDelete.setVisibility(View.GONE);
                 }
 
-                btnDelete.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+                btnDelete.setOnClickListener(v -> {
                         AlertDialog.Builder builder = new AlertDialog.Builder(activity, R.style.AlertDialogTheme);
                         View view = LayoutInflater.from(activity).inflate(R.layout.layout_warning_dialog,
                                 (ConstraintLayout) activity.findViewById(R.id.lyDialogContainer));
@@ -126,8 +124,7 @@ public class DetalleRecepcionAdapter extends RecyclerView.Adapter<DetalleRecepci
                         if(alertDialog.getWindow()!=null)
                             alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
                         alertDialog.show();
-                    }
-                });
+                    });
 
                 tvCantidad.addTextChangedListener(new TextWatcher() {
                     @Override

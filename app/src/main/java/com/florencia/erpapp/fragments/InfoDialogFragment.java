@@ -1,7 +1,9 @@
 package com.florencia.erpapp.fragments;
 
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatDialogFragment;
@@ -19,6 +21,7 @@ import android.widget.TextView;
 
 import com.florencia.erpapp.R;
 import com.florencia.erpapp.models.Cliente;
+import com.florencia.erpapp.utils.Utils;
 
 public class InfoDialogFragment extends AppCompatDialogFragment {
     private View view;
@@ -53,12 +56,10 @@ public class InfoDialogFragment extends AppCompatDialogFragment {
 
         }
 
-        btnCerrar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getDialog().dismiss();
-            }
-        });
+        btnCerrar.setOnClickListener(v -> getDialog().dismiss());
+
+        if(getDialog().getWindow()!=null)
+            getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(0));
         return  view;
     }
 
@@ -69,9 +70,7 @@ public class InfoDialogFragment extends AppCompatDialogFragment {
                 public void run(){
                     pbCargando.setVisibility(View.VISIBLE);
                     cliente = Cliente.get(id);
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
+                    getActivity().runOnUiThread(() -> {
                             if(cliente != null){
                                 txtNombre.setText(cliente.razonsocial);
                                 txtNombreComercial.setText(cliente.nombrecomercial.equals("")?"N/A":cliente.nombrecomercial);
@@ -79,11 +78,16 @@ public class InfoDialogFragment extends AppCompatDialogFragment {
                                 txtCorreo.setText(cliente.email.equals("")?"N/A":cliente.email);
                                 txtDireccion.setText(cliente.direccion.equals("")?"N/A":cliente.direccion);
                                 txtContacto.setText(cliente.fono1.equals("") && cliente.fono2.equals("")?"N/A":cliente.fono1.concat(" - ").concat(cliente.fono2));
-                                txtCategoria.setText(cliente.nombrecategoria.equals("")?"Sin categoría":"Categoría: ".concat(cliente.nombrecategoria));
+                                txtCategoria.setText(
+                                        (cliente.nombrecategoria.equals("")?
+                                                "Sin categoría":
+                                                "Categoría: ".concat(cliente.nombrecategoria))
+                                        .concat("\nMonto Crédito: " + Utils.FormatoMoneda(cliente.montocredito,2))
+                                        .concat("\nDeuda Total: " + Utils.FormatoMoneda(cliente.deudatotal,2))
+                                        .concat("\nMonto Disponible: " + Utils.FormatoMoneda(cliente.montocredito - cliente.deudatotal,2)));
                             }
                             pbCargando.setVisibility(View.GONE);
-                        }
-                    });
+                        });
                 }
             };
             th.start();

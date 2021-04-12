@@ -6,13 +6,19 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
+import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,7 +36,13 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 
 import com.florencia.erpapp.R;
+import com.florencia.erpapp.services.SQLite;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -483,5 +495,99 @@ public class Utils {
         String[] newF = fecha.split("-");
         fecha = newF[2] + "-" + Utils.getMes(Integer.valueOf( newF[1])-1,true) + "-" + newF[0];
         return fecha;
+    }
+
+    public static void DescargaApk(Context c, String url) {
+        try {
+            Uri uri = Uri.parse(url);
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setDataAndType(uri, "text/html");
+            i.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            c.startActivity(i);
+        } catch (Exception e) {
+            Log.d("TAG", e.getMessage());
+        }
+    }
+
+    public static String convertImageToString(Bitmap bitmap){
+        String base64="";
+        try{
+            ByteArrayOutputStream array = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, array);
+            byte[] imageByteO = array.toByteArray();
+            double MB = ((double) imageByteO.length/1024d)/1024d;
+            Log.d("TAGUTILS", "MB Original: " + MB);
+            if(MB > 1) {//Si pesa más de 1MB se comprime
+                double proporcion = MB>4 ? 0.6 : 0.7;
+                int bitmapWidth = (int) (((double) bitmap.getWidth()) * proporcion); // para utilizar width de la imagen original: bitmap.getWidth();
+                int bitmapHeight = (int) (((double) bitmap.getHeight()) * proporcion); // para utilizar height de la imagen original: bitmap.getHeight();
+                Bitmap bitmapout = Bitmap.createScaledBitmap(bitmap, bitmapWidth, bitmapHeight, false);
+
+                array = new ByteArrayOutputStream();
+                bitmapout.compress(Bitmap.CompressFormat.JPEG, MB>4 ? 80 : 90, array);
+                byte[] imageByteC = array.toByteArray();
+                base64 = Base64.encodeToString(imageByteC, Base64.DEFAULT);
+                Log.d("TAGUTILS", "MB Comp: "+ (((double)imageByteC.length/1024d)/1024d) +" - Bytes Comprimido: " + imageByteC.length);
+            }else {
+                base64 = Base64.encodeToString(imageByteO, Base64.DEFAULT);
+                Log.d("TAGUTILS", "Bytes Original: " + imageByteO.length);
+            }
+        }catch (Exception e){
+            Log.d("TAGUTILS", "convertImageToString(): " + e.getMessage());
+        }
+        return base64;
+    }
+
+    public static void insert_image(String sourceFile, String destinationFile) {
+        try{
+
+            File inFile = new File(sourceFile);
+            File outFile = new File(destinationFile);
+
+            FileInputStream in = new FileInputStream(inFile);
+            FileOutputStream out =new FileOutputStream(outFile);
+
+            byte[] buffer = new byte[1024];
+            int c;
+
+
+            while( (c = in.read(buffer) ) != -1)
+                out.write(buffer, 0, c);
+
+            out.flush();
+            in.close();
+            out.close();
+
+        } catch(IOException e) {
+
+            Log.d("insert_image(): ", e.getMessage());
+
+        }
+    }
+
+    public static void insert_image(Bitmap bitmap, String name, String path, ContentResolver cr){
+        try{
+            double proporcion = 0.5;
+            String newPath = path + File.separator + name;
+            int bitmapWidth = (int)(((double) bitmap.getWidth())*proporcion); // para utilizar width de la imagen original: bitmap.getWidth();
+            int bitmapHeight = (int) (((double) bitmap.getHeight())*proporcion); // para utilizar height de la imagen original: bitmap.getHeight();
+            Bitmap bitmapout = Bitmap.createScaledBitmap(bitmap, bitmapWidth, bitmapHeight, false);
+
+            bitmapout.compress(Bitmap.CompressFormat.JPEG, 80, new FileOutputStream(newPath));
+
+            File filefinal = new File(newPath);
+            Log.d("TAG", "CountO: " + bitmap.getByteCount() + "CountN: " + bitmapout.getByteCount());
+            ContentValues values = new ContentValues();
+            values.put(MediaStore.Images.Media.TITLE, "Titulo");
+            values.put(MediaStore.Images.Media.DESCRIPTION, "Descripción");
+            values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis ());
+            values.put(MediaStore.Images.ImageColumns.BUCKET_ID, filefinal.toString().toLowerCase(Locale.getDefault()).hashCode());
+            values.put(MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME, filefinal.getName().toLowerCase(Locale.getDefault()));
+            values.put("_data", filefinal.getAbsolutePath());
+            cr.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+            Log.d("TAGUTILS", newPath);
+        }catch (Exception e){
+            Log.d("TAGUTILS", "insert_image(): " + e.getMessage());
+        }
     }
 }

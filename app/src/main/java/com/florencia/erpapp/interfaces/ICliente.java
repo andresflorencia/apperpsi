@@ -12,7 +12,7 @@ import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.POST;
 
-public interface ClienteInterface {
+public interface ICliente {
     @FormUrlEncoded
     @POST("loadclientes")
     Call<JsonObject> LoadCliente(@Field("usuario") String user, @Field("clave") String clave,
@@ -20,4 +20,9 @@ public interface ClienteInterface {
 
     @POST("loadclientes")
     Call<JsonObject> LoadCliente2(@Body Map<String,Object> clientes);
+
+    @FormUrlEncoded
+    @POST("getdeudacliente")
+    Call<JsonObject> getDeudaCliente(@Field("usuario") String user, @Field("clave") String clave,
+                                 @Field("idpersona") Integer idpersona);
 }

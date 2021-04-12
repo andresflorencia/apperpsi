@@ -6,17 +6,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
-import android.content.DialogInterface;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -36,34 +33,44 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.florencia.erpapp.MainActivity;
 import com.florencia.erpapp.R;
 import com.florencia.erpapp.adapters.DetalleComprobanteAdapter;
 import com.florencia.erpapp.fragments.InfoDialogFragment;
+import com.florencia.erpapp.interfaces.ICliente;
 import com.florencia.erpapp.models.Cliente;
 import com.florencia.erpapp.models.Comprobante;
 import com.florencia.erpapp.models.DetalleComprobante;
 import com.florencia.erpapp.models.Lote;
-import com.florencia.erpapp.models.Producto;
 import com.florencia.erpapp.services.DeviceList;
 import com.florencia.erpapp.services.Printer;
 import com.florencia.erpapp.services.SQLite;
 import com.florencia.erpapp.utils.Constants;
 import com.florencia.erpapp.utils.Utils;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.shasin.notificationbanner.Banner;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.OkHttpClient;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 import static com.florencia.erpapp.services.Printer.btsocket;
-public class ComprobanteActivity extends AppCompatActivity {
+public class ComprobanteActivity extends AppCompatActivity implements View.OnClickListener{
 
     public static final int REQUEST_BUSQUEDA = 1;
     public static final int REQUEST_CLIENTE = 2;
@@ -85,11 +92,14 @@ public class ComprobanteActivity extends AppCompatActivity {
 
     //CONTROLES DEL DIALOG_BOTTOMSHEET
     TextView lblMessage, lblTitle, lblCliente, lblProducto, lblLeyendaCF;
-    LinearLayout lyCliente, lyProductos, lyBotones;
+    LinearLayout lyCliente, lyProductos, lyBotones, lyFormaPago;
     BottomSheetDialog btsDialog;
     Button btnPositive, btnNegative;
     View viewSeparator, rootView;
+    RadioButton rbEfectivo, rbCredito;
     String tipoAccion="";
+    OkHttpClient okHttpClient;
+    Retrofit retrofit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,54 +114,55 @@ public class ComprobanteActivity extends AppCompatActivity {
         toolbar.setTitle("Nueva factura");
         init();
 
-        txtCliente.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if((event.getAction() == KeyEvent.ACTION_DOWN) &&
+        txtCliente.setOnKeyListener(
+            (v, keyCode, event) -> {
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
                         (keyCode == KeyEvent.KEYCODE_ENTER)) {
                     Intent i = new Intent(v.getContext(), ClienteBusquedaActivity.class);
-                    i.putExtra("busqueda",txtCliente.getText().toString().trim());
+                    i.putExtra("busqueda", txtCliente.getText().toString().trim());
                     startActivityForResult(i, REQUEST_CLIENTE);
                     return true;
                 }
                 return false;
             }
-        });
+        );
 
-        txtCliente.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if(event.getAction() == MotionEvent.ACTION_UP) {
-                    if(event.getRawX() >= txtCliente.getRight() - txtCliente.getTotalPaddingRight()) {
+        txtCliente.setOnTouchListener(
+            (v, event) -> {
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    if (event.getRawX() >= txtCliente.getRight() - txtCliente.getTotalPaddingRight()) {
                         txtCliente.setText("");
                         cliente = new Cliente();
                         cliente = Cliente.get(0);
-                        if(cliente == null)
+                        if (cliente == null)
                             cliente = Cliente.get("9999999999999");
+
+                        rbEfectivo.setChecked(true);
+                        rbCredito.setEnabled(false);
+                        rbCredito.setText("Crédito (Disp:$0.00)");
+                        cliente.montocredito = 0d;
+                        cliente.deudatotal = 0d;
+                        cliente.montodisponible = 0d;
+
                         detalleAdapter.categoria = "0";
-                        detalleAdapter.CambiarPrecio("0");
+                        detalleAdapter.isCredito = false;
+                        detalleAdapter.CambiarPrecio("0", false);
                         detalleAdapter.notifyDataSetChanged();
                         return true;
-                    }else if(event.getRawX() <= txtCliente.getTotalPaddingLeft()
-                            && cliente.idcliente>0 && !cliente.nip.contains("999999999")){
+                    } else if (event.getRawX() <= txtCliente.getTotalPaddingLeft()
+                            && cliente.idcliente > 0 && !cliente.nip.contains("999999999")) {
                         MostrarInfoDialog(cliente.idcliente);
                     }
                 }
                 return false;
             }
-        });
+        );
 
         txtCliente.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override
             public void afterTextChanged(Editable s) {
                 try{
@@ -174,8 +185,8 @@ public class ComprobanteActivity extends AppCompatActivity {
             lblMessage = view.findViewById(R.id.lblMessage);
             lblTitle = view.findViewById(R.id.lblTitle);
             viewSeparator = view.findViewById(R.id.vSeparator);
-            btnPositive.setOnClickListener(onClick);
-            btnNegative.setOnClickListener(onClick);
+            btnPositive.setOnClickListener(this::onClick);
+            btnNegative.setOnClickListener(this::onClick);
 
             btsDialog = new BottomSheetDialog(this, R.style.AlertDialogTheme);
             btsDialog.setContentView(view);
@@ -213,18 +224,44 @@ public class ComprobanteActivity extends AppCompatActivity {
         lyProductos = findViewById(R.id.lyProductos);
         lyBotones = findViewById(R.id.lyBotones);
         lblLeyendaCF = findViewById(R.id.lblLeyendaCF);
+        lyFormaPago = findViewById(R.id.lyFormaPago);
+        rbEfectivo = findViewById(R.id.rbEfectivo);
+        rbCredito = findViewById(R.id.rbCredito);
+        lyFormaPago.setVisibility(View.VISIBLE);
+        rbCredito.setEnabled(false);
 
-        lblTotal.setOnClickListener(onClick);
-        lySubtotales.setOnClickListener(onClick);
-        btViewSubtotales.setOnClickListener(onClick);
-        btnBuscarProducto.setOnClickListener(onClick);
-        lblCliente.setOnClickListener(onClick);
-        lblProducto.setOnClickListener(onClick);
+        lblTotal.setOnClickListener(this::onClick);
+        lySubtotales.setOnClickListener(this::onClick);
+        btViewSubtotales.setOnClickListener(this::onClick);
+        btnBuscarProducto.setOnClickListener(this::onClick);
+        lblCliente.setOnClickListener(this::onClick);
+        lblProducto.setOnClickListener(this::onClick);
+
+        okHttpClient = new OkHttpClient().newBuilder()
+                .connectTimeout(60, TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS)
+                .writeTimeout(60, TimeUnit.SECONDS)
+                .build();
+        Gson gson = new GsonBuilder()
+                .setLenient()
+                .create();
+        retrofit = new Retrofit.Builder()
+                .baseUrl(SQLite.configuracion.url_ws)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .client(okHttpClient)
+                .build();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
             lblLeyendaCF.setText(Html.fromHtml(getResources().getString(R.string.leyendaConsumidorFinal), Html.FROM_HTML_MODE_COMPACT));
         else
             lblLeyendaCF.setText(Html.fromHtml(getResources().getString(R.string.leyendaConsumidorFinal)));
+
+        rbEfectivo.setChecked(true);
+        rbCredito.setEnabled(false);
+        rbCredito.setText("Crédito (Disp:$0.00)");
+        cliente.montocredito = 0d;
+        cliente.deudatotal = 0d;
+        cliente.montodisponible = 0d;
 
         if(getIntent().getExtras()!=null){
             int idcliente = getIntent().getExtras().getInt("idcliente",0);
@@ -232,6 +269,9 @@ public class ComprobanteActivity extends AppCompatActivity {
                 cliente = Cliente.get(idcliente);
                 comprobante.cliente = cliente;
                 txtCliente.setText(cliente.razonsocial);
+                if(cliente.codigosistema>0) {
+                    ConsultarDeudaCliente(ComprobanteActivity.this, cliente.codigosistema);
+                }
             }
             idcomprobante = getIntent().getExtras().getInt("idcomprobante",0);
         }
@@ -249,42 +289,64 @@ public class ComprobanteActivity extends AppCompatActivity {
         if(idcomprobante>0){
             BuscaComprobante(idcomprobante);
         }
+
+        rbEfectivo.setOnCheckedChangeListener(
+            (buttonView, isChecked) -> {
+                if(idcomprobante > 0)
+                    return;
+                if(isChecked){
+                    detalleAdapter.isCredito = false;
+                    detalleAdapter.CambiarPrecio(cliente.categoria, false);
+                    detalleAdapter.CalcularTotal();
+                    detalleAdapter.notifyDataSetChanged();
+                }
+            }
+         );
+
+        rbCredito.setOnCheckedChangeListener(
+            (v, isChecked) -> {
+                if(idcomprobante > 0)
+                    return;
+                detalleAdapter.isCredito = isChecked;
+                detalleAdapter.CambiarPrecio(cliente.categoria, isChecked);
+                detalleAdapter.CalcularTotal();
+                detalleAdapter.notifyDataSetChanged();
+            }
+        );
     }
 
-    private View.OnClickListener onClick = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            switch (v.getId()){
-                case R.id.lblTotal:
-                case R.id.lySubtotales:
-                case R.id.btViewSubtotales:
-                    Utils.EfectoLayout(lySubtotales);
-                    break;
-                case R.id.btnBuscarProducto:
-                    Intent i = new Intent(v.getContext(),ProductoBusquedaActivity.class);
-                    i.putExtra("tipobusqueda", "01");
-                    startActivityForResult(i, REQUEST_BUSQUEDA);
-                    break;
-                case R.id.btnPositive:
-                    if(tipoAccion.equals("MESSAGE")) {
-                        btnNegative.setVisibility(View.VISIBLE);
-                        viewSeparator.setVisibility(View.VISIBLE);
-                        lblTitle.setVisibility(View.VISIBLE);
-                        btsDialog.dismiss();
-                    }
-                    break;
-                case R.id.btnNegative:
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.lblTotal:
+            case R.id.lySubtotales:
+            case R.id.btViewSubtotales:
+                Utils.EfectoLayout(lySubtotales);
+                break;
+            case R.id.btnBuscarProducto:
+                Intent i = new Intent(v.getContext(),ProductoBusquedaActivity.class);
+                i.putExtra("tipobusqueda", "01");
+                startActivityForResult(i, REQUEST_BUSQUEDA);
+                break;
+            case R.id.btnPositive:
+                if(tipoAccion.equals("MESSAGE")) {
+                    btnNegative.setVisibility(View.VISIBLE);
+                    viewSeparator.setVisibility(View.VISIBLE);
+                    lblTitle.setVisibility(View.VISIBLE);
                     btsDialog.dismiss();
-                    break;
-                case R.id.lblCliente:
-                    Utils.EfectoLayout(lyCliente, lblCliente);
-                    break;
-                case R.id.lblProducto:
-                    Utils.EfectoLayout(lyProductos, lblProducto);
-                    break;
-            }
+                }
+                break;
+            case R.id.btnNegative:
+                btsDialog.dismiss();
+                break;
+            case R.id.lblCliente:
+                Utils.EfectoLayout(lyCliente, lblCliente);
+                break;
+            case R.id.lblProducto:
+                Utils.EfectoLayout(lyProductos, lblProducto);
+                break;
         }
-    };
+    }
 
     private void MostrarInfoDialog(Integer idcliente){
         DialogFragment dialogFragment = new InfoDialogFragment();
@@ -307,9 +369,8 @@ public class ComprobanteActivity extends AppCompatActivity {
                 public void run() {
                     comprobante = new Comprobante();
                     comprobante = Comprobante.get(idcomprobante);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
+                    runOnUiThread(
+                            () -> {
                             if (comprobante != null) {
                                 toolbar.setTitle("N°: " + comprobante.codigotransaccion);
                                 toolbar.setSubtitle("Fecha: " + Utils.fechaMes(comprobante.fechadocumento));
@@ -324,12 +385,17 @@ public class ComprobanteActivity extends AppCompatActivity {
                                 detalleAdapter.notifyDataSetChanged();
                                 setSubtotales(comprobante.total, comprobante.subtotal, comprobante.subtotaliva);
                                 lblLeyendaCF.setVisibility(View.GONE);
+                                rbEfectivo.setChecked(comprobante.formapago==1);
+                                rbCredito.setChecked(comprobante.formapago==0);
+                                rbCredito.setText("Crédito");
+                                rbEfectivo.setEnabled(false);
+                                rbCredito.setEnabled(false);
                             } else {
                                 Banner.make(rootView, ComprobanteActivity.this,Banner.ERROR,"Ocurrió un error al obtener los datos para esta factura.", Banner.BOTTOM, 3500).show();
                             }
                             pgCargando.dismiss();
                         }
-                    });
+                    );
                 }
             };
             th.start();
@@ -376,18 +442,14 @@ public class ComprobanteActivity extends AppCompatActivity {
                 ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
                 ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
                 final AlertDialog alertDialog = builder.create();
-                view.findViewById(R.id.btnConfirm).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+                view.findViewById(R.id.btnConfirm).setOnClickListener(
+                    v -> {
                         GuardarDatos();
                         alertDialog.dismiss();
                     }
-                });
+                );
 
-                view.findViewById(R.id.btnCancel).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) { alertDialog.dismiss();}
-                });
+                view.findViewById(R.id.btnCancel).setOnClickListener(v -> alertDialog.dismiss());
 
                 if(alertDialog.getWindow()!=null)
                     alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
@@ -447,12 +509,9 @@ public class ComprobanteActivity extends AppCompatActivity {
                     newDetalleCom.add(newDetalle);
                 }else {
                     //ORDENA LA LISTA DE LOTES POR FECHA DE VENCIMIENTO
-                    Collections.sort(miDetalle.producto.lotes, new Comparator<Lote>() {
-                        @Override
-                        public int compare(Lote lot1, Lote lot2) {
-                            return lot1.longdate.compareTo(lot2.longdate);
-                        }
-                    });
+                    Collections.sort(miDetalle.producto.lotes,
+                            (lot1, lot2) -> lot1.longdate.compareTo(lot2.longdate)
+                    );
 
                     Double cantFaltante = miDetalle.cantidad;
                     for(Lote lote:miDetalle.producto.lotes){
@@ -534,10 +593,18 @@ public class ComprobanteActivity extends AppCompatActivity {
             comprobante.fechadocumento = Utils.getDateFormat("yyyy-MM-dd");
             comprobante.usuarioid = SQLite.usuario.IdUsuario;
             comprobante.longdate = Utils.longDate(comprobante.fechadocumento);
-            //comprobante.lat = 0d; OBTENER LATITUD
-            //comprobante.lon = 0d; OBTENER LONGITUD
+            comprobante.formapago = rbCredito.isChecked()?0:1;
+
+            SQLite.gpsTracker.getLastKnownLocation();
+            comprobante.lat = SQLite.gpsTracker.getLatitude();
+            comprobante.lon = SQLite.gpsTracker.getLongitude();
+            if(comprobante.lat == null)
+                comprobante.lat = 0d;
+            if(comprobante.lon == null)
+                comprobante.lon = 0d;
 
             if (comprobante.Save(true)) {
+                toolbar.getMenu().findItem(R.id.option_save).setVisible(false);
                 ConsultaImpresion();
                 Banner.make(rootView,ComprobanteActivity.this,Banner.SUCCESS, Constants.MSG_DATOS_GUARDADOS, Banner.BOTTOM,3000).show();
             }else
@@ -553,15 +620,15 @@ public class ComprobanteActivity extends AppCompatActivity {
             View view = LayoutInflater.from(this).inflate(R.layout.layout_confirmation_dialog,
                     (ConstraintLayout) findViewById(R.id.lyDialogContainer));
             builder.setView(view);
+            builder.setCancelable(false);
             ((TextView)view.findViewById(R.id.lblTitle)).setText("Imprimir");
             ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Desea imprimir este documento?");
             ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_printer_white);
             ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
             ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
             final AlertDialog alertDialog = builder.create();
-            view.findViewById(R.id.btnConfirm).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            view.findViewById(R.id.btnConfirm).setOnClickListener(
+                v -> {
                     if (Printer.btsocket == null) {
                         Utils.showMessage(getApplicationContext(), "Emparejar la impresora...");
                         Intent BTIntent = new Intent(getApplicationContext(), DeviceList.class);
@@ -572,16 +639,15 @@ public class ComprobanteActivity extends AppCompatActivity {
                     }
                     alertDialog.dismiss();
                 }
-            });
+            );
 
-            view.findViewById(R.id.btnCancel).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            view.findViewById(R.id.btnCancel).setOnClickListener(
+                v -> {
                     if(idcomprobante==0)
                         LimpiarDatos();
                     alertDialog.dismiss();
                 }
-            });
+            );
 
             if(alertDialog.getWindow()!=null)
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
@@ -602,6 +668,15 @@ public class ComprobanteActivity extends AppCompatActivity {
                 cliente = Cliente.get("9999999999999");
             txtCliente.setText("");
             txtCliente.setEnabled(true);
+
+            rbEfectivo.setEnabled(true);
+            rbEfectivo.setChecked(true);
+            rbCredito.setEnabled(false);
+            rbCredito.setText("Crédito (Disp:$0.00)");
+            cliente.montocredito = 0d;
+            cliente.deudatotal = 0d;
+            cliente.montodisponible = 0d;
+
             detalleAdapter.visualizacion = false;
             detalleAdapter.detalleComprobante.clear();
             detalleProductos.clear();
@@ -610,6 +685,7 @@ public class ComprobanteActivity extends AppCompatActivity {
             detalleAdapter.notifyDataSetChanged();
             lyBotones.setVisibility(View.VISIBLE);
             idcomprobante = 0;
+            toolbar.getMenu().findItem(R.id.option_save).setVisible(true);
             lblLeyendaCF.setVisibility(View.VISIBLE);
         }catch (Exception e){
             Log.d("TAGCOMPROBANTE_ACT", "LimpiarDatos(): " + e.getMessage());
@@ -642,7 +718,7 @@ public class ComprobanteActivity extends AppCompatActivity {
         }else{
             for(DetalleComprobante miDetalle: comprobante.detalle){
                 if(miDetalle.cantidad <= 0) {
-                    Banner.make(rootView,ComprobanteActivity.this,Banner.ERROR,"Ingresa una cantidad mayor a 0 para el producto " + miDetalle.producto.nombreproducto, Banner.BOTTOM, 3500).show();
+                    Banner.make(rootView,ComprobanteActivity.this,Banner.ERROR,"Debe ingresar una cantidad mayor a 0 para el producto " + miDetalle.producto.nombreproducto, Banner.BOTTOM, 3500).show();
                     return false;
                 }
                 if(miDetalle.cantidad>miDetalle.producto.stock && miDetalle.producto.tipo.equalsIgnoreCase("P")){
@@ -651,6 +727,14 @@ public class ComprobanteActivity extends AppCompatActivity {
                     return false;
                 }
             }
+        }
+
+        if(rbCredito.isChecked() && cliente.montodisponible>0 && comprobante.total>cliente.montodisponible){
+            Banner.make(rootView,ComprobanteActivity.this, Banner.ERROR,
+                    "El total de la factura es mayor al monto disponible para ventas a crédito." +
+                            "\nMonto disponible: " + Utils.FormatoMoneda(cliente.montodisponible,2),
+                    Banner.BOTTOM, 3000).show();
+            return false;
         }
 
         if(cliente.nip.contains("99999999") && comprobante.total > 200){
@@ -715,6 +799,8 @@ public class ComprobanteActivity extends AppCompatActivity {
                         printer.printCustom("IVA 12%: " + Utils.FormatoMoneda((comprobante.total -comprobante.subtotal - comprobante.subtotaliva),2), 0, 2);
                         printer.printCustom("TOTAL: " + Utils.FormatoMoneda(comprobante.total,2), 0, 2);
                         printer.printCustom("", 1, 1);
+                        printer.printCustom("FORMA PAGO: " + (comprobante.formapago==0?"CREDITO":"EFECTIVO"), 0, 0);
+                        printer.printCustom("", 1, 1);
                         if(!comprobante.cliente.nip.equals("9999999999999")) {
                             printer.printCustom("Descargue su factura electrónica en: https://comprobantes.sanisidrosa.com/. Utilice como usuario y contraseña su número de indentificación: ".concat(comprobante.cliente.nip), 0, 0);
                             printer.printCustom("", 0, 1);
@@ -746,6 +832,67 @@ public class ComprobanteActivity extends AppCompatActivity {
         return fImp;
     }
 
+    private void ConsultarDeudaCliente(Context context, Integer idpersona) {
+        try{
+            rbEfectivo.setChecked(true);
+            rbCredito.setEnabled(false);
+            rbCredito.setText("Crédito (Disp:$0.00)");
+            cliente.montocredito = 0d;
+            cliente.deudatotal = 0d;
+            cliente.montodisponible = 0d;
+
+            ICliente miInterface = retrofit.create(ICliente.class);
+
+            Call<JsonObject> call = miInterface.getDeudaCliente(SQLite.usuario.Usuario,SQLite.usuario.Clave, idpersona);
+            call.enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    if(!response.isSuccessful()){
+                        return;
+                    }
+                    try {
+                        if (response.body() != null) {
+                            JsonObject obj = response.body();
+                            if (!obj.get("haserror").getAsBoolean()) {
+                                JsonObject jsonCliente = obj.getAsJsonObject("persona");
+                                if(jsonCliente!=null){
+                                    cliente.montocredito = jsonCliente.get("montocredito").getAsDouble();
+                                    cliente.deudatotal = jsonCliente.get("deudatotal").getAsDouble();
+                                    cliente.montodisponible = jsonCliente.get("montodisponible").getAsDouble();
+                                    cliente.plazomaximo = jsonCliente.get("plazomaximo").getAsInt();
+                                    rbCredito.setEnabled(cliente.montodisponible > 0);
+                                    rbCredito.setText("Crédito (Disp:" + Utils.FormatoMoneda(cliente.montodisponible,2)+")");
+
+                                    ContentValues values = new ContentValues();
+                                    values.put("montocredito", cliente.montocredito);
+                                    values.put("deudatotal", cliente.deudatotal);
+                                    values.put("plazomaximo", cliente.plazomaximo);
+                                    Cliente.Update(cliente.idcliente, values);
+                                }
+                            }
+                        }
+                    }catch (Exception e){
+                        Log.d("TAGCOMPROBANTE_ACT","onResponse(): " + e.getMessage());
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    Log.d("TAGCOMPROBANTE_ACT", "onFailure(): " + t.getMessage());
+                    call.cancel();
+                }
+            });
+        }catch (Exception e){
+            Log.d("TAGCOMPROBANTE_ACT", "ConsultaDeuda(): " + e.getMessage());
+        }
+    }
+
+    public void setSubtotales(Double total, Double subtotal, Double subtotaliva) {
+        lblSubtotales.setText("Subtotal 0%:    " + Utils.FormatoMoneda(subtotal,2) +
+                "\nSubtotal 12%:    " + Utils.FormatoMoneda(subtotaliva ,2) +
+                "\nIVA 12%:    " + Utils.FormatoMoneda((total - subtotaliva - subtotal),2));
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -770,10 +917,9 @@ public class ComprobanteActivity extends AppCompatActivity {
                     comprobante.detalle.addAll(detalleAdapter.detalleComprobante);
                     comprobante.getTotal();
                     this.setSubtotales(comprobante.total, comprobante.subtotal, comprobante.subtotaliva);
-                    detalleAdapter.CambiarPrecio(cliente.categoria.equals("")?"0":cliente.categoria);
+                    detalleAdapter.CambiarPrecio(cliente.categoria.equals("")?"0":cliente.categoria, rbCredito.isChecked());
                     detalleAdapter.CalcularTotal();
                     detalleAdapter.notifyDataSetChanged();
-                    Log.d("TAGPRODUCTO",String.valueOf(detalleAdapter.detalleComprobante.size()));
                     break;
                 case REQUEST_CLIENTE:
                     Integer idcliente = data.getExtras().getInt("idcliente",0);
@@ -781,8 +927,11 @@ public class ComprobanteActivity extends AppCompatActivity {
                         cliente = Cliente.get(idcliente);
                         comprobante.cliente = cliente;
                         txtCliente.setText(cliente.razonsocial);
+                        if(cliente.codigosistema > 0)
+                            ConsultarDeudaCliente(ComprobanteActivity.this, cliente.codigosistema);
                         detalleAdapter.categoria = cliente.categoria;
-                        detalleAdapter.CambiarPrecio(cliente.categoria);
+                        detalleAdapter.isCredito = rbCredito.isChecked();
+                        detalleAdapter.CambiarPrecio(cliente.categoria, rbCredito.isChecked());
                     }
                     break;
                 case DeviceList.REQUEST_CONNECT_BT:
@@ -810,12 +959,6 @@ public class ComprobanteActivity extends AppCompatActivity {
         }
     }
 
-    public void setSubtotales(Double total, Double subtotal, Double subtotaliva) {
-        lblSubtotales.setText("Subtotal 0%:    " + Utils.FormatoMoneda(subtotal,2) +
-                "\nSubtotal 12%:    " + Utils.FormatoMoneda(subtotaliva ,2) +
-                "\nIVA 12%:    " + Utils.FormatoMoneda((total - subtotaliva - subtotal),2));
-    }
-
     @Override
     public void onResume() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.appbar);
@@ -840,17 +983,9 @@ public class ComprobanteActivity extends AppCompatActivity {
             ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
             ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
             final AlertDialog alertDialog = builder.create();
-            view.findViewById(R.id.btnConfirm).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    finish();
-                }
-            });
+            view.findViewById(R.id.btnConfirm).setOnClickListener(v -> finish());
 
-            view.findViewById(R.id.btnCancel).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) { alertDialog.dismiss();}
-            });
+            view.findViewById(R.id.btnCancel).setOnClickListener(v -> alertDialog.dismiss());
 
             if(alertDialog.getWindow()!=null)
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));

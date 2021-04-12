@@ -3,29 +3,35 @@ package com.florencia.erpapp.activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.florencia.erpapp.R;
+import com.florencia.erpapp.interfaces.IUsuario;
 import com.florencia.erpapp.models.Configuracion;
 import com.florencia.erpapp.services.SQLite;
 import com.florencia.erpapp.utils.Constants;
 import com.florencia.erpapp.utils.Utils;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.shasin.notificationbanner.Banner;
+
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.OkHttpClient;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ConfigActivity extends AppCompatActivity {
 
@@ -34,6 +40,7 @@ public class ConfigActivity extends AppCompatActivity {
     Toolbar toolbar;
     EditText txtURLBase;
     CheckBox ckSSL;
+    private OkHttpClient okHttpClient;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +53,12 @@ public class ConfigActivity extends AppCompatActivity {
     }
 
     private void init() {
+        okHttpClient = new OkHttpClient().newBuilder()
+                .connectTimeout(60, TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS)
+                .writeTimeout(60, TimeUnit.SECONDS)
+                .build();
+
         txtURLBase = findViewById(R.id.txtUrlBase);
         ckSSL = findViewById(R.id.ckSSL);
 
@@ -82,47 +95,56 @@ public class ConfigActivity extends AppCompatActivity {
                 Banner.make(rootView,this,Banner.ERROR, "Debe especificar la URL válida.",Banner.BOTTOM, 3000).show();
                 txtURLBase.requestFocus();
                 return;
-            }else if(!Utils.isOnlineNet(txtURLBase.getText().toString().trim())){
-                Banner.make(rootView,this,Banner.ERROR, "No es posible conectar con la URL ingresada. Verifique su conexión.",Banner.BOTTOM, 3000).show();
-                return;
+            }else {//if(!Utils.isOnlineNet(txtURLBase.getText().toString().trim())){
+                String url_temp = (ckSSL.isChecked()?Constants.HTTPs:Constants.HTTP)
+                        + txtURLBase.getText().toString().trim()
+                        + (ckSSL.isChecked()?"":"/erpproduccion")
+                        + Constants.ENDPOINT;
+                Gson gson = new GsonBuilder()
+                        .setLenient()
+                        .create();
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl(url_temp)
+                        .addConverterFactory(GsonConverterFactory.create(gson))
+                        .client(okHttpClient)
+                        .build();
+                IUsuario miInterface = retrofit.create(IUsuario.class);
+
+                Call<String> call = null;
+                call = miInterface.verificaconexion();
+                call.enqueue(new Callback<String>() {
+                    @Override
+                    public void onResponse(Call<String> call, Response<String> response) {
+                        if (!response.isSuccessful()) {
+                            Banner.make(rootView,ConfigActivity.this,Banner.ERROR, "No es posible conectar con la URL ingresada. Verifique su conexión.",Banner.BOTTOM, 3000).show();
+                            return;
+                        }
+                        try {
+                            if (response.body() != null) {
+                                String resp = response.body();
+                                if(resp.equalsIgnoreCase("OK"))
+                                    GuardarDatos();
+                                else
+                                    Banner.make(rootView,ConfigActivity.this,Banner.ERROR, "No es posible conectar con la URL ingresada. Verifique su conexión.",Banner.BOTTOM, 3000).show();
+                            }else
+                                Banner.make(rootView,ConfigActivity.this,Banner.ERROR, "No es posible conectar con la URL ingresada. Verifique su conexión.",Banner.BOTTOM, 3000).show();
+                        } catch (Exception e) {
+                            Banner.make(rootView,ConfigActivity.this,Banner.ERROR, "No es posible conectar con la URL ingresada. Verifique su conexión.",Banner.BOTTOM, 3000).show();
+                            Log.d(TAG, e.getMessage());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<String> call, Throwable t) {
+                        Log.d(TAG, t.getMessage());
+                        Banner.make(rootView,ConfigActivity.this,Banner.ERROR, "No es posible conectar con la URL ingresada. Verifique su conexión.",Banner.BOTTOM, 3000).show();
+                        call.cancel();
+                    }
+                });
             }
 
-            GuardarDatos();
-
-            /*EditText txtPassword;
-            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this, R.style.AlertDialogTheme);
-            View view = LayoutInflater.from(this).inflate(R.layout.layout_seguridad_dialog,
-                    (ConstraintLayout) findViewById(R.id.lyDialogContainer));
-            builder.setView(view);
-            txtPassword = view.findViewById(R.id.txtPassword);
-            ((TextView)view.findViewById(R.id.lblTitle)).setText("Confirmación");
-            ((TextView)view.findViewById(R.id.lblMessage)).setText("Especifique la contraseña de seguridad: ");
-            ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_lock);
-            ((Button)view.findViewById(R.id.btnCancel)).setText("Cancelar");
-            ((Button)view.findViewById(R.id.btnConfirm)).setText("Confirmar");
-            final android.app.AlertDialog alertDialog = builder.create();
-            view.findViewById(R.id.btnConfirm).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(txtPassword.getText().toString().equals(Constants.CLAVE_SEGURIDAD)) {
-                        GuardarDatos();
-                        alertDialog.dismiss();
-                    }else{
-                        Banner.make(rootView,ConfigActivity.this, Banner.ERROR, "Clave incorrecta, intente nuevamente.", Banner.TOP,2000).show();
-                    }
-                }
-            });
-
-            view.findViewById(R.id.btnCancel).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) { alertDialog.dismiss();}
-            });
-
-            if(alertDialog.getWindow()!=null)
-                alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
-            alertDialog.show();*/
-
         }catch (Exception e){
+            Banner.make(rootView,this,Banner.ERROR, "No es posible conectar con la URL ingresada. Verifique su conexión.",Banner.BOTTOM, 3000).show();
             Log.d(TAG, "ValidarDatos(): " + e.getMessage());
         }
     }

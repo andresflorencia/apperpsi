@@ -2,6 +2,7 @@ package com.florencia.erpapp.models;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -39,6 +40,7 @@ public class Usuario {
     public int Autorizacion;
     public int Perfil;
     public String nombrePerfil;
+    public String nip;
 
     public List<Permiso> permisos;
 
@@ -55,6 +57,7 @@ public class Usuario {
         this.ParroquiaID = 0;
         this.permisos = new ArrayList<>();
         this.nombrePerfil = "";
+        this.nip = "";
         //this.context = context;
     }
 
@@ -64,8 +67,8 @@ public class Usuario {
         try {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
             sqLiteDatabase.execSQL("INSERT OR REPLACE INTO " +
-                            "usuario(idusuario, razonsocial, usuario, clave, perfil, autorizacion, pin, sucursalid, parroquiaid, nombreperfil) " +
-                            "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                            "usuario(idusuario, razonsocial, usuario, clave, perfil, autorizacion, pin, sucursalid, parroquiaid, nombreperfil, nip) " +
+                            "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     new String[]{
                             String.valueOf(this.IdUsuario),
                             this.RazonSocial,
@@ -76,7 +79,7 @@ public class Usuario {
                             this.Pin,
                             this.sucursal.IdEstablecimiento == null ? "0": this.sucursal.IdEstablecimiento.toString(),
                             this.ParroquiaID.toString(),
-                            this.nombrePerfil.toUpperCase()
+                            this.nombrePerfil.toUpperCase(), this.nip
                     }
             );
             sqLiteDatabase.close();
@@ -112,6 +115,7 @@ public class Usuario {
         Item.sucursal =  Sucursal.getSucursal(String.valueOf(cursor.getInt(7)));
         Item.ParroquiaID = cursor.getInt(8);
         Item.nombrePerfil = cursor.getString(9);
+        Item.nip = cursor.getString(10);
         Item.permisos = Permiso.getPermisos(Item.Perfil);
 
         return Item;
@@ -137,8 +141,7 @@ public class Usuario {
         return Item;
     }
 
-    static public Usuario Login(String User, String Password)
-    {
+    static public Usuario Login(String User, String Password){
         Usuario Item = null;
         try {
             sqLiteDatabase = SQLite.sqlDB.getReadableDatabase();
@@ -210,15 +213,18 @@ public class Usuario {
             String query = "";
             if(SQLite.usuario.VerificaPermiso(ctx, Constants.PUNTO_VENTA, "lectura"))
                 query = "select 'FACTURAS' documento, count(co.idcomprobante) as cantidad, round(ifnull(sum(co.total),0),2) as total, " +
-                        "(select count(idcomprobante) from comprobante where tipotransaccion = '01' and estado >= 0 and codigosistema = 0 and fechadocumento = '"+fecha+"') as cantidadns " +
+                        "(select count(idcomprobante) from comprobante where tipotransaccion = '01' and estado >= 0 and codigosistema = 0 and fechadocumento = '"+fecha+"' and usuarioid = "+SQLite.usuario.IdUsuario+") as cantidadns " +
                         "from comprobante co where co.tipotransaccion = '01' and estado >= 0 and fechadocumento = '"+fecha+"' and usuarioid =" + SQLite.usuario.IdUsuario;
             if(SQLite.usuario.VerificaPermiso(ctx, Constants.RECEPCION_INVENTARIO, "lectura")) {
                 if(query.length()>0) query += " UNION";
-                query += " select 'RECEPCIONES', count(co.idcomprobante), round(ifnull(sum(co.total),0),2), 0 from comprobante co where co.tipotransaccion in ('8','23') and estado >= 0 and fechadocumento = '" + fecha + "' and usuarioid =" + SQLite.usuario.IdUsuario;
+                query += " select 'RECEPCIONES', count(co.idcomprobante), round(ifnull(sum(co.total),0),2), 0 " +
+                        "from comprobante co where co.tipotransaccion in ('8','23') and estado >= 0 and " +
+                        "fechadocumento = '" + fecha + "' and usuarioid =" + SQLite.usuario.IdUsuario;
             }
             if(SQLite.usuario.VerificaPermiso(ctx, Constants.TRANSFERENCIA_INVENTARIO, "lectura")) {
                 if(query.length()>0) query += " UNION";
-                query += " select 'TRANSFERENCIAS', count(co.idcomprobante), round(ifnull(sum(co.total),0),2), 0 from comprobante co where co.tipotransaccion in ('4','20') and estado >= 0 and fechadocumento = '" + fecha + "' and usuarioid =" + SQLite.usuario.IdUsuario;
+                query += " select 'TRANSFERENCIAS', count(co.idcomprobante), round(ifnull(sum(co.total),0),2), 0 " +
+                        "from comprobante co where co.tipotransaccion in ('4','20') and estado >= 0 and fechadocumento = '" + fecha + "' and usuarioid =" + SQLite.usuario.IdUsuario;
             }
             if(SQLite.usuario.VerificaPermiso(ctx, Constants.PEDIDO, "lectura")) {
                 if(query.length()>0) query += " UNION";
@@ -232,7 +238,6 @@ public class Usuario {
                         "(select count(idpedido) as cantidad from pedidoinv where estadomovil = 1 and codigosistema = 0 and fechahora like '"+fecha+"%' and usuarioid = "+SQLite.usuario.IdUsuario+")" +
                         "from pedidoinv pe where pe.estadomovil >= 0 and fechahora like '"+fecha+"%' and usuarioid = " + SQLite.usuario.IdUsuario;
             }
-
             if(SQLite.usuario.VerificaPermiso(ctx, Constants.REGISTRO_CLIENTE, "lectura")){
                 if(query.length()>0) query += " UNION";
                 query += " select 'CLIENTES'," +
@@ -240,6 +245,12 @@ public class Usuario {
                         "count(*)," +
                         "(select count(*) from cliente where usuarioid = "+SQLite.usuario.IdUsuario+" and fechamodificacion like '"+fecha+"%' and actualizado = 1) " +
                         "from cliente where usuarioid = " + SQLite.usuario.IdUsuario + " and nip not like '999999999%'";
+            }
+            if(SQLite.usuario.VerificaPermiso(ctx, Constants.PUNTO_VENTA, "lectura")){
+                if(query.length()>0) query += " UNION";
+                query += " select 'DEPOSITOS', count(ing.idingreso), round(ifnull(sum(ing.totalingreso),0),2), " +
+                        "(select count(idingreso) from ingreso where estado >= 0 and codigosistema = 0 and longdater = "+Utils.longDate(fecha)+" and usuarioid = "+SQLite.usuario.IdUsuario+")" +
+                        "from ingreso ing where estado >= 0 and longdater = "+Utils.longDate(fecha)+" and usuarioid = " + SQLite.usuario.IdUsuario;
             }
 
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
@@ -263,19 +274,34 @@ public class Usuario {
         return resumen;
     }
 
-    public static int numDocNoSincronizados(Integer idUsuario, String tipodoc){
+    public static int numDocNoSincronizados(Integer idUsuario, String tipodoc, String fecha, Integer idEstablecimiento){
         int cant = 0;
         try{
+            List<String> params = new ArrayList<>();
+            params.add(idUsuario.toString());
             String query = "";
-            if(tipodoc.equals("01"))  //FACTURAS
-                query = "SELECT COUNT(*) FROM comprobante WHERE tipotransaccion = '01' AND codigosistema = 0 AND estado = 0 AND usuarioid = ?";
-            else if(tipodoc.equals("PC"))//PEDIDOS CLIENTE
+            if(tipodoc.equals("01")) {  //FACTURAS
+                query = "SELECT COUNT(*) FROM comprobante WHERE tipotransaccion = '01' AND codigosistema = 0 AND estado = 0 AND usuarioid = ? ";
+                if(fecha != ""){
+                    query += " AND fechadocumento = ?";
+                    params.add(fecha);
+                }
+                if(idEstablecimiento != 0){
+                    query += " AND establecimientoid = ?";
+                    params.add(idEstablecimiento.toString());
+                }
+            }else if(tipodoc.equals("PC"))//PEDIDOS CLIENTE
                 query = "SELECT count(*) FROM pedido WHERE codigosistema = 0 AND estado = 1 AND usuarioid = ?";
             else if(tipodoc.equals("PI"))//PEDIDOS INVENTARIO
                 query = "SELECT count(*) FROM pedidoinv WHERE codigosistema = 0 AND estadomovil = 1 AND usuarioid = ?";
+            else if(tipodoc.equals("DE")) {//ORDEN DE PAGO (DEPOSITOS - DIARIO DE VENTA)
+                query = "SELECT count(*) FROM ingreso WHERE codigosistema = 0 AND estado = 1 AND usuarioid = ? AND establecimientoid = ? ";
+                params.add(idEstablecimiento.toString());
+            }
 
+            String[] paramsA = new String[params.size()];
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
-            Cursor cursor = sqLiteDatabase.rawQuery(query, new String[]{idUsuario.toString()});
+            Cursor cursor = sqLiteDatabase.rawQuery(query, params.toArray(paramsA));
             if (cursor.moveToFirst())
                 cant = cursor.getInt(0);
         }catch (Exception e){
@@ -382,6 +408,44 @@ public class Usuario {
             }
         };
         timer.schedule(task, 0, 1000 * 60 * 15);
+    }
+
+    public static Double[] getTotalVentas(String fecha){
+        Double[] retorno = new Double[]{0d, 0d};
+        try{
+            String query = "select round(ifnull(sum(co.total),0),2) as total " +
+                    "from comprobante co where co.tipotransaccion = '01' and estado >= 0 and formapago = 1 and fechadocumento = ? and usuarioid = ?";
+            sqLiteDatabase = SQLite.sqlDB.getReadableDatabase();
+            Cursor cursor = sqLiteDatabase.rawQuery(query, new String[]{fecha, String.valueOf(SQLite.usuario.IdUsuario)});
+            if (cursor.moveToFirst())
+                retorno[0] = cursor.getDouble(0);
+
+            query = "SELECT ROUND(SUM(totalingreso),2) " +
+                    "FROM ingreso WHERE estado >= 0 and fechadiario = ? AND usuarioid = ? AND establecimientoid = ?";
+
+            cursor = sqLiteDatabase.rawQuery(query, new String[]{fecha, String.valueOf(SQLite.usuario.IdUsuario),
+                    SQLite.usuario.sucursal.IdEstablecimiento.toString()});
+            if (cursor.moveToFirst())
+                retorno[1] = cursor.getDouble(0);
+            cursor.close();
+            sqLiteDatabase.close();
+        }catch (Exception e){
+            Log.d("TAGUSUARIO", e.getMessage());
+        }
+        return retorno;
+    }
+
+    public static boolean Update(Integer idusuario, ContentValues values) {
+        try {
+            sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
+            sqLiteDatabase.update("usuario",values, "idusuario = ?",new String[]{idusuario.toString()});
+            sqLiteDatabase.close();
+            Log.d("TAGUSUARIO","UPDATE USUARIO OK");
+            return true;
+        } catch (SQLException ex){
+            Log.d("TAGUSUARIO", "Update(): " + ex.getMessage());
+            return false;
+        }
     }
 }
 

@@ -10,7 +10,7 @@ import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.POST;
 
-public interface ComprobanteInterface {
+public interface IComprobante {
 
     @POST("loadcomprobantes")
     Call<JsonObject> LoadComprobantes(@Body Map<String,Object> comprobantes);
@@ -40,4 +40,7 @@ public interface ComprobanteInterface {
 
     @POST("loadpedidosinv")
     Call<JsonObject> LoadPedidosInv(@Body Map<String,Object> pedidos);
+
+    @POST("loaddepositos")
+    Call<JsonObject> LoadDepositos(@Body Map<String,Object> depositos);
 }

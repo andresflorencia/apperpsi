@@ -27,6 +27,7 @@ import com.florencia.erpapp.activities.RecepcionActivity;
 import com.florencia.erpapp.activities.TransferenciaActivity;
 import com.florencia.erpapp.fragments.InfoFacturaDialogFragment;
 import com.florencia.erpapp.models.Comprobante;
+import com.florencia.erpapp.models.Ingreso;
 import com.florencia.erpapp.models.Pedido;
 import com.florencia.erpapp.models.PedidoInventario;
 import com.florencia.erpapp.utils.Constants;
@@ -43,19 +44,24 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
     public List<Comprobante> listComprobantes;
     public List<Pedido> listPedidos;
     public List<PedidoInventario> listPedidosInv;
+    public List<Ingreso> listIngresos;
     private List<Comprobante> orginalItems = new ArrayList<>();
     private List<Pedido> orginalItemsP = new ArrayList<>();
     private List<PedidoInventario> orginalItemsPI = new ArrayList<>();
+    private List<Ingreso> originalIngreso = new ArrayList<>();
     ListaComprobantesActivity activity;
     String tipobusqueda;
     View rootView;
     Boolean retornar;
 
-    public ComprobantesAdapter(ListaComprobantesActivity activity, List<Comprobante> listComprobantes, List<Pedido> listPedidos, List<PedidoInventario> listPedidosInv, String tipobusqueda, Boolean retornar) {
+    public ComprobantesAdapter(ListaComprobantesActivity activity, List<Comprobante> listComprobantes,
+                               List<Pedido> listPedidos, List<PedidoInventario> listPedidosInv,
+                               List<Ingreso> listIngresos, String tipobusqueda, Boolean retornar) {
         this.activity = activity;
         this.listComprobantes= listComprobantes;
         this.listPedidos = listPedidos;
         this.listPedidosInv = listPedidosInv;
+        this.listIngresos = listIngresos;
         this.tipobusqueda = tipobusqueda;
         this.rootView = activity.findViewById(android.R.id.content);
         this.retornar = retornar;
@@ -70,6 +76,8 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
             this.orginalItemsP.addAll(this.listPedidos);
         if(this.tipobusqueda.equals("PI") && this.listPedidosInv != null)
             this.orginalItemsPI.addAll(this.listPedidosInv);
+        if(this.tipobusqueda.equals("DE") && this.listIngresos != null)
+            this.originalIngreso.addAll(this.listIngresos);
     }
 
     @NonNull
@@ -85,11 +93,13 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
         if(tipobusqueda.equals("01")
                 || tipobusqueda.equals("8,23") || tipobusqueda.equals("23,8")
                 || tipobusqueda.equals("4,20") || tipobusqueda.equals("20,4")) {
-            holder.bindComprobante(listComprobantes.get(position), null, null);
+            holder.bindComprobante(listComprobantes.get(position), null, null, null);
         }else if(tipobusqueda.equals("PC"))
-            holder.bindComprobante(null, listPedidos.get(position), null);
+            holder.bindComprobante(null, listPedidos.get(position), null, null);
         else if(tipobusqueda.equals("PI"))
-            holder.bindComprobante(null, null, listPedidosInv.get(position));
+            holder.bindComprobante(null, null, listPedidosInv.get(position), null);
+        else if(tipobusqueda.equals("DE"))
+            holder.bindComprobante(null, null, null, listIngresos.get(position));
     }
 
     @Override
@@ -103,6 +113,8 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
             size = listPedidos.size();
         else if(this.tipobusqueda.equals("PI"))
             size = listPedidosInv.size();
+        else if(this.tipobusqueda.equals("DE"))
+            size = listIngresos.size();
         return size;
     }
 
@@ -122,7 +134,7 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                                     .concat(i.codigotransaccion)
                                     .concat(i.claveacceso)
                                     .contains(busqueda.toLowerCase()))
-                            .collect(Collectors.<Comprobante>toList());
+                            .collect(Collectors.toList());
                     listComprobantes.addAll(collect);
                 } else {
                     for (Comprobante i : orginalItems) {
@@ -136,7 +148,8 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                     }
                 }
             }
-        }else if(this.tipobusqueda.equals("PC")){
+        }
+        else if(this.tipobusqueda.equals("PC")){ //PEDIDOS DE CLIENTE
             listPedidos.clear();
             if(busqueda.length()==0){
                 listPedidos.addAll(orginalItemsP);
@@ -148,7 +161,7 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                                     .concat(i.total.toString())
                                     .concat(i.secuencialpedido)
                                     .contains(busqueda.toLowerCase()))
-                            .collect(Collectors.<Pedido>toList());
+                            .collect(Collectors.toList());
                     listPedidos.addAll(collect);
                 }else{
                     for(Pedido i: orginalItemsP){
@@ -161,7 +174,8 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                     }
                 }
             }
-        }else if(this.tipobusqueda.equals("PI")){
+        }
+        else if(this.tipobusqueda.equals("PI")){ // PEDIDOS DE INVENTARIO
             listPedidosInv.clear();
             if(busqueda.length()==0){
                 listPedidosInv.addAll(orginalItemsPI);
@@ -172,7 +186,7 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                                     .concat(i.fecharegistro)
                                     .concat(i.observacion.toLowerCase())
                                     .contains(busqueda.toLowerCase()))
-                            .collect(Collectors.<PedidoInventario>toList());
+                            .collect(Collectors.toList());
                     listPedidosInv.addAll(collect);
                 }else{
                     for(PedidoInventario i: orginalItemsPI){
@@ -181,6 +195,34 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                                 .concat(i.observacion.toLowerCase())
                                 .contains(busqueda.toLowerCase()))
                             listPedidosInv.add(i);
+                    }
+                }
+            }
+        }
+        else if(this.tipobusqueda.equals("DE")){ //DEPOSITOS
+            listIngresos.clear();
+            if(busqueda.length()==0){
+                listIngresos.addAll(originalIngreso);
+            }else{
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    List<Ingreso> collect = originalIngreso.stream()
+                            .filter(i -> i.secuencialdocumento.toLowerCase()
+                                    .concat(i.fechacelular)
+                                    .concat(i.fechadiario)
+                                    .concat(i.fechadocumento)
+                                    .concat(i.observacion.toLowerCase())
+                                    .contains(busqueda.toLowerCase()))
+                            .collect(Collectors.toList());
+                    listIngresos.addAll(collect);
+                }else{
+                    for(Ingreso i: originalIngreso){
+                        if(i.secuencialdocumento.toLowerCase()
+                                .concat(i.fechacelular)
+                                .concat(i.fechadiario)
+                                .concat(i.fechadocumento)
+                                .concat(i.observacion.toLowerCase())
+                                .contains(busqueda.toLowerCase()))
+                            listIngresos.add(i);
                     }
                 }
             }
@@ -203,11 +245,12 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
             btnPreview = itemView.findViewById(R.id.btnPreview);
         }
 
-        void bindComprobante(final Comprobante comprobante, final Pedido pedido, final PedidoInventario pedidoinv){
+        void bindComprobante(final Comprobante comprobante, final Pedido pedido,
+                             final PedidoInventario pedidoinv, final Ingreso ingreso){
             try {
                 if (tipobusqueda.equals("01")) {
                     tvNombreCliente.setText(comprobante.cliente.nip + " - " + comprobante.cliente.razonsocial);
-                    tvNumeroComprobante.setText("N°: " + comprobante.codigotransaccion);
+                    tvNumeroComprobante.setText("N°: ".concat(comprobante.codigotransaccion).concat(" - FP: ").concat(comprobante.formapago==0?"CRÉDITO":"EFECTIVO"));
                     tvTotal.setText("Total: " + Utils.FormatoMoneda(comprobante.total, 2));
                     tvFecha.setText("Fecha: " + comprobante.fechadocumento);
                     btnPreview.setVisibility(View.VISIBLE);
@@ -223,7 +266,8 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                         btnAnular.setEnabled(false);
                         itemView.setBackgroundResource(R.drawable.bg_btn_green);
                     }
-                } else if (tipobusqueda.equals("PC")) {
+                }
+                else if (tipobusqueda.equals("PC")) {
                     tvNombreCliente.setText(pedido.cliente.nip + " - " + pedido.cliente.razonsocial);
                     tvNumeroComprobante.setText("N°: " + pedido.secuencialpedido);
                     tvTotal.setText("Total: " + Utils.FormatoMoneda(pedido.total, 2));
@@ -240,14 +284,16 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                         btnAnular.setEnabled(false);
                         itemView.setBackgroundResource(R.drawable.bg_btn_green);
                     }
-                }else if (tipobusqueda.equals("8,23") || tipobusqueda.equals("23,8")) { //RECEPCIONES - RECEPDEVOLUCION
+                }
+                else if (tipobusqueda.equals("8,23") || tipobusqueda.equals("23,8")) { //RECEPCIONES - RECEPDEVOLUCION
                     tvNombreCliente.setText("RECEP: " + comprobante.codigotransaccion);
                     tvNumeroComprobante.setText("TRANSF: " + comprobante.claveacceso);
                     tvTotal.setText("");
                     tvFecha.setText("F. Reg.: " + comprobante.fechacelular);
                     btnAnular.setVisibility(View.GONE);
                     itemView.setBackgroundResource(R.drawable.bg_btn_gps);
-                }else if (tipobusqueda.equals("4,20") || tipobusqueda.equals("20,4")) { //TRANSFERENCIAS
+                }
+                else if (tipobusqueda.equals("4,20") || tipobusqueda.equals("20,4")) { //TRANSFERENCIAS
                     tvNombreCliente.setText((comprobante.tipotransaccion.equals("4")?"TRANSF: ":"DEVOL: ") + comprobante.claveacceso);
                     tvNumeroComprobante.setText("Origen: " + comprobante.sucursalenvia.split("-")[1]
                                         + "\nDestino: " + comprobante.sucursalrecibe.split("-")[1]);
@@ -255,7 +301,8 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                     tvFecha.setText("F. Reg.: " + comprobante.fechacelular);
                     btnAnular.setVisibility(View.GONE);
                     itemView.setBackgroundResource(R.drawable.bg_btn_gps);
-                }else if (tipobusqueda.equals("PI")) { //PEDIDO INVENTARIO
+                }
+                else if (tipobusqueda.equals("PI")) { //PEDIDO INVENTARIO
                     tvNombreCliente.setText("DOC: " + pedidoinv.codigopedido);
                     tvNumeroComprobante.setText("Fecha: " + pedidoinv.fecharegistro);
                     tvTotal.setText("Num Items: " + pedidoinv.detalle.size());
@@ -276,6 +323,28 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                         itemView.setBackgroundResource(R.drawable.bg_btn_green);
                     }
                 }
+                else if(tipobusqueda.equals("DE")){ //DEPOSITOS - DIARIO DE VENTA
+                    tvNombreCliente.setText(ingreso.detalle.get(0).niptitular.concat(" - ")
+                                            .concat(ingreso.detalle.get(0).razonsocialtitular));
+                    tvNumeroComprobante.setText(ingreso.detalle.get(0).entidadfinanciera.nombrecatalogo
+                                                .concat(" Cuenta: " + (ingreso.detalle.get(0).tipodecuenta.equals("A")?"Ahorro":"Corriente")));
+                    tvTotal.setText("Monto: " + Utils.FormatoMoneda(ingreso.totalingreso, 2));
+                    tvFecha.setText("F. Ventas: " + ingreso.fechadiario + "\n" +
+                                    "F. Doc.: " + ingreso.detalle.get(0).fechadocumento);
+                    btnAnular.setVisibility(View.GONE);
+                    btnPreview.setVisibility(View.VISIBLE);
+                    if (ingreso.estado >= 0 && ingreso.codigosistema == 0) {
+                        btnAnular.setVisibility(View.VISIBLE);
+                        btnAnular.setImageResource(R.drawable.ic_delete2);
+                        btnAnular.setEnabled(true);
+                        itemView.setBackgroundResource(R.drawable.bg_btn_red);
+                    } else {
+                        btnAnular.setVisibility(View.VISIBLE);
+                        btnAnular.setImageResource(R.drawable.ic_cloud_green);
+                        btnAnular.setEnabled(false);
+                        itemView.setBackgroundResource(R.drawable.bg_btn_green);
+                    }
+                }
             }catch (Exception e){
                 Log.d("TAGCOMPROBANTEADAPTER", "bindComprobante(): " + e.getMessage());
             }
@@ -290,6 +359,8 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                         idcomprobante = listPedidos.get(getAdapterPosition()).idpedido;
                     else if(tipobusqueda.equals("PI"))
                         idcomprobante = listPedidosInv.get(getAdapterPosition()).idpedido;
+                    else if(tipobusqueda.equals("DE"))
+                        return;
 
                     if(retornar) {
                         activity.setResult(Activity.RESULT_OK, new Intent().putExtra("idcomprobante", idcomprobante));
@@ -322,80 +393,92 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
             );
 
 
-            itemView.setOnLongClickListener(v -> {
-                        String secuencial = "";
-                        switch (tipobusqueda) {
-                            case "01":
-                            case "4,20":
-                            case "20,4":
-                            case "8,23":
-                            case "23,8":
-                                secuencial = listComprobantes.get(getAdapterPosition()).codigotransaccion;
-                                break;
-                            case "PC":
-                                secuencial = listPedidos.get(getAdapterPosition()).secuencialpedido;
-                                break;
-                            case "PI":
-                                secuencial = listPedidosInv.get(getAdapterPosition()).codigopedido;
-                                break;
-                        }
-                        AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-                        builder.setTitle("Eliminar documento «" + secuencial + "»");
-                        builder.setMessage("¿Está seguro que desea eliminar este documento?\n" +
-                                "Nota:\n" +
-                                "1.- Después de eliminado no podrá sincronizarse y ya no será visible.\n" +
-                                "2.- Este registro solo se eliminará de su dispositivo.");
-                        builder.setIcon(R.drawable.ic_delete2);
-                        builder.setPositiveButton(activity.getResources().getString(R.string.Confirm), new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                int eliminado = 0;
-                                String numdoc = "";
-                                switch (tipobusqueda) {
-                                    case "01":
-                                    case "4,20":
-                                    case "20,4":
-                                    case "8,23":
-                                    case "23,8":
-                                        eliminado = Comprobante.Delete(listComprobantes.get(getAdapterPosition()).idcomprobante, "", "", 0, false);
-                                        if (eliminado > 0) {
-                                            numdoc = listComprobantes.get(getAdapterPosition()).codigotransaccion;
-                                            listComprobantes.remove(getAdapterPosition());
-                                            notifyDataSetChanged();
-                                        }
-                                        break;
-                                    case "PC":
-                                        eliminado = Pedido.Delete(listPedidos.get(getAdapterPosition()).idpedido, "", "", 0, false);
-                                        if (eliminado > 0) {
-                                            numdoc = listPedidos.get(getAdapterPosition()).secuencialpedido;
-                                            listPedidos.remove(getAdapterPosition());
-                                            notifyDataSetChanged();
-                                        }
-                                        break;
-                                    case "PI":
-                                        eliminado = PedidoInventario.Delete(listPedidosInv.get(getAdapterPosition()).idpedido, "", "", 0, false);
-                                        if (eliminado > 0) {
-                                            numdoc = listPedidosInv.get(getAdapterPosition()).codigopedido;
-                                            listPedidosInv.remove(getAdapterPosition());
-                                            notifyDataSetChanged();
-                                        }
-                                        break;
-                                }
-
-                                if (eliminado > 0) {
-                                    Banner.make(rootView, activity, Banner.SUCCESS, "Documento «" + numdoc + "» eliminado correctamente.", Banner.BOTTOM, 3000).show();
-                                } else {
-                                    Banner.make(rootView, activity, Banner.ERROR, Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM, 3000).show();
-                                }
-                            }
-                        });
-                        builder.setNegativeButton(activity.getResources().getString(R.string.Cancel), null);
-                        builder.show();
-                        return false;
+            itemView.setOnLongClickListener(
+                v -> {
+                    String secuencial = "";
+                    switch (tipobusqueda) {
+                        case "01":
+                        case "4,20":
+                        case "20,4":
+                        case "8,23":
+                        case "23,8":
+                            secuencial = listComprobantes.get(getAdapterPosition()).codigotransaccion;
+                            break;
+                        case "PC":
+                            secuencial = listPedidos.get(getAdapterPosition()).secuencialpedido;
+                            break;
+                        case "PI":
+                            secuencial = listPedidosInv.get(getAdapterPosition()).codigopedido;
+                            break;
+                        case "DE":
+                            secuencial = listIngresos.get(getAdapterPosition()).secuencialdocumento;
+                            break;
                     }
+                    AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                    builder.setTitle("Eliminar documento «" + secuencial + "»");
+                    builder.setMessage("¿Está seguro que desea eliminar este documento?\n" +
+                            "Nota:\n" +
+                            "1.- Después de eliminado no podrá sincronizarse y ya no será visible.\n" +
+                            "2.- Este registro solo se eliminará de su dispositivo.");
+                    builder.setIcon(R.drawable.ic_delete2);
+                    builder.setPositiveButton(activity.getResources().getString(R.string.Confirm),
+                        (dialog, which) ->{
+                            int eliminado = 0;
+                            String numdoc = "";
+                            switch (tipobusqueda) {
+                                case "01":
+                                case "4,20":
+                                case "20,4":
+                                case "8,23":
+                                case "23,8":
+                                    eliminado = Comprobante.Delete(listComprobantes.get(getAdapterPosition()).idcomprobante, "", "", 0, false);
+                                    if (eliminado > 0) {
+                                        numdoc = listComprobantes.get(getAdapterPosition()).codigotransaccion;
+                                        listComprobantes.remove(getAdapterPosition());
+                                        notifyDataSetChanged();
+                                    }
+                                    break;
+                                case "PC":
+                                    eliminado = Pedido.Delete(listPedidos.get(getAdapterPosition()).idpedido, "", "", 0, false);
+                                    if (eliminado > 0) {
+                                        numdoc = listPedidos.get(getAdapterPosition()).secuencialpedido;
+                                        listPedidos.remove(getAdapterPosition());
+                                        notifyDataSetChanged();
+                                    }
+                                    break;
+                                case "PI":
+                                    eliminado = PedidoInventario.Delete(listPedidosInv.get(getAdapterPosition()).idpedido, "", "", 0, false);
+                                    if (eliminado > 0) {
+                                        numdoc = listPedidosInv.get(getAdapterPosition()).codigopedido;
+                                        listPedidosInv.remove(getAdapterPosition());
+                                        notifyDataSetChanged();
+                                    }
+                                    break;
+                                case "DE":
+                                    eliminado = Ingreso.Delete(listIngresos.get(getAdapterPosition()).idingreso, "", "", 0, false);
+                                    if(eliminado > 0){
+                                        numdoc = listIngresos.get(getAdapterPosition()).secuencialdocumento;
+                                        listIngresos.remove(getAdapterPosition());
+                                        notifyDataSetChanged();
+                                    }
+                                    break;
+                            }
+
+                            if (eliminado > 0) {
+                                Banner.make(rootView, activity, Banner.SUCCESS, "Documento «" + numdoc + "» eliminado correctamente.", Banner.BOTTOM, 3000).show();
+                            } else {
+                                Banner.make(rootView, activity, Banner.ERROR, Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM, 3000).show();
+                            }
+                        }
+                    );
+                    builder.setNegativeButton(activity.getResources().getString(R.string.Cancel), null);
+                    builder.show();
+                    return false;
+                }
             );
 
-            btnAnular.setOnClickListener(v -> {
+            btnAnular.setOnClickListener(
+                v -> {
                     String secuencial = "";
                     if(tipobusqueda.equals("01"))
                         secuencial = listComprobantes.get(getAdapterPosition()).codigotransaccion;
@@ -403,14 +486,15 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                             secuencial = listPedidos.get(getAdapterPosition()).secuencialpedido;
                     else if(tipobusqueda.equals("PI"))
                         secuencial = listPedidosInv.get(getAdapterPosition()).codigopedido;
+                    else if(tipobusqueda.equals("DE"))
+                        secuencial = listIngresos.get(getAdapterPosition()).secuencialdocumento;
                     AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
                     builder.setTitle("Anular documento " + secuencial);
                     builder.setMessage("¿Está seguro que desea anular este documento?\n" +
                             "Nota: Después de anulado no podrá sincronizarse y ya no será visible.");
                     builder.setIcon(R.drawable.ic_delete2);
-                    builder.setPositiveButton(activity.getResources().getString(R.string.Confirm), new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
+                    builder.setPositiveButton(activity.getResources().getString(R.string.Confirm),
+                        (dialog, which) -> {
                             boolean actualizado = false;
                             int id = 0;
                             ContentValues values = new ContentValues();
@@ -433,7 +517,13 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                                 actualizado = PedidoInventario.Update(id, values);
                                 listPedidosInv.remove(getAdapterPosition());
                                 notifyDataSetChanged();
+                            }else if(tipobusqueda.equals("DE")){
+                                id = listIngresos.get(getAdapterPosition()).idingreso;
+                                actualizado = Ingreso.Update(id, values);
+                                listIngresos.remove(getAdapterPosition());
+                                notifyDataSetChanged();
                             }
+
 
                             if(actualizado){
                                 Banner.make(rootView,activity,Banner.SUCCESS, Constants.MSG_DATOS_GUARDADOS, Banner.BOTTOM,3000).show();
@@ -441,27 +531,31 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                                 Banner.make(rootView,activity,Banner.ERROR, Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM,3000).show();
                             }
                         }
-                    });
+                    );
                     builder.setNegativeButton(activity.getResources().getString(R.string.Cancel), null);
                     builder.show();
                 }
             );
 
-            btnPreview.setOnClickListener(v -> {
-                        DialogFragment dialogFragment = new InfoFacturaDialogFragment();
-                        Bundle bundle = new Bundle();
-                        switch (tipobusqueda) {
-                            case "01":
-                                bundle.putInt("id", listComprobantes.get(getAdapterPosition()).idcomprobante);
-                                break;
-                            case "PC":
-                                bundle.putInt("id", listPedidos.get(getAdapterPosition()).idpedido);
-                                break;
-                        }
-                        bundle.putString("tipobusqueda", tipobusqueda);
-                        dialogFragment.setArguments(bundle);
-                        dialogFragment.show(activity.getSupportFragmentManager(), "dialog");
+            btnPreview.setOnClickListener(
+                v -> {
+                    DialogFragment dialogFragment = new InfoFacturaDialogFragment(activity);
+                    Bundle bundle = new Bundle();
+                    switch (tipobusqueda) {
+                        case "01":
+                            bundle.putInt("id", listComprobantes.get(getAdapterPosition()).idcomprobante);
+                            break;
+                        case "PC":
+                            bundle.putInt("id", listPedidos.get(getAdapterPosition()).idpedido);
+                            break;
+                        case "DE":
+                            bundle.putInt("id", listIngresos.get(getAdapterPosition()).idingreso);
+                            break;
                     }
+                    bundle.putString("tipobusqueda", tipobusqueda);
+                    dialogFragment.setArguments(bundle);
+                    dialogFragment.show(activity.getSupportFragmentManager(), "dialog");
+                }
             );
         }
     }

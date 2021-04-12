@@ -30,6 +30,7 @@ import com.florencia.erpapp.adapters.ClienteBusquedaAdapter;
 import com.florencia.erpapp.adapters.ComprobantesAdapter;
 import com.florencia.erpapp.models.Cliente;
 import com.florencia.erpapp.models.Comprobante;
+import com.florencia.erpapp.models.Ingreso;
 import com.florencia.erpapp.models.Pedido;
 import com.florencia.erpapp.models.PedidoInventario;
 import com.florencia.erpapp.services.SQLite;
@@ -49,6 +50,7 @@ public class ListaComprobantesActivity extends AppCompatActivity implements Sear
     List<Comprobante> listComprobantes = null;
     List<Pedido> listPedido = null;
     List<PedidoInventario> listPedidoInv = null;
+    List<Ingreso> listIngresos = null;
     ComprobantesAdapter comprobanteAdapter;
     SearchView svBusqueda;
     LinearLayout lyContainer;
@@ -77,7 +79,7 @@ public class ListaComprobantesActivity extends AppCompatActivity implements Sear
         svBusqueda = findViewById(R.id.svBusqueda);
         svBusqueda.setOnQueryTextListener(this);
 
-        pgCargando.setTitle("Cargando clientes");
+        pgCargando.setTitle("Cargando registros");
         pgCargando.setMessage("Espere un momento...");
         pgCargando.setCancelable(false);
 
@@ -86,7 +88,6 @@ public class ListaComprobantesActivity extends AppCompatActivity implements Sear
             fechadesde = getIntent().getExtras().getString("fechadesde","");
             fechahasta = getIntent().getExtras().getString("fechahasta","");
             retornar = getIntent().getExtras().getBoolean("retornar", true);
-            CargarDatos(tipobusqueda, fechadesde, fechahasta, retornar);
         }
 
     }
@@ -96,10 +97,10 @@ public class ListaComprobantesActivity extends AppCompatActivity implements Sear
             Thread th = new Thread(){
                 @Override
                 public void run(){
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
+                    runOnUiThread(
+                        () -> {
                             try {
+                                boolean band = false;
                                 switch (tipobusqueda) {
                                     case "01":  //FACTURAS
                                     case "8,23":   //RECEPCION - RECEPDEVOLUCION
@@ -107,52 +108,38 @@ public class ListaComprobantesActivity extends AppCompatActivity implements Sear
                                     case "4,20":   //TRANSFERENCIA - DEVOLUCION
                                     case "20,4":   //DEVOLUCION - TRANSFERENCIA
                                         listComprobantes = Comprobante.getByUsuario(SQLite.usuario.IdUsuario, SQLite.usuario.sucursal.IdEstablecimiento, tipobusqueda, fechadesde, fechahasta);
-                                        if (listComprobantes == null || listComprobantes.size() == 0) {
-                                            imgFondo.setVisibility(View.VISIBLE);
-                                            lyContainer.setVisibility(View.GONE);
-                                            toolbar.getMenu().findItem(R.id.option_delete).setVisible(false);
-                                        } else {
-                                            imgFondo.setVisibility(View.GONE);
-                                            lyContainer.setVisibility(View.VISIBLE);
-                                            comprobanteAdapter = new ComprobantesAdapter(ListaComprobantesActivity.this, listComprobantes, null, null, tipobusqueda, retornar);
-                                            rvComprobantes.setAdapter(comprobanteAdapter);
-                                            toolbar.getMenu().findItem(R.id.option_delete).setVisible(true);
-                                        }
+                                        band = (listComprobantes != null && listComprobantes.size() > 0);
                                         break;
                                     case "PC":  //PEDIDOS
                                         listPedido = Pedido.getByUsuario(SQLite.usuario.IdUsuario, SQLite.usuario.sucursal.IdEstablecimiento, fechadesde, fechahasta);
-                                        if (listPedido == null || listPedido.size() == 0) {
-                                            imgFondo.setVisibility(View.VISIBLE);
-                                            lyContainer.setVisibility(View.GONE);
-                                            toolbar.getMenu().findItem(R.id.option_delete).setVisible(false);
-                                        } else {
-                                            imgFondo.setVisibility(View.GONE);
-                                            lyContainer.setVisibility(View.VISIBLE);
-                                            comprobanteAdapter = new ComprobantesAdapter(ListaComprobantesActivity.this, null, listPedido, null, tipobusqueda, retornar);
-                                            rvComprobantes.setAdapter(comprobanteAdapter);
-                                            toolbar.getMenu().findItem(R.id.option_delete).setVisible(true);
-                                        }
+                                        band = (listPedido != null && listPedido.size() > 0);
                                         break;
                                     case "PI":  //PEDIDOS INVENTARIO
                                         listPedidoInv = PedidoInventario.getByUsuario(SQLite.usuario.IdUsuario, SQLite.usuario.sucursal.IdEstablecimiento, fechadesde, fechahasta);
-                                        if (listPedidoInv == null || listPedidoInv.size() == 0) {
-                                            imgFondo.setVisibility(View.VISIBLE);
-                                            lyContainer.setVisibility(View.GONE);
-                                            toolbar.getMenu().findItem(R.id.option_delete).setVisible(false);
-                                        } else {
-                                            imgFondo.setVisibility(View.GONE);
-                                            lyContainer.setVisibility(View.VISIBLE);
-                                            comprobanteAdapter = new ComprobantesAdapter(ListaComprobantesActivity.this, null, null, listPedidoInv, tipobusqueda, retornar);
-                                            rvComprobantes.setAdapter(comprobanteAdapter);
-                                            toolbar.getMenu().findItem(R.id.option_delete).setVisible(true);
-                                        }
+                                        band = (listPedidoInv != null && listPedidoInv.size() > 0);
                                         break;
+                                    case "DE":  //COMPROBANTES DE DEPOSITO - DIARIO DE VENTA
+                                        listIngresos = Ingreso.getByUsuario(SQLite.usuario.IdUsuario, SQLite.usuario.sucursal.IdEstablecimiento, fechadesde, fechahasta);
+                                        band = (listIngresos != null && listIngresos.size() > 0);
+                                        break;
+                                }
+
+                                if(band){
+                                    imgFondo.setVisibility(View.GONE);
+                                    lyContainer.setVisibility(View.VISIBLE);
+                                    comprobanteAdapter = new ComprobantesAdapter(ListaComprobantesActivity.this, listComprobantes, listPedido, listPedidoInv, listIngresos, tipobusqueda, retornar);
+                                    rvComprobantes.setAdapter(comprobanteAdapter);
+                                    toolbar.getMenu().findItem(R.id.option_delete).setVisible(true);
+                                }else{
+                                    imgFondo.setVisibility(View.VISIBLE);
+                                    lyContainer.setVisibility(View.GONE);
+                                    toolbar.getMenu().findItem(R.id.option_delete).setVisible(false);
                                 }
                             }catch (Exception e){
                                 Log.d("TAG", e.getMessage());
                             }
                         }
-                    });
+                    );
                 }
             };
             th.start();
@@ -178,29 +165,27 @@ public class ListaComprobantesActivity extends AppCompatActivity implements Sear
             month = Integer.valueOf(fechhas[1]) - 1;
             year = Integer.valueOf(fechhas[0]);
         }
-        dtpDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int day) {
-                String dia = (day>=0 && day<10?"0"+(day):String.valueOf(day));
-                String mes = (month>=0 && month<10?"0"+(month+1):String.valueOf(month+1));
+        dtpDialog = new DatePickerDialog(this,
+            (v, y, m, d) -> {
+                String dia = (d >= 0 && d < 10 ? "0" + (d) : String.valueOf(d));
+                String mes = (m >= 0 && m < 9 ? "0" + (m + 1) : String.valueOf(m + 1));
 
-                if(isDesde)
-                    fechadesde = year + "-" + mes + "-" + dia;
+                if (isDesde)
+                    fechadesde = y + "-" + mes + "-" + dia;
                 else
-                    fechahasta = year + "-" + mes + "-" + dia;
+                    fechahasta = y + "-" + mes + "-" + dia;
                 boolean buscar = true;
-                if(!fechadesde.equals("") && !fechahasta.equals("")){
-                    if(Utils.longDate(fechadesde)>Utils.longDate(fechahasta)){
-                        Banner.make(rootView, ListaComprobantesActivity.this,Banner.WARNING, "La fecha inicio no puede ser mayor que la fecha fin", Banner.BOTTOM, 3000).show();
+                if (!fechadesde.equals("") && !fechahasta.equals("")) {
+                    if (Utils.longDate(fechadesde) > Utils.longDate(fechahasta)) {
+                        Banner.make(rootView, ListaComprobantesActivity.this, Banner.WARNING, "La fecha inicio no puede ser mayor que la fecha fin", Banner.BOTTOM, 3000).show();
                         buscar = false;
                     }
                 }
-                if(buscar) {
+                if (buscar) {
                     toolbar.setSubtitle(fechadesde.equals(fechahasta) ? "Fecha: " + fechadesde : fechadesde + " || " + fechahasta);
                     CargarDatos(tipobusqueda, fechadesde, fechahasta, retornar);
                 }
-            }
-        },year,month,day);
+            },year,month,day);
         dtpDialog.show();
     }
 
@@ -218,6 +203,8 @@ public class ListaComprobantesActivity extends AppCompatActivity implements Sear
             documento = "Transferencias || Devoluciones";
         else if (tipobusqueda.equals("PI"))
             documento = "Pedidos Inventario";
+        else if (tipobusqueda.equals("DE"))
+            documento = "Depósitos";
         toolbar.setTitle(documento);
 
         if(!fechadesde.equals(""))
@@ -235,6 +222,7 @@ public class ListaComprobantesActivity extends AppCompatActivity implements Sear
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_filter, menu);
+        CargarDatos(tipobusqueda, fechadesde, fechahasta, retornar);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -277,9 +265,8 @@ public class ListaComprobantesActivity extends AppCompatActivity implements Sear
                     "2.- Estos registros solo se eliminarán de su dispositivo.");
             builder.setIcon(R.drawable.ic_delete2);
             builder.setView(ckSincronizados);
-            builder.setPositiveButton(getResources().getString(R.string.Confirm), new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
+            builder.setPositiveButton(getResources().getString(R.string.Confirm),
+                (dialog, which) -> {
                     int eliminado = 0;
                     String numdoc = "";
                     switch (tipobusqueda) {
@@ -289,35 +276,42 @@ public class ListaComprobantesActivity extends AppCompatActivity implements Sear
                         case "8,23":
                         case "23,8":
                             eliminado = Comprobante.Delete(0, fechadesde, fechadesde, 0, ckSincronizados.isChecked());
-                            if(eliminado > 0){
+                            if (eliminado > 0) {
                                 comprobanteAdapter.listComprobantes.clear();
                                 comprobanteAdapter.notifyDataSetChanged();
                             }
                             break;
                         case "PC":
                             eliminado = Pedido.Delete(0, fechadesde, fechadesde, 0, ckSincronizados.isChecked());
-                            if(eliminado > 0){
+                            if (eliminado > 0) {
                                 comprobanteAdapter.listPedidos.clear();
                                 comprobanteAdapter.notifyDataSetChanged();
                             }
                             break;
                         case "PI":
                             eliminado = PedidoInventario.Delete(0, fechadesde, fechadesde, 0, ckSincronizados.isChecked());
-                            if(eliminado > 0){
+                            if (eliminado > 0) {
                                 comprobanteAdapter.listPedidosInv.clear();
+                                comprobanteAdapter.notifyDataSetChanged();
+                            }
+                            break;
+                        case "DE":
+                            eliminado = Ingreso.Delete(0, fechadesde, fechadesde, 0, ckSincronizados.isChecked());
+                            if (eliminado > 0) {
+                                comprobanteAdapter.listIngresos.clear();
                                 comprobanteAdapter.notifyDataSetChanged();
                             }
                             break;
                     }
 
-                    if(eliminado > 0){
+                    if (eliminado > 0) {
                         CargarDatos(tipobusqueda, fechadesde, fechahasta, retornar);
-                        Banner.make(rootView,ListaComprobantesActivity.this,Banner.SUCCESS, "Registros eliminados correctamente.", Banner.BOTTOM,3000).show();
-                    }else{
-                        Banner.make(rootView,ListaComprobantesActivity.this,Banner.ERROR, Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM,3000).show();
+                        Banner.make(rootView, ListaComprobantesActivity.this, Banner.SUCCESS, "Registros eliminados correctamente.", Banner.BOTTOM, 3000).show();
+                    } else {
+                        Banner.make(rootView, ListaComprobantesActivity.this, Banner.ERROR, Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM, 3000).show();
                     }
                 }
-            });
+            );
             builder.setNegativeButton(getResources().getString(R.string.Cancel), null);
             builder.show();
         }catch (Exception e){

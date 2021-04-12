@@ -87,6 +87,50 @@
                                 android:text=""
                                 android:paddingLeft="5dp"
                                 android:textColor="@color/colornavheader"/>
+                            <LinearLayout
+                                android:id="@+id/lyFormaPago"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:padding="5dp"
+                                android:layout_gravity="center"
+                                android:gravity="center"
+                                android:visibility="visible">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="FORMA PAGO:"
+                                    style="@style/EstiloText_Black"
+                                    android:clickable="true"
+                                    android:textSize="14sp"
+                                    android:paddingLeft="10dp"
+                                    android:layout_marginRight="5dp"/>
+
+                                <RadioGroup
+                                    android:id="@+id/rgTipoTransaccion"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:gravity="center">
+                                    <RadioButton
+                                        android:id="@+id/rbEfectivo"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Efectivo"
+                                        android:checked="true"
+                                        android:layout_marginRight="10dp"
+                                        android:textSize="13sp"/>
+                                    <RadioButton
+                                        android:id="@+id/rbCredito"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Crédito (Disp:$0.00)"
+                                        android:checked="false"
+                                        android:layout_marginRight="5dp"
+                                        android:textSize="13sp"/>
+                                </RadioGroup>
+                            </LinearLayout>
                         </LinearLayout>
                     </LinearLayout>
 

@@ -16,4 +16,7 @@
     <item android:id="@+id/option_sincronizapedidos_inv"
         android:title="Sincronizar Pedidos Inventario"
         app:showAsAction="never" />
+    <item android:id="@+id/option_sincronizadepositos"
+        android:title="Sincronizar Depositos"
+        app:showAsAction="never" />
 </menu>

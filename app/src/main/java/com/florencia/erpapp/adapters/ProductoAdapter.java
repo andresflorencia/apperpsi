@@ -1,5 +1,6 @@
 package com.florencia.erpapp.adapters;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
@@ -7,13 +8,17 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -22,6 +27,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -185,28 +191,20 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.Produc
                 }
 
 
-                itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        IngresarCantidad(v.getContext(),listProductos.get(getAdapterPosition()));
-                    }
-                });
-                btnInfo.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+                itemView.setOnClickListener(v -> IngresarCantidad(v.getContext(),listProductos.get(getAdapterPosition())));
+                btnInfo.setOnClickListener(v ->{
                         DialogFragment dialogFragment = new InfoItemDialogFragment();
                         Bundle bundle = new Bundle();
                         bundle.putInt("idproducto", listProductos.get(getAdapterPosition()).idproducto);
                         dialogFragment.setArguments(bundle);
                         dialogFragment.show(activity.getSupportFragmentManager(), "dialog");
-                    }
-                });
+                    });
             }catch (Exception e){
                 Log.d("TAGPRODUCTO",e.getMessage());
             }
 
         }
-
+        @SuppressLint("RestrictedApi")
         void IngresarCantidad(Context context, Producto producto){
             try {
 
@@ -267,72 +265,107 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.Produc
                     return;
                 }
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle(producto.nombreproducto);
-                builder.setMessage("Ingrese la cantidad: ");
-                final EditText input = new EditText(context);
-                input.setInputType(InputType.TYPE_CLASS_PHONE);
-                input.setText("1");
-                input.setSelectAllOnFocus(true);
-                builder.setView(input);
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                EditText txtCantidad;
+                TextView lblMessage;
+                Button btnOk;
+                android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context, R.style.AlertDialogTheme);
+                View view = LayoutInflater.from(context).inflate(R.layout.layout_cantidad_dialog,
+                        (ConstraintLayout) activity.findViewById(R.id.lyDialogContainer));
+                builder.setView(view);
+                txtCantidad = view.findViewById(R.id.txtCantidad);
+                lblMessage = (TextView)view.findViewById(R.id.lblMessage);
+                btnOk = (Button)view.findViewById(R.id.btnConfirm);
+                ((Button)view.findViewById(R.id.btnCancel)).setText("Cancelar");
+
+                btnOk.setText("Confirmar");
+                txtCantidad.setText("1"); txtCantidad.setSelectAllOnFocus(true);
+
+                txtCantidad.addTextChangedListener(new TextWatcher() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (input.getText().toString().equals("")) {
-                            Banner.make(rootView,activity,Banner.ERROR, "Debe especificar una cantidad.",Banner.BOTTOM,2000).show();
-                            return;
-                        }else{
-                            Double cantidad = Double.parseDouble(input.getText().toString().trim());
-                            if(tipobusqueda.equals("01") && cantidad > producto.stock && producto.tipo.equalsIgnoreCase("P")){
-                                Banner.make(rootView,activity,Banner.ERROR,"La cantidad máxima de venta es: " + producto.stock, Banner.BOTTOM,2000).show();
-                                return;
-                            }else if((tipobusqueda.equals("4,20") || tipobusqueda.equals("20,4")) && cantidad > producto.lotes.get(0).stock){
-                                Banner.make(rootView,activity,Banner.ERROR,"La cantidad máxima de transferencia del lote «"
-                                        + producto.lotes.get(0).numerolote +"» es: " + producto.lotes.get(0).stock, Banner.BOTTOM,2000).show();
-                                return;
-                            }
-                            if(tipobusqueda.equals("01")) { //FACTURA
-                                DetalleComprobante midetalle = new DetalleComprobante();
-                                midetalle.producto = producto;
-                                midetalle.cantidad = cantidad;
-                                midetalle.precio = producto.pvp1;
-                                midetalle.total = midetalle.cantidad * midetalle.precio;
-                                productosSelected.add(midetalle);
-                            }else if(tipobusqueda.equals("PC")){ //PEDIDO CLIENTE
-                                DetallePedido midetalle = new DetallePedido();
-                                midetalle.producto = producto;
-                                midetalle.cantidad = cantidad;
-                                midetalle.precio = producto.pvp1;
-                                productosSelectedP.add(midetalle);
-                            }else if(tipobusqueda.equals("4,20") || tipobusqueda.equals("20,4")){ //TRANSFERENCIA
-                                DetalleComprobante midetalle = new DetalleComprobante();
-                                midetalle.producto = producto;
-                                midetalle.cantidad = cantidad;
-                                midetalle.precio = producto.lotes.get(0).preciocosto;
-                                midetalle.preciocosto = producto.lotes.get(0).preciocosto;
-                                midetalle.numerolote = producto.lotes.get(0).numerolote;
-                                midetalle.stock = producto.lotes.get(0).stock - cantidad;
-                                midetalle.fechavencimiento = producto.lotes.get(0).fechavencimiento;
-                                productosSelected.add(midetalle);
-                            }else if(tipobusqueda.equals("PI")){ //PEDIDO INVENTARIO
-                                DetallePedidoInv midetalle = new DetallePedidoInv();
-                                midetalle.producto = producto;
-                                midetalle.cantidadpedida = cantidad;
-                                midetalle.cantidadautorizada = cantidad;
-                                midetalle.stockactual = producto.stock;
-                                productosSelectedPI.add(midetalle);
-                            }
-                            toolbar.getMenu().findItem(R.id.option_select).setVisible(true);
-                            Banner.make(rootView,activity,Banner.INFO,"Item agregado a la lista", Banner.BOTTOM,2000).show();
-                            dialog.dismiss();
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {}
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        try{
+                            Double c = Double.parseDouble(s.toString().trim());
+                            lblMessage.setText("");
+                            btnOk.setEnabled(true);
+                        }catch (Exception e){
+                            btnOk.setEnabled(false);
+                            lblMessage.setText("Ingrese una cantidad válida.");
                         }
                     }
                 });
 
-                builder.setNegativeButton("Cancelar", null);
-                builder.show();
-                input.clearFocus();
-                //input.requestFocus();
+                final android.app.AlertDialog alertDialog = builder.create();
+                btnOk.setOnClickListener(
+                    v -> {
+                            if (txtCantidad.getText().toString().equals("")) {
+                                Banner.make(rootView, activity, Banner.ERROR, "Debe especificar una cantidad.", Banner.BOTTOM, 2000).show();
+                                return;
+                            } else {
+                                Double cantidad = Double.parseDouble(txtCantidad.getText().toString().trim());
+                                if (tipobusqueda.equals("01") && cantidad > producto.stock && producto.tipo.equalsIgnoreCase("P")) {
+                                    Banner.make(rootView, activity, Banner.ERROR, "La cantidad máxima de venta es: " + producto.stock, Banner.BOTTOM, 2000).show();
+                                    return;
+                                } else if ((tipobusqueda.equals("4,20") || tipobusqueda.equals("20,4")) && cantidad > producto.lotes.get(0).stock) {
+                                    Banner.make(rootView, activity, Banner.ERROR, "La cantidad máxima de transferencia del lote «"
+                                            + producto.lotes.get(0).numerolote + "» es: " + producto.lotes.get(0).stock, Banner.BOTTOM, 2000).show();
+                                    return;
+                                }
+                                Integer counter = 0;
+                                if (tipobusqueda.equals("01")) { //FACTURA
+                                    DetalleComprobante midetalle = new DetalleComprobante();
+                                    midetalle.producto = producto;
+                                    midetalle.cantidad = cantidad;
+                                    midetalle.precio = producto.pvp1;
+                                    midetalle.total = midetalle.cantidad * midetalle.precio;
+                                    productosSelected.add(midetalle);
+                                    counter = productosSelected.size();
+                                } else if (tipobusqueda.equals("PC")) { //PEDIDO CLIENTE
+                                    DetallePedido midetalle = new DetallePedido();
+                                    midetalle.producto = producto;
+                                    midetalle.cantidad = cantidad;
+                                    midetalle.precio = producto.pvp1;
+                                    productosSelectedP.add(midetalle);
+                                    counter = productosSelectedP.size();
+                                } else if (tipobusqueda.equals("4,20") || tipobusqueda.equals("20,4")) { //TRANSFERENCIA
+                                    DetalleComprobante midetalle = new DetalleComprobante();
+                                    midetalle.producto = producto;
+                                    midetalle.cantidad = cantidad;
+                                    midetalle.precio = producto.lotes.get(0).preciocosto;
+                                    midetalle.preciocosto = producto.lotes.get(0).preciocosto;
+                                    midetalle.numerolote = producto.lotes.get(0).numerolote;
+                                    midetalle.stock = producto.lotes.get(0).stock - cantidad;
+                                    midetalle.fechavencimiento = producto.lotes.get(0).fechavencimiento;
+                                    productosSelected.add(midetalle);
+                                    counter = productosSelected.size();
+                                } else if (tipobusqueda.equals("PI")) { //PEDIDO INVENTARIO
+                                    DetallePedidoInv midetalle = new DetallePedidoInv();
+                                    midetalle.producto = producto;
+                                    midetalle.cantidadpedida = cantidad;
+                                    midetalle.cantidadautorizada = cantidad;
+                                    midetalle.stockactual = producto.stock;
+                                    productosSelectedPI.add(midetalle);
+                                    counter = productosSelectedPI.size();
+                                }
+                                activity.btnConfirmar.setVisibility(View.VISIBLE);
+                                activity.txtCounter.setVisibility(View.VISIBLE);
+                                activity.txtCounter.setText(counter.toString());
+                                //toolbar.getMenu().findItem(R.id.option_select).setVisible(true);
+                                Banner.make(rootView, activity, Banner.INFO,
+                                        "Item agregado a la lista", Banner.TOP, 2000).show();
+                                alertDialog.dismiss();
+                            }
+                        }
+                );
+
+                view.findViewById(R.id.btnCancel).setOnClickListener(v -> alertDialog.dismiss());
+
+                if(alertDialog.getWindow()!=null)
+                    alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+                alertDialog.show();
             }catch (Exception e){
                 Log.d("TAGPRODUCTO", e.getMessage());
             }

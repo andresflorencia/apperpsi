@@ -107,9 +107,7 @@ public class ClienteBusquedaAdapter extends RecyclerView.Adapter<ClienteBusqueda
             tvDireccion.setText(cliente.direccion);
             tvContacto.setText(cliente.fono1 + " - " + cliente.fono2 +" - Categoría: " + cliente.nombrecategoria);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            itemView.setOnClickListener(v -> {
                     if(tipobusqueda.equals("PC") &&
                             (listClients.get(getAdapterPosition()).idcliente==0 || listClients.get(getAdapterPosition()).nip.contains("99999999"))){
                         Banner.make(rootView, activity, Banner.INFO,"No se puede registrar pedidos para CONSUMIDOR FINAL", Banner.BOTTOM,3000).show();
@@ -117,8 +115,7 @@ public class ClienteBusquedaAdapter extends RecyclerView.Adapter<ClienteBusqueda
                     }
                     activity.setResult(Activity.RESULT_OK,new Intent().putExtra("idcliente",listClients.get(getAdapterPosition()).idcliente));
                     activity.finish();
-                }
-            });
+                });
 
         }
     }

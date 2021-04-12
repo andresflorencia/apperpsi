@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -39,7 +38,7 @@ import android.widget.Toast;
 
 import com.florencia.erpapp.R;
 import com.florencia.erpapp.adapters.DetalleRecepcionAdapter;
-import com.florencia.erpapp.interfaces.ComprobanteInterface;
+import com.florencia.erpapp.interfaces.IComprobante;
 import com.florencia.erpapp.models.Comprobante;
 import com.florencia.erpapp.models.DetalleComprobante;
 import com.florencia.erpapp.models.Producto;
@@ -74,9 +73,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.florencia.erpapp.services.Printer.btsocket;
 
-import static com.florencia.erpapp.services.Printer.btsocket;
-
-public class TransferenciaActivity extends AppCompatActivity{
+public class TransferenciaActivity extends AppCompatActivity implements View.OnClickListener{
 
     private static final int REQUEST_BUSQUEDA_PRODUCTO = 1;
     private static final int REQUEST_BUSQUEDA_TRANSFERENCIA = 2;
@@ -110,6 +107,7 @@ public class TransferenciaActivity extends AppCompatActivity{
     String tipoAccion="";
     RadioGroup rgTipoTransaccion;
     RadioButton rbTransferencia, rbDevolucion;
+    Retrofit retrofit;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -139,7 +137,6 @@ public class TransferenciaActivity extends AppCompatActivity{
         });
     }
 
-
     private void init(){
         cbEstablecimientos = findViewById(R.id.cbEstablecimiento);
         rvDetalleProducto = findViewById(R.id.rvDetalleProductos);
@@ -167,17 +164,27 @@ public class TransferenciaActivity extends AppCompatActivity{
                 .writeTimeout(60, TimeUnit.SECONDS)
                 .build();
 
+        Gson gson = new GsonBuilder()
+                .setLenient()
+                .create();
+
+        retrofit = new Retrofit.Builder()
+                .baseUrl(SQLite.configuracion.url_ws)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .client(okHttpClient)
+                .build();
+
         LlenarEstablecimientos(this);
 
         mitransferencia = new Comprobante();
         detalleAdapter = new DetalleRecepcionAdapter(this,detalleProductos,"",false,"4,20");
         rvDetalleProducto.setAdapter(detalleAdapter);
 
-        btnRefresh.setOnClickListener(onClick);
-        btnBuscarProducto.setOnClickListener(onClick);
-        lblObservacion.setOnClickListener(onClick);
-        lblProducto.setOnClickListener(onClick);
-        lblTransferencia.setOnClickListener(onClick);
+        btnRefresh.setOnClickListener(this::onClick);
+        btnBuscarProducto.setOnClickListener(this::onClick);
+        lblObservacion.setOnClickListener(this::onClick);
+        lblProducto.setOnClickListener(this::onClick);
+        lblTransferencia.setOnClickListener(this::onClick);
 
         if(getIntent().getExtras()!=null){
             idtransferencia = getIntent().getExtras().getInt("idcomprobante",0);
@@ -186,65 +193,55 @@ public class TransferenciaActivity extends AppCompatActivity{
         }
     }
 
-    private View.OnClickListener onClick = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            switch (v.getId()){
-                case R.id.btnRefresh:
-                    LlenarEstablecimientos(v.getContext());
-                    break;
-                case R.id.lblObservacion:
-                    Utils.EfectoLayout(tvObservacion,lblObservacion);
-                    break;
-                case R.id.btnBuscarProducto:
-                    Intent i = new Intent(v.getContext(),ProductoBusquedaActivity.class);
-                    i.putExtra("tipobusqueda", "4,20");
-                    startActivityForResult(i, REQUEST_BUSQUEDA_PRODUCTO);
-                    break;
-                case R.id.btnPositive:
-                    if(tipoAccion.equals("MESSAGE")) {
-                        btnNegative.setVisibility(View.VISIBLE);
-                        viewSeparator.setVisibility(View.VISIBLE);
-                        lblTitle.setVisibility(View.VISIBLE);
-                        btsDialog.dismiss();
-                    }
-                    break;
-                case R.id.btnNegative:
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.btnRefresh:
+                LlenarEstablecimientos(v.getContext());
+                break;
+            case R.id.lblObservacion:
+                Utils.EfectoLayout(tvObservacion,lblObservacion);
+                break;
+            case R.id.btnBuscarProducto:
+                Intent i = new Intent(v.getContext(),ProductoBusquedaActivity.class);
+                i.putExtra("tipobusqueda", "4,20");
+                startActivityForResult(i, REQUEST_BUSQUEDA_PRODUCTO);
+                break;
+            case R.id.btnPositive:
+                if(tipoAccion.equals("MESSAGE")) {
+                    btnNegative.setVisibility(View.VISIBLE);
+                    viewSeparator.setVisibility(View.VISIBLE);
+                    lblTitle.setVisibility(View.VISIBLE);
                     btsDialog.dismiss();
-                    break;
-                case R.id.lblTransferencia:
-                    if(idtransferencia>0)
-                        Utils.EfectoLayout(lyDatosInformativos, lblTransferencia);
-                    else
-                        Utils.EfectoLayout(lyCombo, lblTransferencia);
-                    break;
-                case R.id.lblProducto:
-                    Utils.EfectoLayout(lyProductos, lblProducto);
-                    break;
-            }
+                }
+                break;
+            case R.id.btnNegative:
+                btsDialog.dismiss();
+                break;
+            case R.id.lblTransferencia:
+                if(idtransferencia>0)
+                    Utils.EfectoLayout(lyDatosInformativos, lblTransferencia);
+                else
+                    Utils.EfectoLayout(lyCombo, lblTransferencia);
+                break;
+            case R.id.lblProducto:
+                Utils.EfectoLayout(lyProductos, lblProducto);
+                break;
         }
-    };
+    }
 
     private void LlenarEstablecimientos(Context context) {
         try{
-            if(!Utils.isOnlineNet(SQLite.configuracion.urlbase)) {
+            /*if(!Utils.isOnlineNet(SQLite.configuracion.urlbase)) {
                 Banner.make(rootView,TransferenciaActivity.this,Banner.ERROR,Constants.MSG_COMPROBAR_CONEXION_INTERNET, Banner.BOTTOM,3000).show();
                 return;
-            }
+            }*/
 
             pbCargando.setVisibility(View.VISIBLE);
             btnRefresh.setVisibility(View.GONE);
 
-            Gson gson = new GsonBuilder()
-                    .setLenient()
-                    .create();
+            IComprobante miInterface = retrofit.create(IComprobante.class);
 
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(SQLite.configuracion.url_ws)
-                    .addConverterFactory(GsonConverterFactory.create(gson))
-                    .client(okHttpClient)
-                    .build();
-            ComprobanteInterface miInterface = retrofit.create(ComprobanteInterface.class);
             Call<JsonObject> call=null;
             call=miInterface.getEstablecimientos(SQLite.usuario.Usuario,SQLite.usuario.Clave,SQLite.usuario.sucursal.IdEstablecimiento);
             call.enqueue(new Callback<JsonObject>() {
@@ -297,6 +294,7 @@ public class TransferenciaActivity extends AppCompatActivity{
                 public void onFailure(Call<JsonObject> call, Throwable t) {
                     Utils.showErrorDialog(TransferenciaActivity.this,"Error",t.getMessage());
                     Log.d(TAG, "onFailure(): " + t.getMessage());
+                    call.cancel();
                     pbCargando.setVisibility(View.GONE);
                     btnRefresh.setVisibility(View.VISIBLE);
                 }
@@ -358,6 +356,14 @@ public class TransferenciaActivity extends AppCompatActivity{
             mitransferencia.fechacelular = Utils.getDateFormat("yyyy-MM-dd HH:mm:ss");
             mitransferencia.fechadocumento = Utils.getDateFormat("yyyy-MM-dd");
 
+            SQLite.gpsTracker.getLastKnownLocation();
+            mitransferencia.lat = SQLite.gpsTracker.getLatitude();
+            mitransferencia.lon = SQLite.gpsTracker.getLongitude();
+            if(mitransferencia.lat == null)
+                mitransferencia.lat = 0d;
+            if(mitransferencia.lon == null)
+                mitransferencia.lon = 0d;
+
             for(DetalleComprobante midetalle:mitransferencia.detalle)
                 mitransferencia.total += midetalle.Subtotalcosto();
             mitransferencia.subtotal = mitransferencia.total;
@@ -378,6 +384,9 @@ public class TransferenciaActivity extends AppCompatActivity{
             mitransferencia2.fechadocumento = Utils.getDateFormat("yyyy-MM-dd");
             mitransferencia2.detalle.addAll(mitransferencia.detalle);
 
+            mitransferencia2.lat = mitransferencia.lat;
+            mitransferencia2.lon = mitransferencia.lon;
+
             listTransacciones.add(mitransferencia2);
 
             EnviarDatos(this);
@@ -388,26 +397,17 @@ public class TransferenciaActivity extends AppCompatActivity{
 
     private void EnviarDatos(Context context) {
         try{
-            if(!Utils.isOnlineNet(SQLite.configuracion.urlbase)){
+            /*if(!Utils.isOnlineNet(SQLite.configuracion.urlbase)){
                 Banner.make(rootView,TransferenciaActivity.this,Banner.ERROR,Constants.MSG_COMPROBAR_CONEXION_INTERNET, Banner.BOTTOM,3000).show();
                 return;
-            }
+            }*/
             if(listTransacciones.size()>0){
                 pgCargando.setTitle("Guardando transacción");
                 pgCargando.setMessage("Espere un momento...");
                 pgCargando.setCancelable(false);
                 pgCargando.show();
 
-                Gson gson = new GsonBuilder()
-                        .setLenient()
-                        .create();
-
-                Retrofit retrofit = new Retrofit.Builder()
-                        .baseUrl(SQLite.configuracion.url_ws)
-                        .addConverterFactory(GsonConverterFactory.create(gson))
-                        .client(okHttpClient)
-                        .build();
-                ComprobanteInterface miInterface = retrofit.create(ComprobanteInterface.class);
+                IComprobante miInterface = retrofit.create(IComprobante.class);
 
                 Map<String,Object> post = new HashMap<>();
                 post.put("usuario",SQLite.usuario.Usuario);
@@ -462,6 +462,7 @@ public class TransferenciaActivity extends AppCompatActivity{
                                                     else
                                                         Banner.make(rootView,TransferenciaActivity.this,Banner.ERROR,Constants.MSG_PROCESO_NO_COMPLETADO,Banner.BOTTOM,3000).show();
                                                 }
+                                                toolbar.getMenu().findItem(R.id.option_save).setVisible(false);
                                                 ConsultaImpresion();
                                                 //LimpiarDatos();
                                             }
@@ -483,6 +484,7 @@ public class TransferenciaActivity extends AppCompatActivity{
                     public void onFailure(Call<JsonObject> call, Throwable t) {
                         Utils.showErrorDialog(TransferenciaActivity.this,"Error",t.getMessage());
                         Log.d(TAG, t.getMessage());
+                        call.cancel();
                         pgCargando.dismiss();
                     }
                 });
@@ -499,15 +501,14 @@ public class TransferenciaActivity extends AppCompatActivity{
             View view = LayoutInflater.from(this).inflate(R.layout.layout_confirmation_dialog,
                     (ConstraintLayout) findViewById(R.id.lyDialogContainer));
             builder.setView(view);
+            builder.setCancelable(false);
             ((TextView)view.findViewById(R.id.lblTitle)).setText("Imprimir");
             ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Desea imprimir este documento?");
             ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_printer_white);
             ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
             ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
             final AlertDialog alertDialog = builder.create();
-            view.findViewById(R.id.btnConfirm).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            view.findViewById(R.id.btnConfirm).setOnClickListener(v -> {
                     if (Printer.btsocket == null) {
                         Utils.showMessage(getApplicationContext(), "Emparejar la impresora...");
                         Intent BTIntent = new Intent(getApplicationContext(), DeviceList.class);
@@ -517,17 +518,13 @@ public class TransferenciaActivity extends AppCompatActivity{
                         imprimirFactura(idtransferencia==0?"* ORIGINAL *":"* REIMPRESIÓN DE DOCUMENTO *", idtransferencia>0);
                     }
                     alertDialog.dismiss();
-                }
-            });
+                });
 
-            view.findViewById(R.id.btnCancel).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            view.findViewById(R.id.btnCancel).setOnClickListener(v -> {
                     if(idtransferencia==0)
                         LimpiarDatos();
                     alertDialog.dismiss();
-                }
-            });
+                });
 
             if(alertDialog.getWindow()!=null)
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
@@ -578,9 +575,7 @@ public class TransferenciaActivity extends AppCompatActivity{
                 public void run() {
                     mitransferencia = new Comprobante();
                     mitransferencia = Comprobante.get(idtransferencia);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
+                    runOnUiThread(() -> {
                             if (mitransferencia != null) {
                                 rbTransferencia.setChecked(mitransferencia.tipotransaccion.equals("4"));
                                 rbDevolucion.setChecked(mitransferencia.tipotransaccion.equals("20"));
@@ -608,8 +603,7 @@ public class TransferenciaActivity extends AppCompatActivity{
                                 Banner.make(rootView,TransferenciaActivity.this,Banner.ERROR,"Ocurrió un error al obtener los datos para este documento.", Banner.BOTTOM,3000).show();
                             }
                             pbCargando.setVisibility(View.GONE);
-                        }
-                    });
+                        });
                 }
             };
             th.start();
@@ -717,8 +711,8 @@ public class TransferenciaActivity extends AppCompatActivity{
             lblMessage = view.findViewById(R.id.lblMessage);
             lblTitle = view.findViewById(R.id.lblTitle);
             viewSeparator = view.findViewById(R.id.vSeparator);
-            btnPositive.setOnClickListener(onClick);
-            btnNegative.setOnClickListener(onClick);
+            btnPositive.setOnClickListener(this::onClick);
+            btnNegative.setOnClickListener(this::onClick);
 
             btsDialog = new BottomSheetDialog(this, R.style.AlertDialogTheme);
             btsDialog.setContentView(view);
@@ -823,18 +817,12 @@ public class TransferenciaActivity extends AppCompatActivity{
                 ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
                 ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
                 final AlertDialog alertDialog = builder.create();
-                view.findViewById(R.id.btnConfirm).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+                view.findViewById(R.id.btnConfirm).setOnClickListener(v -> {
                         GuardarDatos();
                         alertDialog.dismiss();
-                    }
-                });
+                    });
 
-                view.findViewById(R.id.btnCancel).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) { alertDialog.dismiss();}
-                });
+                view.findViewById(R.id.btnCancel).setOnClickListener(v -> alertDialog.dismiss());
 
                 if(alertDialog.getWindow()!=null)
                     alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
@@ -879,17 +867,9 @@ public class TransferenciaActivity extends AppCompatActivity{
             ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
             ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
             final AlertDialog alertDialog = builder.create();
-            view.findViewById(R.id.btnConfirm).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    finish();
-                }
-            });
+            view.findViewById(R.id.btnConfirm).setOnClickListener(v ->finish());
 
-            view.findViewById(R.id.btnCancel).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) { alertDialog.dismiss();}
-            });
+            view.findViewById(R.id.btnCancel).setOnClickListener(v -> alertDialog.dismiss());
 
             if(alertDialog.getWindow()!=null)
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));

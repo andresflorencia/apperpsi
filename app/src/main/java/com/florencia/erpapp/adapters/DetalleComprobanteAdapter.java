@@ -45,6 +45,7 @@ public class DetalleComprobanteAdapter  extends RecyclerView.Adapter<DetalleComp
     public List<DetalleComprobante> detalleComprobante;
     ComprobanteActivity activity;
     public String categoria;
+    public boolean isCredito = false;
     public boolean visualizacion = false;
     View rootView;
 
@@ -92,7 +93,7 @@ public class DetalleComprobanteAdapter  extends RecyclerView.Adapter<DetalleComp
         }
     }
 
-    public void CambiarPrecio(String categoria){
+    public void CambiarPrecio(String categoria, boolean credito){
         try{
             if(categoria.equals("") || categoria.equalsIgnoreCase("A"))
                 categoria = "0";
@@ -104,7 +105,7 @@ public class DetalleComprobanteAdapter  extends RecyclerView.Adapter<DetalleComp
                 }
                 Log.d("TAGDETALLE", "Cant: " + miDetalle.producto.nombreproducto + " -> " + cant_ut);
                 miDetalle.getPrecio(miDetalle.producto.reglas, miDetalle.producto.precioscategoria,
-                        categoria, cant_ut, miDetalle.precio);
+                        categoria, cant_ut, miDetalle.precio, credito);
                 /*miDetalle.precio = miDetalle.producto.getPrecio(categoria);
                 Double ptemp = miDetalle.precio;//GUARDAMOS EL PRECIO DE LA CATEGORIA
                 if(miDetalle.producto.reglas.size()>0){
@@ -162,9 +163,7 @@ public class DetalleComprobanteAdapter  extends RecyclerView.Adapter<DetalleComp
 
                 CalcularTotal();
 
-                btnDelete.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+                btnDelete.setOnClickListener(v -> {
 
                         AlertDialog.Builder builder = new AlertDialog.Builder(activity, R.style.AlertDialogTheme);
                         View view = LayoutInflater.from(activity).inflate(R.layout.layout_warning_dialog,
@@ -195,8 +194,7 @@ public class DetalleComprobanteAdapter  extends RecyclerView.Adapter<DetalleComp
                         if(alertDialog.getWindow()!=null)
                             alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
                         alertDialog.show();
-                    }
-                });
+                    });
 
                 tvCantidad.addTextChangedListener(new TextWatcher() {
                     @Override
@@ -231,7 +229,7 @@ public class DetalleComprobanteAdapter  extends RecyclerView.Adapter<DetalleComp
                                             if(det.producto.idproducto.equals(deta.producto.idproducto))
                                                 cant_t += deta.cantidad;
                                         }
-                                        Double precio = detalleComprobante.get(getAdapterPosition()).getPrecio(det.producto.reglas, det.producto.precioscategoria, categoria, cant_t,det.precio);
+                                        Double precio = detalleComprobante.get(getAdapterPosition()).getPrecio(det.producto.reglas, det.producto.precioscategoria, categoria, cant_t,det.precio, isCredito);
                                         tvPrecio.setText(Utils.FormatoMoneda(precio,2));
                                         for(DetalleComprobante deta:detalleComprobante){
                                             if(det.producto.idproducto.equals(deta.producto.idproducto))
@@ -252,16 +250,15 @@ public class DetalleComprobanteAdapter  extends RecyclerView.Adapter<DetalleComp
                     }
                 });
 
-                btnInfo.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+                btnInfo.setOnClickListener(
+                    v -> {
                         DialogFragment dialogFragment = new InfoItemDialogFragment();
                         Bundle bundle = new Bundle();
                         bundle.putInt("idproducto", detalleComprobante.get(getAdapterPosition()).producto.idproducto);
                         dialogFragment.setArguments(bundle);
                         dialogFragment.show(activity.getSupportFragmentManager(), "dialog");
                     }
-                });
+                );
 
             }catch (Exception e){
                 Log.d("TAGPRODUCTO",e.getMessage());

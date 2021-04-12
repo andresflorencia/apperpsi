@@ -18,53 +18,57 @@
     android:paddingTop="10dp"
     android:theme="@style/ThemeOverlay.AppCompat.Light"
     android:background="@color/colornavheader">
-    <!--android:background="@drawable/door"-->
-    <!--<ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="121dp"
-        android:layout_height="126dp"
-        android:layout_gravity="center"
-        android:paddingTop="25dp"
-        app:srcCompat="@drawable/escudouteq" />-->
+
     <TextView
         android:id="@+id/txtEmpresa"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Empresa"
         android:textColor="#FFFFFF"
-        android:textSize="14sp"
-        android:layout_marginHorizontal="10dp"
-        android:padding="0dp"
-        android:textAlignment="center"/>
-    <ImageView
-        android:layout_width="90dp"
-        android:layout_height="70dp"
-        android:layout_marginBottom="0dp"
-        android:layout_gravity="center"
-        android:src="@drawable/no_avatar"/>
-
-    <TextView
-        android:id="@+id/txt_Usuario"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="USUARIO"
-        android:textColor="#FFFFFF"
-        android:textSize="15sp"
-        android:textAlignment="center"
-        android:layout_marginHorizontal="10dp"
-        android:layout_marginBottom="3dp"
-        android:padding="0dp"/>
-    <TextView
-        android:id="@+id/txtPerfil"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Perfil"
-        android:textColor="#FFFFFF"
         android:textSize="13sp"
         android:layout_marginHorizontal="10dp"
-        android:layout_marginBottom="3dp"
         android:padding="0dp"
-        android:textAlignment="center"/>
+        android:textAlignment="center"
+        android:layout_gravity="center_vertical"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <ImageView
+            android:layout_width="70dp"
+            android:layout_height="60dp"
+            android:layout_marginBottom="0dp"
+            android:layout_gravity="center"
+            android:src="@drawable/no_avatar"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center_vertical">
+            <TextView
+                android:id="@+id/txt_Usuario"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="USUARIO"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textAlignment="center"
+                android:layout_marginHorizontal="10dp"
+                android:layout_marginBottom="3dp"
+                android:padding="0dp"/>
+            <TextView
+                android:id="@+id/txtPerfil"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Perfil"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:layout_marginHorizontal="10dp"
+                android:layout_marginBottom="3dp"
+                android:padding="0dp"
+                android:textAlignment="center"/>
+        </LinearLayout>
+    </LinearLayout>
     <TextView
         android:id="@+id/txtSucursal"
         android:layout_width="match_parent"
@@ -81,9 +85,9 @@
         android:layout_height="wrap_content"
         android:text="Info"
         android:textColor="#FFFFFF"
-        android:textSize="13sp"
+        android:textSize="12sp"
         android:layout_marginHorizontal="10dp"
-        android:layout_marginBottom="3dp"
         android:padding="0dp"
-        android:textAlignment="center"/>
+        android:textAlignment="center"
+        android:layout_marginBottom="5dp"/>
 </LinearLayout>

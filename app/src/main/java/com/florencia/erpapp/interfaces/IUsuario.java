@@ -22,7 +22,7 @@ import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Url;
 
-public interface UsuarioInterface {
+public interface IUsuario {
 
     @FormUrlEncoded
     @POST("registramovil")
@@ -33,11 +33,15 @@ public interface UsuarioInterface {
     Call<JsonObject> getLastVersion();
 
     @POST("verificaconexion")
-    Call<JsonObject> verificaconexion();
+    Call<String> verificaconexion();
 
     @GET
     Call<ResponseBody> downloadApk(@Url String url);
 
     @POST("loadubicacion")
     Call<JsonObject> loadUbicacion(@Body Map<String,Object> ubicaciones);
+
+    @FormUrlEncoded
+    @POST("getpermisos")
+    Call<JsonObject> getPermisos(@Field("usuario") String user, @Field("clave") String clave);
 }

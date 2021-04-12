@@ -102,9 +102,8 @@ public class PedidoActivity extends AppCompatActivity {
 
         crearBottonSheet();
 
-        txtCliente.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
+        txtCliente.setOnKeyListener(
+            (v, keyCode, event) -> {
                 if((event.getAction() == KeyEvent.ACTION_DOWN) &&
                         (keyCode == KeyEvent.KEYCODE_ENTER)) {
                     Intent i = new Intent(v.getContext(),ClienteBusquedaActivity.class);
@@ -115,11 +114,10 @@ public class PedidoActivity extends AppCompatActivity {
                 }
                 return false;
             }
-        });
+        );
 
-        txtCliente.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
+        txtCliente.setOnTouchListener(
+            (v, event) -> {
                 if(event.getAction() == MotionEvent.ACTION_UP) {
                     if(event.getRawX() >= txtCliente.getRight() - txtCliente.getTotalPaddingRight()) {
                         txtCliente.setText("");
@@ -134,7 +132,7 @@ public class PedidoActivity extends AppCompatActivity {
                 }
                 return false;
             }
-        });
+        );
 
         txtCliente.addTextChangedListener(new TextWatcher() {
             @Override
@@ -201,6 +199,7 @@ public class PedidoActivity extends AppCompatActivity {
         lyCliente = findViewById(R.id.lyCliente);
         lyProductos = findViewById(R.id.lyProductos);
         lyBotones = findViewById(R.id.lyBotones);
+        findViewById(R.id.lyFormaPago).setVisibility(View.GONE);
 
         lblTotal.setOnClickListener(onClick);
         lySubtotales.setOnClickListener(onClick);
@@ -234,9 +233,7 @@ public class PedidoActivity extends AppCompatActivity {
         }
     }
 
-    private View.OnClickListener onClick = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
+    private View.OnClickListener onClick = v -> {
             switch (v.getId()){
                 case R.id.lblTotal:
                 case R.id.lySubtotales:
@@ -276,8 +273,7 @@ public class PedidoActivity extends AppCompatActivity {
                     Utils.EfectoLayout(lyProductos, lblProducto);
                     break;
             }
-        }
-    };
+        };
 
     public void showDatePickerDialog(View v) {
         Locale l = new Locale("ES-es");
@@ -289,17 +285,16 @@ public class PedidoActivity extends AppCompatActivity {
         day = Integer.valueOf(fecha[2]);
         month = Integer.valueOf(fecha[1])-1;
         year = Integer.valueOf(fecha[0]);
-        dtpDialog = new DatePickerDialog(v.getContext(), new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int day) {
-                String dia = (day>=0 && day<10?"0"+(day):String.valueOf(day));
-                String mes = (month>=0 && month<10?"0"+(month+1):String.valueOf(month+1));
+        dtpDialog = new DatePickerDialog(v.getContext(),
+            (vi, y, m, d) -> {
+                String dia = (d>=0 && d<10?"0"+(d):String.valueOf(d));
+                String mes = (m>=0 && m<9?"0"+(m+1):String.valueOf(m+1));
 
-                String mitextoU = year + "-" + mes + "-" + dia;
+                String mitextoU = y + "-" + mes + "-" + dia;
                 btnFecha.setTag(mitextoU);
-                btnFecha.setText(dia + "-" + Utils.getMes(month, true) + "-" + year);
+                btnFecha.setText(dia + "-" + Utils.getMes(m, true) + "-" + y);
             }
-        },year,month,day);
+        ,year,month,day);
         dtpDialog.show();
     }
 
@@ -324,9 +319,7 @@ public class PedidoActivity extends AppCompatActivity {
                 public void run() {
                     pedido = new Pedido();
                     pedido = Pedido.get(idpedido);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
+                    runOnUiThread(() -> {
                             if (pedido != null) {
                                 toolbar.setTitle(pedido.secuencialpedido);
                                 toolbar.setSubtitle("Registro: " + pedido.fechacelular);
@@ -347,8 +340,7 @@ public class PedidoActivity extends AppCompatActivity {
                                 Banner.make(rootView,PedidoActivity.this, Banner.ERROR,"Ocurrió un error al obtener los datos para este pedido.", Banner.BOTTOM, 3000).show();
                             }
                             pgCargando.dismiss();
-                        }
-                    });
+                        });
                 }
             };
             th.start();
@@ -410,18 +402,12 @@ public class PedidoActivity extends AppCompatActivity {
                 ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
                 ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
                 final AlertDialog alertDialog = builder.create();
-                view.findViewById(R.id.btnConfirm).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+                view.findViewById(R.id.btnConfirm).setOnClickListener(v -> {
                         GuardarDatos();
                         alertDialog.dismiss();
-                    }
-                });
+                    });
 
-                view.findViewById(R.id.btnCancel).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) { alertDialog.dismiss();}
-                });
+                view.findViewById(R.id.btnCancel).setOnClickListener(v -> alertDialog.dismiss());
 
                 if(alertDialog.getWindow()!=null)
                     alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
@@ -753,17 +739,9 @@ public class PedidoActivity extends AppCompatActivity {
             ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
             ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
             final AlertDialog alertDialog = builder.create();
-            view.findViewById(R.id.btnConfirm).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    finish();
-                }
-            });
+            view.findViewById(R.id.btnConfirm).setOnClickListener(v -> finish());
 
-            view.findViewById(R.id.btnCancel).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) { alertDialog.dismiss();}
-            });
+            view.findViewById(R.id.btnCancel).setOnClickListener(v -> alertDialog.dismiss());
 
             if(alertDialog.getWindow()!=null)
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));

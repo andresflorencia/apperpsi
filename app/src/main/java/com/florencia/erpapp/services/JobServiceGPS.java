@@ -53,14 +53,14 @@ public class JobServiceGPS extends JobService {
                             SQLite.sqlDB = new SQLite(getApplication().getApplicationContext(),true);
                             if (miLocation != null) {
                                 Ubicacion.Save(idUser, rucempresa, miLocation.getLatitude(), miLocation.getLongitude());
-                                Log.d("TAG", "Lat: " + miLocation.getLatitude() + " - Lon: " + miLocation.getLongitude());
+                                //Log.d("TAG", "Lat: " + miLocation.getLatitude() + " - Lon: " + miLocation.getLongitude());
                             }
                         }
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
                     }
                     //}
-                    Log.d("TAG", "Job Terminado");
+                    //Log.d("TAG", "Job Terminado");
                     jobFinished(params, true);
                 }
             }).start();
@@ -89,7 +89,7 @@ public class JobServiceGPS extends JobService {
             //Obtener diferencia en milisegundos
             //long horas = TimeUnit.MINUTES.convert(difference, TimeUnit.MILLISECONDS);
             retorno = (millNow >= millInicio && millNow <= millFinal);
-            Log.d("TAG",retorno?"SI ESTÀ EN EL RANGO DE HORAS": "NO ESTÀ EN EL RANGO DE HORAS");
+            //Log.d("TAG",retorno?"SI ESTÀ EN EL RANGO DE HORAS": "NO ESTÀ EN EL RANGO DE HORAS");
             //Toast.makeText(getApplication().getApplicationContext(), retorno?"Si está en el rango": "No está en el rango",Toast.LENGTH_LONG).show();
         }catch (Exception e){
             retorno = false;

@@ -4,6 +4,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,18 +12,22 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.florencia.erpapp.MainActivity;
 import com.florencia.erpapp.R;
-import com.florencia.erpapp.interfaces.UsuarioInterface;
+import com.florencia.erpapp.interfaces.IUsuario;
 import com.florencia.erpapp.models.Canton;
+import com.florencia.erpapp.models.Catalogo;
 import com.florencia.erpapp.models.Comprobante;
 import com.florencia.erpapp.models.Configuracion;
+import com.florencia.erpapp.models.Ingreso;
 import com.florencia.erpapp.models.Parroquia;
 import com.florencia.erpapp.models.PedidoInventario;
 import com.florencia.erpapp.models.Permiso;
@@ -40,10 +45,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.shasin.notificationbanner.Banner;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,6 +66,7 @@ public class actLogin extends AppCompatActivity {
     private OkHttpClient okHttpClient;
     private ProgressDialog pbProgreso;
     View rootView;
+    Retrofit retrofit;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,6 +93,10 @@ public class actLogin extends AppCompatActivity {
                 .writeTimeout(60, TimeUnit.SECONDS)
                 .build();
 
+        Gson gson = new GsonBuilder()
+                .setLenient()
+                .create();
+
         SQLite.configuracion = Configuracion.GetLast();
         if(SQLite.configuracion!=null) {
             SQLite.configuracion.url_ws = (SQLite.configuracion.hasSSL ? Constants.HTTPs : Constants.HTTP)
@@ -98,6 +104,13 @@ public class actLogin extends AppCompatActivity {
                     + (SQLite.configuracion.hasSSL ? "" : "/erpproduccion")
                     + Constants.ENDPOINT;
         }
+
+        retrofit = new Retrofit.Builder()
+                .baseUrl(SQLite.configuracion.url_ws)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .client(okHttpClient)
+                .build();
+
         sPreferencesSesion = getSharedPreferences("DatosSesion", MODE_PRIVATE);
         if(sPreferencesSesion != null){
             int id = sPreferencesSesion.getInt("idUser",0);
@@ -105,16 +118,27 @@ public class actLogin extends AppCompatActivity {
                 this.LoginLocal(id);
         }
 
-        etPassword.setOnKeyListener(new View.OnKeyListener() {
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
+        etPassword.setOnKeyListener(
+            (v, keyCode,  event) -> {
                 if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
                         (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                    IniciarSesion(v.getContext());
+                    IniciarSesion(v.getContext(), etUser.getText().toString().trim(), etPassword.getText().toString());
                     return true;
                 }
                 return false;
             }
-        });
+        );
+
+        etPassword.setOnTouchListener(
+            (v, event) -> {
+                if(event.getAction() == MotionEvent.ACTION_UP) {
+                    btnLogin.requestFocus();
+                    ScrollView sv = findViewById(R.id.svLogin);
+                    sv.scrollTo(0, sv.getBottom());
+                }
+                return false;
+            }
+        );
     }
 
     private void ConsultaConfig() {
@@ -137,20 +161,18 @@ public class actLogin extends AppCompatActivity {
         }
     }
 
-    private View.OnClickListener onClick = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
+    private View.OnClickListener onClick =
+        v -> {
             switch (v.getId()){
                 case R.id.btnLogin:
-                    IniciarSesion(v.getContext());
+                    IniciarSesion(v.getContext(), etUser.getText().toString().trim(), etPassword.getText().toString());
                     break;
                 case R.id.btnConfig:
                     Intent i = new Intent(actLogin.this,ConfigActivity.class);
                     startActivity(i);
                     break;
             }
-        }
-    };
+        };
 
     private void LoginLocal(Integer id) {
         try {
@@ -167,34 +189,102 @@ public class actLogin extends AppCompatActivity {
         }
     }
 
-    private void IniciarSesion(final Context context){
+    private void ActualizarPermisos(){
+        try{
+            IUsuario iUsuario = retrofit.create(IUsuario.class);
+            Call<JsonObject> call = iUsuario.getPermisos(SQLite.usuario.Usuario,SQLite.usuario.Clave);
+            call.enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    if(response.isSuccessful() && response.body()!= null){
+                        JsonObject obj = response.body();
+                        if (!obj.get("haserror").getAsBoolean()) {
+                            JsonArray jsonPermisos = obj.get("permisos").getAsJsonArray();
+                            if(jsonPermisos!=null){
+                                SQLite.usuario.permisos.clear();
+                                for(JsonElement element:jsonPermisos){
+                                    JsonObject per = element.getAsJsonObject();
+                                    Permiso mipermiso = new Permiso();
+                                    mipermiso.nombreopcion = per.get("nombreopcion").getAsString();
+                                    mipermiso.opcionid = per.get("opcionid").getAsInt();
+                                    mipermiso.perfilid = per.get("perfilid").getAsInt();
+                                    mipermiso.permisoescritura = per.get("permisoescritura").getAsString();
+                                    mipermiso.permisoimpresion = per.get("permisoimpresion").getAsString();
+                                    mipermiso.permisomodificacion = per.get("permisomodificacion").getAsString();
+                                    mipermiso.permisoborrar = per.get("permisoborrar").getAsString();
+                                    mipermiso.rutaopcion = per.get("rutaopcion").getAsString();
+                                    SQLite.usuario.permisos.add(mipermiso);
+                                }
+                                Permiso.SaveLista(SQLite.usuario.permisos);
+
+                                if(obj.has("newperfil")){
+                                    ContentValues values = new ContentValues();
+                                    values.put("perfilid", obj.get("newperfil").getAsInt());
+                                    Usuario.Update(SQLite.usuario.IdUsuario, values);
+                                }
+                                SQLite.usuario.GuardarSesionLocal(actLogin.this);
+                                Intent i = new Intent(actLogin.this, MainActivity.class);
+                                startActivity(i);
+                                finish();
+                            }
+                        }else{
+                            Banner.make(rootView, actLogin.this, Banner.ERROR,
+                                    obj.get("message").getAsString(), Banner.BOTTOM, 3000).show();
+                        }
+                    }else{
+                        SQLite.usuario.GuardarSesionLocal(actLogin.this);
+                        Intent i = new Intent(actLogin.this, MainActivity.class);
+                        startActivity(i);
+                        finish();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    call.cancel();
+                    SQLite.usuario.GuardarSesionLocal(actLogin.this);
+                    Intent i = new Intent(actLogin.this, MainActivity.class);
+                    startActivity(i);
+                    finish();
+                }
+            });
+        }catch (Exception e){
+            Log.d("TAGLOGIN", e.getMessage());
+        }
+    }
+
+    private void IniciarSesionLocal(String User, String Clave){
+        try{
+            Usuario miUser = Usuario.Login(User, Clave);
+            if(miUser == null){
+                Banner.make(rootView, actLogin.this, Banner.ERROR, "Usuario o contraseña incorrecta.", Banner.BOTTOM, 2000).show();
+                return;
+            }else {
+                SQLite.usuario = miUser;
+                SQLite.usuario.GuardarSesionLocal(actLogin.this);
+                Utils.showMessage(actLogin.this, "Bienvenido...");
+                Intent i = new Intent(actLogin.this, MainActivity.class);
+                startActivity(i);
+                finish();
+            }
+        }catch (Exception e){
+            Banner.make(rootView, actLogin.this, Banner.ERROR, "Ocurrió un error al tratar de iniciar sesión", Banner.BOTTOM, 2000).show();
+            Log.d("TAGLOGIN", "IniciarSesionLocal(): " + e.getMessage());
+        }
+    }
+
+    private void IniciarSesion(final Context context, String User, String Clave){
         try{
             Usuario miUser = new Usuario();
 
-            String User = etUser.getText().toString().trim();
-            String Clave = etPassword.getText().toString();
+            //String User = etUser.getText().toString().trim();
+            //String Clave = etPassword.getText().toString();
             if (User.equals("")) {
                 etUser.setError("Ingrese el usuario");
                 return;
             }
             if(Clave.equals("")){
-                etPassword.setError("Ingrese la contraseña");
-                return;
-            }
-
-            if(!Utils.isOnlineNet(SQLite.configuracion.urlbase)) {
-                miUser = Usuario.Login(User, Clave);
-                if(miUser == null){
-                    Banner.make(rootView, actLogin.this, Banner.ERROR, "Usuario o contraseña incorrecta.", Banner.BOTTOM, 2000).show();
-                    return;
-                }else{
-                    SQLite.usuario = miUser;
-                    SQLite.usuario.GuardarSesionLocal(context);
-                    Utils.showMessage(context, "Bienvenido...");
-                    Intent i = new Intent(actLogin.this, MainActivity.class);
-                    startActivity(i);
-                    finish();
-                }
+                etUser.setError("Ingrese la contraseña");
                 return;
             }
 
@@ -203,25 +293,16 @@ public class actLogin extends AppCompatActivity {
             pbProgreso.setCancelable(false);
             pbProgreso.show();
 
-            Gson gson = new GsonBuilder()
-                    .setLenient()
-                    .create();
-            Log.d("TAGLOGIN", SQLite.configuracion.url_ws);
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(SQLite.configuracion.url_ws)
-                    .addConverterFactory(GsonConverterFactory.create(gson))
-                    .client(okHttpClient)
-                    .build();
-            UsuarioInterface miInterface = retrofit.create(UsuarioInterface.class);
+            IUsuario miInterface = retrofit.create(IUsuario.class);
 
-            Call<JsonObject> call=null;
-            call=miInterface.IniciarSesion(User,Clave,"");
+            Call<JsonObject> call = miInterface.IniciarSesion(User,Clave,"");
             call.enqueue(new Callback<JsonObject>() {
                 @Override
                 public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                     if(!response.isSuccessful()){
                         Toast.makeText(context,"Code:" + response.code(),Toast.LENGTH_SHORT).show();
                         pbProgreso.dismiss();
+                        IniciarSesionLocal(User, Clave);
                         return;
                     }
                     try {
@@ -233,12 +314,13 @@ public class actLogin extends AppCompatActivity {
                                 usuario.IdUsuario = jsonUsuario.get("idpersona").getAsInt();
                                 usuario.RazonSocial = jsonUsuario.get("razonsocial").getAsString();
                                 usuario.Usuario = jsonUsuario.get("usuario").getAsString();
-                                usuario.Clave = etPassword.getText().toString();
+                                usuario.Clave = Clave;
                                 usuario.Perfil = jsonUsuario.get("perfil").getAsInt();
                                 usuario.Autorizacion = jsonUsuario.get("auth").getAsInt();
                                 usuario.sucursal = Sucursal.AsignaDatos(jsonUsuario.getAsJsonObject("sucursal"));
                                 usuario.ParroquiaID = jsonUsuario.get("parroquiaid").getAsInt();
                                 usuario.nombrePerfil = jsonUsuario.has("nombreperfil")?jsonUsuario.get("nombreperfil").getAsString():"";
+                                usuario.nip = jsonUsuario.has("nip")?jsonUsuario.get("nip").getAsString():"";
 
                                 JsonArray jsonPermisos = jsonUsuario.get("permisos").getAsJsonArray();
                                 //usuario.permisos = new Gson().fromJson(jsonPermisos, usuario.permisos.getClass());
@@ -264,9 +346,24 @@ public class actLogin extends AppCompatActivity {
                                 }
 
                                 if(usuario.Guardar()) {
+                                    Catalogo.Delete("ENTIDADFINANCIE");
+                                    JsonArray jsonCatalogo = obj.get("catalogos").getAsJsonArray();
+                                    List<Catalogo> listCatalogo= new ArrayList<>();
+                                    for (JsonElement ele : jsonCatalogo) {
+                                        JsonObject cata = ele.getAsJsonObject();
+                                        Catalogo miCatalogo = new Catalogo();
+                                        miCatalogo.idcatalogo = cata.get("idcatalogo").getAsInt();
+                                        miCatalogo.nombrecatalogo = cata.get("nombrecatalogo").getAsString();
+                                        miCatalogo.codigocatalogo = cata.get("codigocatalogo").getAsString();
+                                        miCatalogo.codigopadre = cata.get("codigopadre").getAsString();
+                                        miCatalogo.cuentaid = cata.get("cuentaid").isJsonNull()?0:cata.get("cuentaid").getAsInt();
+                                        miCatalogo.entidadfinancieracodigo = cata.has("entidadfinancieracodigo")?cata.get("entidadfinancieracodigo").getAsString():"";
+                                        listCatalogo.add(miCatalogo);
+                                    }
+                                    Catalogo.SaveLista(listCatalogo);
                                     //ACTUALIZAR EL SECUENCIAL DE FACTURAS
                                     Comprobante comprobante;
-                                    if(jsonUsuario.has("secuencial_fa") && Usuario.numDocNoSincronizados(usuario.IdUsuario, "01") == 0) {
+                                    if(jsonUsuario.has("secuencial_fa") && Usuario.numDocNoSincronizados(usuario.IdUsuario, "01", "", usuario.sucursal.IdEstablecimiento) == 0) {
                                         Integer secuencial_fa = jsonUsuario.get("secuencial_fa").getAsInt();
                                         comprobante = new Comprobante();
                                         comprobante.secuencial = secuencial_fa - 1;
@@ -278,7 +375,7 @@ public class actLogin extends AppCompatActivity {
                                     }
 
                                     //ACTUALIZAR EL SECUENCIAL DE PEDIDOS CLIENTE
-                                    if(jsonUsuario.has("secuencial_pe") && Usuario.numDocNoSincronizados(usuario.IdUsuario, "PC") == 0) {
+                                    if(jsonUsuario.has("secuencial_pe") && Usuario.numDocNoSincronizados(usuario.IdUsuario, "PC", "", 0) == 0) {
                                         Integer secuencial_pe = jsonUsuario.get("secuencial_pe").getAsInt();
                                         comprobante = new Comprobante();
                                         comprobante.secuencial = secuencial_pe - 1;
@@ -290,13 +387,22 @@ public class actLogin extends AppCompatActivity {
                                     }
 
                                     //ACTUALIZAR EL SECUENCIAL DE PEDIDOS INVENTARIO
-                                    if(jsonUsuario.has("secuencial_pi") && Usuario.numDocNoSincronizados(usuario.IdUsuario, "PI") == 0) {
+                                    if(jsonUsuario.has("secuencial_pi") && Usuario.numDocNoSincronizados(usuario.IdUsuario, "PI", "", 0) == 0) {
                                         Integer secuencial_pi = jsonUsuario.get("secuencial_pi").getAsInt();
                                         PedidoInventario pedidoinv = new PedidoInventario();
                                         pedidoinv.secuencial = secuencial_pi - 1;
                                         pedidoinv.establecimientoid = usuario.sucursal.IdEstablecimiento;
                                         pedidoinv.tipotransaccion = "PI";
                                         pedidoinv.actualizasecuencial();
+                                    }
+
+                                    //ACTUALIZAR EL SECUENCIAL DE ORDEN DE PAGO(DEPOSITOS - DIARIO DE VENTA)
+                                    if(jsonUsuario.has("secuencial_op") && Usuario.numDocNoSincronizados(usuario.IdUsuario, "DE", "", usuario.sucursal.IdEstablecimiento) == 0) {
+                                        Integer secuencial_op = jsonUsuario.get("secuencial_op").getAsInt();
+                                        Ingreso ingreso = new Ingreso();
+                                        ingreso.secuencial = secuencial_op;
+                                        ingreso.establecimientoid = usuario.sucursal.IdEstablecimiento;
+                                        ingreso.actualizasecuencial();
                                     }
 
                                     List<Provincia> listProvincia = new ArrayList<>();
@@ -349,15 +455,17 @@ public class actLogin extends AppCompatActivity {
 
                     }catch (JsonParseException ex){
                         Log.d("TAG", ex.getMessage());
+                        IniciarSesionLocal(User, Clave);
                     }
                     pbProgreso.dismiss();
                 }
 
                 @Override
                 public void onFailure(Call<JsonObject> call, Throwable t) {
-                    Utils.showErrorDialog(actLogin.this, "Error",t.getMessage());
+                    //Utils.showErrorDialog(actLogin.this, "Error",t.getMessage());
                     Log.d("TAG", t.getMessage());
                     pbProgreso.dismiss();
+                    IniciarSesionLocal(User, Clave);
                 }
             });
         }catch (Exception e){

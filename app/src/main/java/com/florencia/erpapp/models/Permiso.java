@@ -1,6 +1,7 @@
 package com.florencia.erpapp.models;
 
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.util.Log;
@@ -60,6 +61,7 @@ public class Permiso
 
     public static boolean SaveLista(List<Permiso> permisos) {
         try {
+            Delete(permisos.get(0).perfilid);
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
             for (Permiso item:permisos) {
                 sqLiteDatabase.execSQL("INSERT OR REPLACE INTO " +
@@ -96,5 +98,18 @@ public class Permiso
             Log.d(TAG, ec.getMessage());
         }
         return Item;
+    }
+
+    public static boolean Delete(Integer idperfil) {
+        try {
+            sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
+            sqLiteDatabase.delete("permiso","perfilid = ?",new String[]{idperfil.toString()});
+            //sqLiteDatabase.close();
+            Log.d(TAG,"DELETE PERMISOS OK");
+            return true;
+        } catch (SQLException ex){
+            Log.d(TAG, "Delete(): " + ex.getMessage());
+            return false;
+        }
     }
 }

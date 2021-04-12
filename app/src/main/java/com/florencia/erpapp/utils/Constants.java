@@ -38,4 +38,10 @@ public class Constants {
     public static final String CLAVE_SEGURIDAD = "T3cn0l0g14_";
     public static final String URL_DOWNLOAD_APK = "downloadapk";
     public static final String ACTION_INSTALL_COMPLETE = "com.florencia.erpapp.INSTALL_COMPLETE";
+
+
+    //RUTA IMAGENES
+    public static final String FOLDER_FILES = "ImageSI"; //DIRECTORIO PRINCIPAL
+    public static final String FOLDER_IMAGES = "imagenes"; // CARPETA DONDE SE GUARDAN LAS IMAGENES
+    public static final String PATH_IMAGES = FOLDER_FILES + FOLDER_IMAGES; //RUTA CARPETA
 }

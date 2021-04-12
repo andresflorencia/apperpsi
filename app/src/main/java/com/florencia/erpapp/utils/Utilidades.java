@@ -53,6 +53,10 @@ public class Utilidades {
         SQLite.sqlDB.SQLEstructura(context.getString(R.string.dbDetallePedidoInv));
         SQLite.sqlDB.SQLEstructura(context.getString(R.string.dbPrecioCategoria));
         SQLite.sqlDB.SQLEstructura(context.getString(R.string.dbUbicacion));
+        SQLite.sqlDB.SQLEstructura(context.getString(R.string.dbCatalogo));
+        SQLite.sqlDB.SQLEstructura(context.getString(R.string.dbFotos));
+        SQLite.sqlDB.SQLEstructura(context.getString(R.string.dbIngreso));
+        SQLite.sqlDB.SQLEstructura(context.getString(R.string.dbDetalleIngreso));
     }
 
     public static String[] getDateTime() {

@@ -130,32 +130,16 @@ public class ClienteAdapter extends RecyclerView.Adapter<ClienteAdapter.ClienteV
                 itemView.setBackgroundResource(R.drawable.bg_btn_gps);
             }
 
-            btnOptions.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showPopupMenu(v);
-                    /*if(!SQLite.usuario.VerificaPermiso(v.getContext(),Constants.REGISTRO_CLIENTE, "lectura")){
-                        Utils.showMessage(v.getContext(),"No tiene permisos para visualizar datos de cliente.");
-                        return;
-                    }else {
-                        Intent i = new Intent(v.getContext(), ClienteActivity.class);
-                        i.putExtra("idcliente", listClients.get(getAdapterPosition()).idcliente);
-                        v.getContext().startActivity(i);
-                    }*/
-                }
-            });
+            btnOptions.setOnClickListener(v -> showPopupMenu(v));
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            itemView.setOnClickListener(v -> {
                     if(!listClients.get(getAdapterPosition()).nip.contains("99999999")) {
                         Intent i = new Intent(context, ClienteActivity.class);
                         i.putExtra("idcliente", listClients.get(getAdapterPosition()).idcliente);
                         context.startActivity(i);
                     }else
                         Utils.showMessage(v.getContext(),"No se puede editar datos de «CONSUMIDOR FINAL»");
-                }
-            });
+                });
         }
 
         private void showPopupMenu(View v){
