@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 
 public class ClienteBusquedaAdapter extends RecyclerView.Adapter<ClienteBusquedaAdapter.ClienteViewHolder> {
 
+    private static String TAG = "TAGCLIENTE_BUSQ_ADAPTER";
     public List<Cliente> listClients;
     private List<Cliente> orginalItems = new ArrayList<>();
     Activity activity;

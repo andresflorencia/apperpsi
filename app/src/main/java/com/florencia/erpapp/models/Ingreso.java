@@ -51,10 +51,10 @@ public class Ingreso {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
             sqLiteDatabase.update("ingreso",values, "idingreso = ?",new String[]{idingreso.toString()});
             sqLiteDatabase.close();
-            Log.d("TAGINGRESO","UPDATE INGRESO OK");
+            Log.d(TAG,"UPDATE INGRESO OK");
             return true;
         } catch (SQLException ex){
-            Log.d("TAGINGRESO", "Update(): " + String.valueOf(ex));
+            Log.d(TAG, "Update(): " + String.valueOf(ex));
             return false;
         }
     }

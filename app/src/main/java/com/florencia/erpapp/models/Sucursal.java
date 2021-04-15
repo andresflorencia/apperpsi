@@ -26,7 +26,9 @@ public class Sucursal {
     public String Ambiente;
     public String SucursalPadreID;
     public Integer IdEstablecimiento, IdPuntoEmision, periodo, mesactual;
+
     public static SQLiteDatabase sqLiteDatabase;
+    public static String TAG = "TAGSUCURSAL";
 
     public Sucursal() {
         this.IdSucursal = "";
@@ -56,7 +58,7 @@ public class Sucursal {
             sqLiteDatabase.close();
             return true;
         } catch (SQLException ex) {
-            Log.d("TAGSUCURSAL", "Guardar(): " + ex.getMessage());
+            Log.d(TAG, "Guardar(): " + ex.getMessage());
             return false;
         }
     }
@@ -66,10 +68,10 @@ public class Sucursal {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
             sqLiteDatabase.delete("sucursal","idestablecimiento = ?",new String[]{id.toString()});
             sqLiteDatabase.close();
-            Log.d("TAGSUCURSAL","DELETE SUCURSAL OK");
+            Log.d(TAG,"DELETE SUCURSAL OK");
             return true;
         } catch (SQLException ex){
-            Log.d("TAGSUCURSAL", "Delete(): " + ex.getMessage());
+            Log.d(TAG, "Delete(): " + ex.getMessage());
             return false;
         }
     }
@@ -128,7 +130,7 @@ public class Sucursal {
                     Item.actualizasecuencial(object.get("s01").getAsInt(), "01");
             }
         }catch (JsonParseException e){
-            Log.d("TAGSUCURSAL", "AsiganDatos(): " + e.getMessage());
+            Log.d(TAG, "AsignaDatos(): " + e.getMessage());
         }
         return Item;
     }
@@ -138,10 +140,10 @@ public class Sucursal {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
             sqLiteDatabase.execSQL("INSERT OR REPLACE INTO secuencial(secuencial, sucursalid, codigoestablecimiento, puntoemision, tipocomprobante) VALUES(?, ?, ?, ?, ?) ", new String[]{String.valueOf(Secuencial), this.IdSucursal.toString(), this.CodigoEstablecimiento, this.PuntoEmision, TipoComprobante});
             sqLiteDatabase.close();
-            Log.d("TAGSUCURSAL", "SECUENCIAL ACTUALIZADO");
+            Log.d(TAG, "SECUENCIAL ACTUALIZADO");
             return true;
         } catch (Exception ec) {
-            Log.d("TAGSUCURSAL", "actualizasecuencial(): " + ec.getMessage());
+            Log.d(TAG, "actualizasecuencial(): " + ec.getMessage());
             ec.printStackTrace();
             return false;
         }

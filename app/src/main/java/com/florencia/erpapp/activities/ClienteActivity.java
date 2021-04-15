@@ -51,6 +51,7 @@ import java.util.List;
 
 public class ClienteActivity extends AppCompatActivity implements View.OnFocusChangeListener, View.OnClickListener {
 
+    private static String TAG = "TAGCLIENTE_ACTIVITY";
     Spinner cbTipoDocumento, cbProvincia, cbCanton, cbParroquia;;
     EditText txtNIP, txtRazonSocial, txtNombreComercial, txtLatitud, txtLongitud, txtDireccion,
             txtFono1, txtFono2, txtCorreo, txtObservacion;
@@ -161,7 +162,7 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
             };
             th.start();
         }catch (Exception e){
-            Log.d("TAGCLIENTE", "BuscarDatos" + e.getMessage());
+            Log.d(TAG, "BuscarDatos" + e.getMessage());
         }
     }
 
@@ -280,7 +281,7 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
             } else if(alertar)
                 SQLite.gpsTracker.showSettingsAlert(ClienteActivity.this);
         }catch (Exception e){
-            Log.d("TAG_CLIENTEACTIVITY", e.getMessage());
+            Log.d(TAG, e.getMessage());
         }
     }
 
@@ -382,7 +383,7 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
                 Banner.make(rootView,this,Banner.ERROR,Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM,3500).show();
 
         }catch (Exception e){
-            Log.d("TAGCLIENTE", e.getMessage());
+            Log.d(TAG, e.getMessage());
             Utils.showErrorDialog(this,"Error: ", e.getMessage());
         }
     }
@@ -447,7 +448,7 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
             toolbar.setTitle("Nuevo Registro");
             cvInfo.setVisibility(View.GONE);
         }catch (Exception e){
-            Log.d("TAGCLIENTE", "LimpiarDatos(): " + e.getMessage());
+            Log.d(TAG, "LimpiarDatos(): " + e.getMessage());
         }
     }
 
@@ -525,7 +526,7 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
                     break;
             }
         }catch (Exception e){
-            Log.d("TAGCLIENTE", "onFocusChange(): " + e.getMessage());
+            Log.d(TAG, "onFocusChange(): " + e.getMessage());
         }
     }
 
@@ -545,7 +546,7 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
             if(idprovincia>=0)
                 cbProvincia.setSelection(position,true);
         }catch (Exception e){
-            Log.d("TAG_CLIENTEACT", "LlenarComboProvincias(): " +e.getMessage());
+            Log.d(TAG, "LlenarComboProvincias(): " +e.getMessage());
         }
     }
 
@@ -566,7 +567,7 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
             if(idcanton>=0)
                 cbCanton.setSelection(position, true);
         }catch (Exception e){
-            Log.d("TAG_CLIENTEACT", "LlenarComboCantones(): " +e.getMessage());
+            Log.d(TAG, "LlenarComboCantones(): " +e.getMessage());
         }
     }
 
@@ -589,7 +590,7 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
                 //band = false;
             }
         }catch (Exception e){
-            Log.d("TAG_CLIENTEACT", "LlenarComboProvincias(): " +e.getMessage());
+            Log.d(TAG, "LlenarComboProvincias(): " +e.getMessage());
         }
     }
 }

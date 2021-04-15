@@ -42,6 +42,7 @@ import java.util.stream.Collectors;
 
 public class DetalleComprobanteAdapter  extends RecyclerView.Adapter<DetalleComprobanteAdapter.ProductoViewHolder>{
 
+    private static String TAG = "TAGDETALLECOMP_ADAPTER";
     public List<DetalleComprobante> detalleComprobante;
     ComprobanteActivity activity;
     public String categoria;
@@ -89,7 +90,7 @@ public class DetalleComprobanteAdapter  extends RecyclerView.Adapter<DetalleComp
             this.activity.lblTotal.setText("Total: " + Utils.FormatoMoneda(total,2));
             this.activity.setSubtotales(total, subtotal, subtotaliva);
         }catch (Exception e){
-            Log.d("TAGPRODUCTO",e.getMessage());
+            Log.d(TAG,e.getMessage());
         }
     }
 
@@ -103,7 +104,6 @@ public class DetalleComprobanteAdapter  extends RecyclerView.Adapter<DetalleComp
                     if(miDetalle.producto.idproducto.equals(dc.producto.idproducto))
                         cant_ut += dc.cantidad;
                 }
-                Log.d("TAGDETALLE", "Cant: " + miDetalle.producto.nombreproducto + " -> " + cant_ut);
                 miDetalle.getPrecio(miDetalle.producto.reglas, miDetalle.producto.precioscategoria,
                         categoria, cant_ut, miDetalle.precio, credito);
                 /*miDetalle.precio = miDetalle.producto.getPrecio(categoria);
@@ -122,7 +122,7 @@ public class DetalleComprobanteAdapter  extends RecyclerView.Adapter<DetalleComp
             }
             notifyDataSetChanged();
         }catch (Exception e){
-            Log.d("TAGPRODUCTO", e.getMessage());
+            Log.d(TAG, e.getMessage());
         }
     }
 
@@ -261,7 +261,7 @@ public class DetalleComprobanteAdapter  extends RecyclerView.Adapter<DetalleComp
                 );
 
             }catch (Exception e){
-                Log.d("TAGPRODUCTO",e.getMessage());
+                Log.d(TAG,e.getMessage());
             }
 
         }

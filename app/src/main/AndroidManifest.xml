@@ -88,7 +88,7 @@
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:theme="@style/ClienteTheme" />
         <activity
-            android:name=".activities.actLogin"
+            android:name=".activities.LoginActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize|adjustPan"
             android:screenOrientation="portrait">

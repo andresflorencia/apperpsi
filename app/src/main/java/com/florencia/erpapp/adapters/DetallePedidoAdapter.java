@@ -32,6 +32,7 @@ import java.util.List;
 
 public class DetallePedidoAdapter extends RecyclerView.Adapter<DetallePedidoAdapter.ProductoViewHolder>{
 
+    private static String TAG = "TAGDETALLEPEDIDO_ADAPTER";
     public List<DetallePedido> detallePedido;
     PedidoActivity activity;
     public String categoria;
@@ -78,7 +79,7 @@ public class DetallePedidoAdapter extends RecyclerView.Adapter<DetallePedidoAdap
             this.activity.lblTotal.setText("Total: " + Utils.FormatoMoneda(total,2));
             this.activity.setSubtotales(total, subtotal, subtotaliva);
         }catch (Exception e){
-            Log.d("TAGPRODUCTO",e.getMessage());
+            Log.d(TAG,e.getMessage());
         }
     }
 
@@ -93,7 +94,7 @@ public class DetallePedidoAdapter extends RecyclerView.Adapter<DetallePedidoAdap
             }
             notifyDataSetChanged();
         }catch (Exception e){
-            Log.d("TAGPRODUCTO", e.getMessage());
+            Log.d(TAG, e.getMessage());
         }
     }
 
@@ -217,7 +218,7 @@ public class DetallePedidoAdapter extends RecyclerView.Adapter<DetallePedidoAdap
                     });
 
             }catch (Exception e){
-                Log.d("TAGPRODUCTO",e.getMessage());
+                Log.d(TAG, e.getMessage());
             }
 
         }

@@ -40,6 +40,7 @@ public class ClienteBusquedaActivity extends AppCompatActivity implements Search
     ProgressDialog pgCargando;
     String tipobusqueda="";
     public static final int REQUEST_NEW_CLIENTE = 2;
+    private static String TAG = "TAGCLIENTE_BUSQUEDA_ACT";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,7 +85,7 @@ public class ClienteBusquedaActivity extends AppCompatActivity implements Search
                 rvCliente.setAdapter(clienteAdapter);
             }
         }catch (Exception e){
-            Log.d("TAGCLIENTE",e.getMessage());
+            Log.d(TAG,e.getMessage());
         }
     }
 

@@ -55,6 +55,7 @@ public class PrecioCategoria {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
             sqLiteDatabase.delete("preciocategoria","productoid = ? and establecimientoid in (?, ?)", new String[]{idproducto.toString(), establecimientoid.toString(), "0"});
             for(PrecioCategoria categoria: categorias) {
+                sqLiteDatabase.delete("preciocategoria","idproductocategoria = ?", new String[]{categoria.idproductocategoria.toString()});
                 values= new ContentValues();
                 values.put("idproductocategoria", categoria.idproductocategoria);
                 values.put("productoid", categoria.productoid);

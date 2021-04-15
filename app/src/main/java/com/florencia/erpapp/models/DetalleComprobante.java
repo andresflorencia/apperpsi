@@ -18,6 +18,7 @@ public class DetalleComprobante {
     public Double stock, preciocosto, precioreferencia, valoriva, valorice, descuento, marquetas;
 
     public static SQLiteDatabase sqLiteDatabase;
+    public static String TAG = "TAGDETALLECOMPROBANTE";
 
     public DetalleComprobante(){
         this.comprobanteid =0;
@@ -44,7 +45,7 @@ public class DetalleComprobante {
         try{
             retorno =this.cantidad * this.precio;
         }catch (Exception e){
-            Log.d("TAGPRODUCTO", e.getMessage());
+            Log.d(TAG, e.getMessage());
         }
         return retorno;
     }
@@ -54,7 +55,7 @@ public class DetalleComprobante {
         try{
             retorno =this.cantidad * this.preciocosto;
         }catch (Exception e){
-            Log.d("TAGPRODUCTO", e.getMessage());
+            Log.d(TAG, e.getMessage());
         }
         return retorno;
     }
@@ -64,7 +65,7 @@ public class DetalleComprobante {
         try{
             retorno =this.cantidad * (this.precio +(this.precio * this.producto.porcentajeiva/100));
         }catch (Exception e){
-            Log.d("TAGPRODUCTO", e.getMessage());
+            Log.d(TAG, e.getMessage());
         }
         return retorno;
     }
@@ -83,7 +84,7 @@ public class DetalleComprobante {
             }
             sqLiteDatabase.close();
         }catch (SQLiteException e){
-            Log.d("TAGCOMPROBANTE", "getDetalle(): " + e.getMessage());
+            Log.d(TAG, "getDetalle(): " + e.getMessage());
         }
         return Items;
     }
@@ -116,7 +117,7 @@ public class DetalleComprobante {
                 Item.producto.iva = Item.valoriva>0?1:0;
             }
         } catch (Exception ec) {
-            Log.d("TAGCOMPROBANTE", "AsignaDatos(): " + ec.getMessage());
+            Log.d(TAG, "AsignaDatos(): " + ec.getMessage());
             ec.printStackTrace();
             Item = null;
         }
@@ -139,7 +140,7 @@ public class DetalleComprobante {
             if (ptemp < this.precio)
                 this.precio = ptemp;
         }catch (Exception e){
-            Log.d("TAGDETALLECOMPROBANTE", "getPrecio(): " + e.getMessage());
+            Log.d(TAG, "getPrecio(): " + e.getMessage());
         }
         return this.precio;
     }
@@ -182,7 +183,7 @@ public class DetalleComprobante {
                     this.precio = pvpNormal>precioregla && precioregla>0 ? precioregla : pvpNormal;
             }
         }catch (Exception e){
-            Log.d("TAGDETALLECOMPROBANTE", "getPrecio2(): " + e.getMessage());
+            Log.d(TAG, "getPrecio2(): " + e.getMessage());
         }
         return this.precio;
     }

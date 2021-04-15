@@ -61,6 +61,7 @@ import java.util.Locale;
 import static com.florencia.erpapp.services.Printer.btsocket;
 
 public class PedidoActivity extends AppCompatActivity {
+    private static String TAG = "TAGPEDIDO_ACT";
     public static final int REQUEST_BUSQUEDA = 1;
     public static final int REQUEST_CLIENTE = 2;
     public static final int REQUEST_BUSQUEDA_PEDIDO = 3;
@@ -153,7 +154,7 @@ public class PedidoActivity extends AppCompatActivity {
                     else
                         txtCliente.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_user,0, 0,0);
                 }catch (Exception e){
-                    Log.d("TAG_PEDIDOACT", e.getMessage());
+                    Log.d(TAG, e.getMessage());
                 }
             }
         });
@@ -346,7 +347,7 @@ public class PedidoActivity extends AppCompatActivity {
             th.start();
         }catch (Exception e){
             pgCargando.dismiss();
-            Log.d("TAG", e.getMessage());
+            Log.d(TAG, e.getMessage());
         }
 
     }
@@ -498,7 +499,7 @@ public class PedidoActivity extends AppCompatActivity {
             }else
                 Banner.make(rootView,PedidoActivity.this,Banner.ERROR,Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM,3000).show();
         }catch (Exception e){
-            Log.d("TAGPEDIDO", e.getMessage());
+            Log.d(TAG, e.getMessage());
         }
     }
 
@@ -522,7 +523,7 @@ public class PedidoActivity extends AppCompatActivity {
             EstablecerFecha("");
             btnFecha.setEnabled(true);
         }catch (Exception e){
-            Log.d("TAGPEDIDO_ACT", "LimpiarDatos(): " + e.getMessage());
+            Log.d(TAG, "LimpiarDatos(): " + e.getMessage());
         }
     }
 
@@ -639,7 +640,7 @@ public class PedidoActivity extends AppCompatActivity {
 
             } else fImp = false;
         }catch (Exception e){
-            Log.d("TAGIMPRIMIR1", e.getMessage());
+            Log.d(TAG, e.getMessage());
             fImp = false;
         }
         return fImp;
@@ -672,7 +673,7 @@ public class PedidoActivity extends AppCompatActivity {
                     detalleAdapter.CambiarPrecio(cliente.categoria.equals("")?"0":cliente.categoria);
                     detalleAdapter.CalcularTotal();
                     detalleAdapter.notifyDataSetChanged();
-                    Log.d("TAGPRODUCTO",String.valueOf(detalleAdapter.detallePedido.size()));
+                    Log.d(TAG,String.valueOf(detalleAdapter.detallePedido.size()));
                     break;
                 case REQUEST_CLIENTE:
                     Integer idcliente = data.getExtras().getInt("idcliente",0);
@@ -691,10 +692,10 @@ public class PedidoActivity extends AppCompatActivity {
                             Utils.showMessageShort(this,"Imprimiendo comprobante");
                             imprimirFactura(idpedido==0?"* ORIGINALCLIENTE *": "* REIMPRESIÓN DE PEDIDO *",
                                     idpedido>0);
-                            Log.d("TAGIMPRIMIR2", "IMPRESORA SELECCIONADA");
+                            Log.d(TAG, "IMPRESORA SELECCIONADA");
                         }
                     }catch (Exception e){
-                        Log.d("TAGIMPRIMIR2",e.getMessage());
+                        Log.d(TAG,e.getMessage());
                     }
                     break;
                 case REQUEST_BUSQUEDA_PEDIDO:

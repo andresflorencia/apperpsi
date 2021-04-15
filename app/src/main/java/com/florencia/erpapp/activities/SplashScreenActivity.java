@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -57,7 +56,7 @@ public class SplashScreenActivity extends Activity {
                         waited += 100;
                     }
                     Intent intent = new Intent(SplashScreenActivity.this,
-                            actLogin.class);
+                            LoginActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                     startActivity(intent);
                     SplashScreenActivity.this.finish();

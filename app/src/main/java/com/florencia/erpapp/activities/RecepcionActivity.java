@@ -71,6 +71,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import static com.florencia.erpapp.services.Printer.btsocket;
 public class RecepcionActivity extends AppCompatActivity implements View.OnClickListener{
     private static final int REQUEST_BUSQUEDA_RECEPCION = 1;
+    private static String TAG = "TAGRECEPCION_ACT";
     Spinner cbTransferencias;
     RecyclerView rvDetalleProducto;
     ProgressDialog pgCargando;
@@ -116,13 +117,13 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
                     mitransferencia = listTransferencias.get(position);
                     if(mitransferencia.codigosistema>0) {
                         BuscarDetalleTransferencia(mitransferencia.codigosistema, view.getContext());
-                        Log.d("TAG",mitransferencia.codigotransaccion);
+                        Log.d(TAG,mitransferencia.codigotransaccion);
                     }else if(idrecepcion.equals(0)){
                         detalleAdapter.detalleComprobante.clear();
                         detalleAdapter.notifyDataSetChanged();
                     }
                 }catch (Exception e){
-                    Log.d("TAGRECEPCION_ACT", "cbTransferencia(): " + e.getMessage());
+                    Log.d(TAG, "cbTransferencia(): " + e.getMessage());
                 }
             }
 
@@ -271,7 +272,7 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
                             Banner.make(rootView,RecepcionActivity.this,Banner.ERROR,"Error al cargar los datos.",Banner.BOTTOM,2500).show();
 
                     }catch (Exception e){
-                        Log.d("TAGRECEPCION_ACT","onResponse(): " + e.getMessage());
+                        Log.d(TAG,"onResponse(): " + e.getMessage());
                     }
                     pbCargando.setVisibility(View.GONE);
                     btnRefresh.setVisibility(View.VISIBLE);
@@ -280,14 +281,14 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
                 @Override
                 public void onFailure(Call<JsonObject> call, Throwable t) {
                     Utils.showErrorDialog(RecepcionActivity.this,"Error",t.getMessage());
-                    Log.d("TAGRECEPCION_ACT", "onFailure(): " + t.getMessage());
+                    Log.d(TAG, "onFailure(): " + t.getMessage());
                     call.cancel();
                     pbCargando.setVisibility(View.GONE);
                     btnRefresh.setVisibility(View.VISIBLE);
                 }
             });
         }catch (Exception e){
-            Log.d("TAGRECEPCION_ACT", "LlenarTransferencias(): " + e.getMessage());
+            Log.d(TAG, "LlenarTransferencias(): " + e.getMessage());
             pbCargando.setVisibility(View.GONE);
             btnRefresh.setVisibility(View.VISIBLE);
         }
@@ -344,7 +345,7 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
                                         midetalle.cantidad = trans.has("cantidad")?trans.get("cantidad").getAsDouble():0;
                                         midetalle.marquetas = trans.has("marquetas")?trans.get("marquetas").getAsDouble():0;
                                         detalleProductos.add(midetalle);
-                                        Log.d("TAG",midetalle.producto.nombreproducto);
+                                        Log.d(TAG,midetalle.producto.nombreproducto);
                                     }
                                     //detalleAdapter.detalleComprobante.addAll(detalleProductos);
                                     mitransferencia.detalle.addAll(detalleProductos);
@@ -357,7 +358,7 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
                             Banner.make(rootView,RecepcionActivity.this,Banner.ERROR,"Error al cargar los datos.", Banner.BOTTOM,3000).show();
 
                     }catch (Exception e){
-                        Log.d("TAGRECEPCION_ACT","onResponse(): " + e.getMessage());
+                        Log.d(TAG,"onResponse(): " + e.getMessage());
                     }
                     pbCargando.setVisibility(View.GONE);
                     btnRefresh.setVisibility(View.VISIBLE);
@@ -366,14 +367,14 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
                 @Override
                 public void onFailure(Call<JsonObject> call, Throwable t) {
                     Utils.showErrorDialog(RecepcionActivity.this,"Error",t.getMessage());
-                    Log.d("TAGRECEPCION_ACT", "onFailure(): " + t.getMessage());
+                    Log.d(TAG, "onFailure(): " + t.getMessage());
                     call.cancel();
                     pbCargando.setVisibility(View.GONE);
                     btnRefresh.setVisibility(View.VISIBLE);
                 }
             });
         }catch (Exception e){
-            Log.d("TAGRECEPCION_ACT", "BuscarDetalleTransferencia(): " + e.getMessage());
+            Log.d(TAG, "BuscarDetalleTransferencia(): " + e.getMessage());
             pbCargando.setVisibility(View.GONE);
             btnRefresh.setVisibility(View.VISIBLE);
         }
@@ -500,7 +501,7 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
 
             EnviarDatos(this, tiptransaccion);
         }catch (Exception e){
-            Log.d("TAGRECEPCION_ACT", "GuardarDatos(): " + e.getMessage());
+            Log.d(TAG, "GuardarDatos(): " + e.getMessage());
         }
     }
 
@@ -526,7 +527,6 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
                 post.put("transacciones", listTransacciones);
                 post.put("tipotransferencia", tipotrans);
                 String json = post.toString();
-                Log.d("TAGJSON", json);
                 Call<JsonObject> call=null;
                 call=miInterface.saveRecepcion(post);
                 call.enqueue(new Callback<JsonObject>() {
@@ -587,7 +587,7 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
                                 Banner.make(rootView,RecepcionActivity.this,Banner.ERROR,Constants.MSG_USUARIO_CLAVE_INCORRECTO, Banner.BOTTOM,3000).show();
                             }
                         }catch (JsonParseException ex){
-                            Log.d("TAG", ex.getMessage());
+                            Log.d(TAG, ex.getMessage());
                         }
                         pgCargando.dismiss();
                     }
@@ -595,13 +595,13 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
                     @Override
                     public void onFailure(Call<JsonObject> call, Throwable t) {
                         Utils.showErrorDialog(RecepcionActivity.this,"Error",t.getMessage());
-                        Log.d("TAG", t.getMessage());
+                        Log.d(TAG, t.getMessage());
                         pgCargando.dismiss();
                     }
                 });
             }
         }catch (Exception e){
-            Log.d("TAGRECEPCION_ACT", "EnviarDatos(): " + e.getMessage());
+            Log.d(TAG, "EnviarDatos(): " + e.getMessage());
             pgCargando.dismiss();
         }
     }
@@ -642,7 +642,7 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
             alertDialog.show();
         }catch (Exception e){
-            Log.d("TAGRECEPCION_ACT", "ConsultaImpresion(): "+ e.getMessage());
+            Log.d(TAG, "ConsultaImpresion(): "+ e.getMessage());
         }
     }
 
@@ -668,7 +668,7 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
             toolbar.getMenu().findItem(R.id.option_save).setVisible(true);
             LlenarTransferencias(this);
         }catch (Exception e){
-            Log.d("TAGRECEPCION_ACT", "LimpiarDatos(): "+ e.getMessage());
+            Log.d(TAG, "LimpiarDatos(): "+ e.getMessage());
         }
     }
 
@@ -687,7 +687,7 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
                 return false;
             }
         }catch (Exception e){
-            Log.d("TAGRECEPCION_ACT", "ValidarDatos(): " + e.getMessage());
+            Log.d(TAG, "ValidarDatos(): " + e.getMessage());
             return false;
         }
         return true;
@@ -770,7 +770,7 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
 
             } else fImp = false;
         }catch (Exception e){
-            Log.d("TAGIMPRIMIR1", e.getMessage());
+            Log.d(TAG, e.getMessage());
             fImp = false;
         }
         return fImp;
@@ -796,10 +796,10 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
                             Utils.showMessageShort(this,"Imprimiendo comprobante");
                             imprimirFactura(idrecepcion==0?"* ORIGINAL *": "* REIMPRESIÓN DE DOCUMENTO *",
                                     idrecepcion>0);
-                            Log.d("TAGIMPRIMIR2", "IMPRESORA SELECCIONADA");
+                            Log.d(TAG, "IMPRESORA SELECCIONADA");
                         }
                     }catch (Exception e){
-                        Log.d("TAGIMPRIMIR2",e.getMessage());
+                        Log.d(TAG,e.getMessage());
                     }
                     break;
             }
@@ -845,7 +845,7 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
             };
             th.start();
         }catch (Exception e){
-            Log.d("TAGRECEPCION_ACT", "BuscaRecepcion(): " + e.getMessage());
+            Log.d(TAG, "BuscaRecepcion(): " + e.getMessage());
         }
     }
 

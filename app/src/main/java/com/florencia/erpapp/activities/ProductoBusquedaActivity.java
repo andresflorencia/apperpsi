@@ -36,6 +36,7 @@ import java.util.List;
 
 public class ProductoBusquedaActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
+    private static String TAG = "TAGPRODUCTO_BUSQUEDA_ACT";
     RecyclerView rvProductos, rvCategorias;
     List<Producto> lstProductos = new ArrayList<>();
     List<Categoria> categorias = new ArrayList<>();
@@ -141,7 +142,7 @@ public class ProductoBusquedaActivity extends AppCompatActivity implements Searc
         }catch (Exception e){
             pbCargando.setVisibility(View.GONE);
             //pgCargando.dismiss();
-            Log.d("TAGCLIENTE",e.getMessage());
+            Log.d(TAG,e.getMessage());
         }
     }
 

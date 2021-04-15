@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 
 public class ClienteAdapter extends RecyclerView.Adapter<ClienteAdapter.ClienteViewHolder>{
 
+    private static String TAG = "TAGCLIENTE_ADAPTER";
     public List<Cliente> listClients;
     private List<Cliente> orginalItems = new ArrayList<>();
     Context context;

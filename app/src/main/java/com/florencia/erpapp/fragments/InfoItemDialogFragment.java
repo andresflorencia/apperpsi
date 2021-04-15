@@ -31,7 +31,7 @@ import com.florencia.erpapp.utils.Utils;
  * A simple {@link Fragment} subclass.
  */
 public class InfoItemDialogFragment extends AppCompatDialogFragment {
-
+    private static String TAG = "TAGDIALOG_FRAGMENT";
     private View view;
     private TextView txtNombre, txtInfoRight, txtInfoLeft, lblNumLote, lblFecVenc, lblStock, lblReglasPrecio,
             lblCant, lblValido, lblPrecio;
@@ -107,6 +107,10 @@ public class InfoItemDialogFragment extends AppCompatDialogFragment {
                                         .concat(producto.unidadesporcaja > 0?producto.unidadesporcaja.toString()+"\n":"")
                                         .concat(producto.tipo.equalsIgnoreCase("S")?"":producto.stock.toString());
 
+                                /*for(PrecioCategoria pc: producto.precioscategoria)
+                                    textRight = textRight.concat("\n" + pc.nombrecategoria + " -> "+ pc.valor
+                                            + " - " + pc.prioridad + " - " + pc.aplicacredito);*/
+
                                 txtInfoLeft.setText(textLeft);
                                 txtInfoRight.setText(textRight);
 
@@ -137,7 +141,7 @@ public class InfoItemDialogFragment extends AppCompatDialogFragment {
             th.start();
         }catch (Exception e){
             pbCargando.setVisibility(View.GONE);
-            Log.d("TAGPRODUCTOFRAGMENT", e.getMessage());
+            Log.d(TAG, e.getMessage());
         }
     }
 }

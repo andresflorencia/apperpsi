@@ -41,6 +41,7 @@ import java.util.List;
 
 public class PedidoInventarioActivity extends AppCompatActivity implements View.OnClickListener {
 
+    private static String TAG = "TAGPEDIDOINV_ACT";
     public static final int REQUEST_PRODUCTO = 1;
     public static final int REQUEST_BUSQUEDA_PEDIDO = 2;
     RecyclerView rvDetalle;
@@ -232,7 +233,7 @@ public class PedidoInventarioActivity extends AppCompatActivity implements View.
             cvInformacion.setVisibility(View.GONE);
             idpedido = 0;
         }catch (Exception e){
-            Log.d("TAGPEDIDO_ACT", "LimpiarDatos(): " + e.getMessage());
+            Log.d(TAG, "LimpiarDatos(): " + e.getMessage());
         }
     }
 
@@ -285,7 +286,7 @@ public class PedidoInventarioActivity extends AppCompatActivity implements View.
             }else
                 Banner.make(rootView,PedidoInventarioActivity.this,Banner.ERROR,Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM,3000).show();
         }catch (Exception e){
-            Log.d("TAGPEDIDO", e.getMessage());
+            Log.d(TAG, e.getMessage());
         }
     }
 
@@ -326,7 +327,7 @@ public class PedidoInventarioActivity extends AppCompatActivity implements View.
             th.start();
         }catch (Exception e){
             pgCargando.dismiss();
-            Log.d("TAG", e.getMessage());
+            Log.d(TAG, e.getMessage());
         }
 
     }
@@ -345,7 +346,7 @@ public class PedidoInventarioActivity extends AppCompatActivity implements View.
                     pedido.detalle.clear();
                     pedido.detalle.addAll(detalleAdapter.detallePedido);
                     detalleAdapter.notifyDataSetChanged();
-                    Log.d("TAGPRODUCTO", String.valueOf(detalleAdapter.detallePedido.size()));
+                    Log.d(TAG, String.valueOf(detalleAdapter.detallePedido.size()));
                     break;
                 case REQUEST_BUSQUEDA_PEDIDO:
                     idpedido = data.getExtras().getInt("idcomprobante", 0);

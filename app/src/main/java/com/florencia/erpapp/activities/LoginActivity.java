@@ -57,8 +57,9 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class actLogin extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity {
 
+    private static String TAG = "TAGLOGIN_ACT";
     EditText etUser, etPassword;
     Button btnLogin;
     ImageButton btnConfig;
@@ -70,7 +71,7 @@ public class actLogin extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_act_login);
+        setContentView(R.layout.activity_login);
 
         SQLite.sqlDB = new SQLite(getApplicationContext());
         Utilidades.createdb(this);
@@ -143,21 +144,21 @@ public class actLogin extends AppCompatActivity {
 
     private void ConsultaConfig() {
         try{
-            AlertDialog.Builder dialog = new AlertDialog.Builder(actLogin.this);
+            AlertDialog.Builder dialog = new AlertDialog.Builder(LoginActivity.this);
             dialog.setIcon(getResources().getDrawable(R.drawable.ic_settings));
             dialog.setTitle("Configuración");
             dialog.setMessage("Debe especificar la configuración para continuar");
             dialog.setPositiveButton("Configurar", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    Intent i = new Intent(actLogin.this, ConfigActivity.class);
+                    Intent i = new Intent(LoginActivity.this, ConfigActivity.class);
                     startActivity(i);
                     dialog.dismiss();
                 }
             });
             dialog.show();
         }catch (Exception e) {
-            Log.d("TAGLOGIN", e.getMessage());
+            Log.d(TAG, e.getMessage());
         }
     }
 
@@ -168,7 +169,7 @@ public class actLogin extends AppCompatActivity {
                     IniciarSesion(v.getContext(), etUser.getText().toString().trim(), etPassword.getText().toString());
                     break;
                 case R.id.btnConfig:
-                    Intent i = new Intent(actLogin.this,ConfigActivity.class);
+                    Intent i = new Intent(LoginActivity.this,ConfigActivity.class);
                     startActivity(i);
                     break;
             }
@@ -185,7 +186,7 @@ public class actLogin extends AppCompatActivity {
                 finish();
             }
         }catch (Exception e){
-            Utils.showErrorDialog(actLogin.this, "Error", e.getMessage());
+            Utils.showErrorDialog(LoginActivity.this, "Error", e.getMessage());
         }
     }
 
@@ -222,18 +223,18 @@ public class actLogin extends AppCompatActivity {
                                     values.put("perfilid", obj.get("newperfil").getAsInt());
                                     Usuario.Update(SQLite.usuario.IdUsuario, values);
                                 }
-                                SQLite.usuario.GuardarSesionLocal(actLogin.this);
-                                Intent i = new Intent(actLogin.this, MainActivity.class);
+                                SQLite.usuario.GuardarSesionLocal(LoginActivity.this);
+                                Intent i = new Intent(LoginActivity.this, MainActivity.class);
                                 startActivity(i);
                                 finish();
                             }
                         }else{
-                            Banner.make(rootView, actLogin.this, Banner.ERROR,
+                            Banner.make(rootView, LoginActivity.this, Banner.ERROR,
                                     obj.get("message").getAsString(), Banner.BOTTOM, 3000).show();
                         }
                     }else{
-                        SQLite.usuario.GuardarSesionLocal(actLogin.this);
-                        Intent i = new Intent(actLogin.this, MainActivity.class);
+                        SQLite.usuario.GuardarSesionLocal(LoginActivity.this);
+                        Intent i = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(i);
                         finish();
                     }
@@ -242,14 +243,14 @@ public class actLogin extends AppCompatActivity {
                 @Override
                 public void onFailure(Call<JsonObject> call, Throwable t) {
                     call.cancel();
-                    SQLite.usuario.GuardarSesionLocal(actLogin.this);
-                    Intent i = new Intent(actLogin.this, MainActivity.class);
+                    SQLite.usuario.GuardarSesionLocal(LoginActivity.this);
+                    Intent i = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(i);
                     finish();
                 }
             });
         }catch (Exception e){
-            Log.d("TAGLOGIN", e.getMessage());
+            Log.d(TAG, e.getMessage());
         }
     }
 
@@ -257,19 +258,19 @@ public class actLogin extends AppCompatActivity {
         try{
             Usuario miUser = Usuario.Login(User, Clave);
             if(miUser == null){
-                Banner.make(rootView, actLogin.this, Banner.ERROR, "Usuario o contraseña incorrecta.", Banner.BOTTOM, 2000).show();
+                Banner.make(rootView, LoginActivity.this, Banner.ERROR, "Usuario o contraseña incorrecta.", Banner.BOTTOM, 2000).show();
                 return;
             }else {
                 SQLite.usuario = miUser;
-                SQLite.usuario.GuardarSesionLocal(actLogin.this);
-                Utils.showMessage(actLogin.this, "Bienvenido...");
-                Intent i = new Intent(actLogin.this, MainActivity.class);
+                SQLite.usuario.GuardarSesionLocal(LoginActivity.this);
+                Utils.showMessage(LoginActivity.this, "Bienvenido...");
+                Intent i = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(i);
                 finish();
             }
         }catch (Exception e){
-            Banner.make(rootView, actLogin.this, Banner.ERROR, "Ocurrió un error al tratar de iniciar sesión", Banner.BOTTOM, 2000).show();
-            Log.d("TAGLOGIN", "IniciarSesionLocal(): " + e.getMessage());
+            Banner.make(rootView, LoginActivity.this, Banner.ERROR, "Ocurrió un error al tratar de iniciar sesión", Banner.BOTTOM, 2000).show();
+            Log.d(TAG, "IniciarSesionLocal(): " + e.getMessage());
         }
     }
 
@@ -341,7 +342,7 @@ public class actLogin extends AppCompatActivity {
                                 }
 
                                 if(usuario.permisos == null || usuario.permisos.size()==0){
-                                    Banner.make(rootView, actLogin.this, Banner.ERROR, "Su perfil no tiene permisos asignados. Contacte a soporte.", Banner.BOTTOM, 2000).show();
+                                    Banner.make(rootView, LoginActivity.this, Banner.ERROR, "Su perfil no tiene permisos asignados. Contacte a soporte.", Banner.BOTTOM, 2000).show();
                                     return;
                                 }
 
@@ -443,18 +444,18 @@ public class actLogin extends AppCompatActivity {
                                     SQLite.usuario = usuario;
                                     SQLite.usuario.GuardarSesionLocal(context);
                                     pbProgreso.dismiss();
-                                    Intent i = new Intent(actLogin.this, MainActivity.class);
+                                    Intent i = new Intent(LoginActivity.this, MainActivity.class);
                                     startActivity(i);
                                     finish();
                                 }else
-                                    Banner.make(rootView, actLogin.this, Banner.ERROR, Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM, 2000).show();
+                                    Banner.make(rootView, LoginActivity.this, Banner.ERROR, Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM, 2000).show();
                             } else
-                                Utils.showErrorDialog(actLogin.this,"Error", obj.get("message").getAsString());
+                                Utils.showErrorDialog(LoginActivity.this,"Error", obj.get("message").getAsString());
                         } else
-                            Banner.make(rootView, actLogin.this, Banner.ERROR, Constants.MSG_USUARIO_CLAVE_INCORRECTO, Banner.BOTTOM, 2000).show();
+                            Banner.make(rootView, LoginActivity.this, Banner.ERROR, Constants.MSG_USUARIO_CLAVE_INCORRECTO, Banner.BOTTOM, 2000).show();
 
                     }catch (JsonParseException ex){
-                        Log.d("TAG", ex.getMessage());
+                        Log.d(TAG, ex.getMessage());
                         IniciarSesionLocal(User, Clave);
                     }
                     pbProgreso.dismiss();
@@ -462,15 +463,15 @@ public class actLogin extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<JsonObject> call, Throwable t) {
-                    //Utils.showErrorDialog(actLogin.this, "Error",t.getMessage());
-                    Log.d("TAG", t.getMessage());
+                    //Utils.showErrorDialog(LoginActivity.this, "Error",t.getMessage());
+                    Log.d(TAG, t.getMessage());
                     pbProgreso.dismiss();
                     IniciarSesionLocal(User, Clave);
                 }
             });
         }catch (Exception e){
             e.printStackTrace();
-            Log.d("TAG", e.getMessage());
+            Log.d(TAG, e.getMessage());
             Utils.showErrorDialog(this, "Error",e.getMessage());
             pbProgreso.dismiss();
         }
@@ -483,7 +484,7 @@ public class actLogin extends AppCompatActivity {
         if(SQLite.configuracion==null || SQLite.configuracion.urlbase.equals(""))
         {
             btnLogin.setEnabled(false);
-            Intent i = new Intent(actLogin.this, ConfigActivity.class);
+            Intent i = new Intent(LoginActivity.this, ConfigActivity.class);
             startActivity(i);
         }else{
             btnLogin.setEnabled(true);

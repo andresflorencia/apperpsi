@@ -22,6 +22,7 @@ public class Lote {
     public Long longdate;
 
     public static SQLiteDatabase sqLiteDatabase;
+    public static String TAG = "TAGLOTE";
 
     public Lote(){
         this.productoid = 0;
@@ -41,10 +42,10 @@ public class Lote {
                     "values(?, ?, ?, ?, ?)", new String[]{this.productoid.toString(), this.numerolote, this.stock.toString(),
                     this.preciocosto.toString(), this.fechavencimiento, this.longdate.toString(), this.establecimientoid.toString()});
             this.sqLiteDatabase.close();
-            Log.d("TAGLOTE","SAVE LOTE OK");
+            Log.d(TAG,"SAVE LOTE OK");
             return true;
         } catch (SQLException ex){
-            Log.d("TAGLOTE",String.valueOf(ex));
+            Log.d(TAG, ex.getMessage());
             return false;
         }
     }
@@ -67,10 +68,10 @@ public class Lote {
                 sqLiteDatabase.insert("lote", "", values);
             }
             sqLiteDatabase.close();
-            Log.d("TAGLOTE", "INSERT LOTE OK");
+            Log.d(TAG, "INSERT LOTE OK");
             return true;
         }catch (SQLiteException e){
-            Log.d("TAGLOTE", e.getMessage());
+            Log.d(TAG, e.getMessage());
             return false;
         }
     }
@@ -87,7 +88,7 @@ public class Lote {
             Item.longdate = cursor.getLong(5);
             Item.establecimientoid = cursor.getInt(6);
         }catch(Exception e){
-            Log.d("TAGLOTE", "AsignaDatos(): " + e.getMessage());
+            Log.d(TAG, "AsignaDatos(): " + e.getMessage());
         } finally { }
         return Item;
     }
@@ -123,10 +124,10 @@ public class Lote {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
             sqLiteDatabase.update("lote",data, "productoid = ? and numerolote = ? and establecimientoid = ?",where);
             //sqLiteDatabase.close();
-            Log.d("TAGLOTE","UPDATE 2 LOTE OK");
+            Log.d(TAG,"UPDATE 2 LOTE OK");
             return true;
         } catch (SQLException ex){
-            Log.d("TAGLOTE",String.valueOf(ex));
+            Log.d(TAG,String.valueOf(ex));
             return false;
         }
     }
@@ -136,10 +137,10 @@ public class Lote {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
             sqLiteDatabase.delete("lote", "productoid = ? and numerolote = ? and establecimientoid = ?",where);
             sqLiteDatabase.close();
-            Log.d("TAGLOTE","UPDATE 2 LOTE OK");
+            Log.d(TAG,"UPDATE 2 LOTE OK");
             return true;
         } catch (SQLException ex){
-            Log.d("TAGLOTE",String.valueOf(ex));
+            Log.d(TAG, ex.getMessage());
             return false;
         }
     }

@@ -23,6 +23,7 @@ public class Pedido {
     public Long longdate;
 
     public static SQLiteDatabase sqLiteDatabase;
+    public static String TAG = "TAGPEDIDO";
 
     public Pedido(){
         this.idpedido = 0;
@@ -59,10 +60,10 @@ public class Pedido {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
             sqLiteDatabase.update("pedido",values, "idpedido = ?",new String[]{idcomprobante.toString()});
             sqLiteDatabase.close();
-            Log.d("TAGPEDIDO","UPDATE PEDIDO OK");
+            Log.d(TAG,"UPDATE PEDIDO OK");
             return true;
         } catch (SQLException ex){
-            Log.d("TAGPEDIDO", "Update(): " + String.valueOf(ex));
+            Log.d(TAG, "Update(): " + String.valueOf(ex));
             return false;
         }
     }
@@ -87,10 +88,10 @@ public class Pedido {
             else
                 sqLiteDatabase.execSQL("DELETE FROM detallepedido WHERE pedidoid = ?", new String[]{String.valueOf(this.idpedido)});
             sqLiteDatabase.close();
-            Log.d("TAGPEDIDO","GUARDO ENCABEZADO - ID: " + this.idpedido);
+            Log.d(TAG,"GUARDO ENCABEZADO - ID: " + this.idpedido);
             return this.SaveDetalle(this.idpedido);
         } catch (SQLException ex) {
-            Log.d("TAGPEDIDO", "Save(): " + ex.getMessage());
+            Log.d(TAG, "Save(): " + ex.getMessage());
             return false;
         }
     }
@@ -110,11 +111,11 @@ public class Pedido {
             }
             this.actualizasecuencial();
             sqLiteDatabase.close();
-            Log.d("TAGDETALLECOMPROBANTE","Guardó detalle comprobante");
+            Log.d(TAG,"Guardó detalle comprobante");
             return true;
         } catch (Exception ex) {
             ex.printStackTrace();
-            Log.d("TAGDETALLECOMPROBANTE", "SaveDetalle(): " + ex.getMessage());
+            Log.d(TAG, "SaveDetalle(): " + ex.getMessage());
             return false;
         }
     }
@@ -127,7 +128,7 @@ public class Pedido {
             if (cursor.moveToFirst()) Item = Pedido.AsignaDatos(cursor);
             sqLiteDatabase.close();
         }catch (Exception e){
-            Log.d("TAGCOMPROBANTE", "get(): " + e.getMessage());
+            Log.d(TAG, "get(): " + e.getMessage());
         }
         return Item;
     }
@@ -146,7 +147,7 @@ public class Pedido {
             }
             sqLiteDatabase.close();
         }catch (Exception e){
-            Log.d("TAGPEDIDO", "getByCliente(): " + e.getMessage());
+            Log.d(TAG, "getByCliente(): " + e.getMessage());
         }
         return Items;
     }
@@ -182,9 +183,9 @@ public class Pedido {
             }
             cursor.close();
             sqLiteDatabase.close();
-            Log.d("TAGPEDIDO", "NUMERO COMPROBANTES: " + Items.size());
+            Log.d(TAG, "NUMERO COMPROBANTES: " + Items.size());
         }catch (SQLiteException e){
-            Log.d("TAGPEDIDO", "getByUsuario(): " + e.getMessage());
+            Log.d(TAG, "getByUsuario(): " + e.getMessage());
         }
         return Items;
     }
@@ -203,9 +204,9 @@ public class Pedido {
             }
             cursor.close();
             sqLiteDatabase.close();
-            Log.d("TAGPEDIDO", "NUMERO COMPROBANTES PS: " + Items.size());
+            Log.d(TAG, "NUMERO COMPROBANTES PS: " + Items.size());
         }catch (SQLiteException e){
-            Log.d("TAGPEDIDO", "getPorSincronizar(): " + e.getMessage());
+            Log.d(TAG, "getPorSincronizar(): " + e.getMessage());
         }
         return Items;
     }
@@ -232,9 +233,9 @@ public class Pedido {
             String[] params = new String[listParams.size()];
             sqLiteDatabase = SQLite.sqlDB.getReadableDatabase();
             retorno = sqLiteDatabase.delete("pedido", WHERE, listParams.toArray(params));
-            Log.d("TAGPEDIDO", "Registros eliminados: " + retorno);
+            Log.d(TAG, "Registros eliminados: " + retorno);
         }catch (Exception e){
-            Log.d("TAGPEDIDO", "Delete(): " + e.getMessage());
+            Log.d(TAG, "Delete(): " + e.getMessage());
             retorno = 0;
         }
         return retorno;
@@ -275,7 +276,7 @@ public class Pedido {
             Item.detalle = DetallePedido.getDetalle(Item.idpedido);
         } catch (Exception ec) {
             ec.printStackTrace();
-            Log.d("TAGPEDIDO", "AsignaDatos(): " + ec.getMessage());
+            Log.d(TAG, "AsignaDatos(): " + ec.getMessage());
             Item = null;
         }
         return Item;
@@ -289,7 +290,7 @@ public class Pedido {
             codigo = "PC-" + String.format("%03d", this.establecimientoid) + "-" + String.format("%09d", this.secuencial);
             this.secuencialpedido = codigo;
         }catch (Exception e){
-            Log.d("TAGPEDIDO", "getCodigoTransaccion(): " + e.getMessage());
+            Log.d(TAG, "getCodigoTransaccion(): " + e.getMessage());
         }
         return codigo;
     }
@@ -316,7 +317,7 @@ public class Pedido {
             //sqLiteDatabase.close();
         } catch (Exception ec) {
             ec.printStackTrace();
-            Log.d("TAGPEDIDO", "actualizasecuencial(): " + ec.getMessage());
+            Log.d(TAG, "actualizasecuencial(): " + ec.getMessage());
             return false;
         }
         return true;

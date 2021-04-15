@@ -22,6 +22,7 @@ public class Regla {
     public Long longdate;
 
     public static SQLiteDatabase sqLiteDatabase;
+    public static String TAG = "TAGREGLA";
 
     public Regla(){
         this.idproductoregla = 0;
@@ -42,10 +43,10 @@ public class Regla {
                     "values(?, ?, ?, ?, ?, ?, ?, ?)", new String[]{this.idproductoregla.toString(), this.productoid.toString(), this.establecimientoid.toString(),
                     this.cantidad.toString(),this.numerolote, this.fechamaxima, this.precio.toString(), String.valueOf(Utils.longDate(this.fechamaxima))});
             this.sqLiteDatabase.close();
-            Log.d("TAGREGLA","SAVE REGLA OK");
+            Log.d(TAG,"SAVE REGLA OK");
             return true;
         } catch (SQLException ex){
-            Log.d("TAGREGLA", ex.getMessage());
+            Log.d(TAG, ex.getMessage());
             return false;
         }
     }
@@ -69,10 +70,10 @@ public class Regla {
                 sqLiteDatabase.insert("reglaprecio", "", values);
             }
             sqLiteDatabase.close();
-            Log.d("TAGREGLA", "INSERT REGLAS OK");
+            Log.d(TAG, "INSERT REGLAS OK");
             return true;
         }catch (SQLiteException e){
-            Log.d("TAGREGLA", e.getMessage());
+            Log.d(TAG, e.getMessage());
             return false;
         }
     }
@@ -90,7 +91,7 @@ public class Regla {
             Item.precio = cursor.getDouble(6);
             Item.longdate = cursor.getLong(7);
         }catch(Exception e){
-            Log.d("TAGREGLA", "AsignaDatos(): " + e.getMessage());
+            Log.d(TAG, "AsignaDatos(): " + e.getMessage());
         } finally { }
         return Item;
     }
@@ -129,10 +130,10 @@ public class Regla {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
             sqLiteDatabase.delete("reglaprecio", "productoid = ? and establecimientoid = ?",where);
             sqLiteDatabase.close();
-            Log.d("TAGREGLA","DELETE REGLAS OK");
+            Log.d(TAG,"DELETE REGLAS OK");
             return true;
         } catch (SQLException ex){
-            Log.d("TAGREGLA", ex.getMessage());
+            Log.d(TAG, ex.getMessage());
             return false;
         }
     }

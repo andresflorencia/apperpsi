@@ -24,6 +24,8 @@ import com.florencia.erpapp.models.Cliente;
 import com.florencia.erpapp.utils.Utils;
 
 public class InfoDialogFragment extends AppCompatDialogFragment {
+
+    private static String TAG = "TAGDIALOG_FRAGMENT";
     private View view;
     private TextView txtNombre, txtNombreComercial, txtNip, txtContacto, txtDireccion, txtCorreo, txtCategoria;
     private ProgressBar pbCargando;
@@ -93,7 +95,7 @@ public class InfoDialogFragment extends AppCompatDialogFragment {
             th.start();
         }catch (Exception e){
             pbCargando.setVisibility(View.GONE);
-            Log.d("TAGCLIENTEFRAGMENT", e.getMessage());
+            Log.d(TAG, e.getMessage());
         }
     }
 

@@ -45,6 +45,7 @@ public class Usuario {
     public List<Permiso> permisos;
 
     public static SQLiteDatabase sqLiteDatabase;
+    public static String TAG = "TAGUSUARIO";
 
     public Usuario() {
         this.RazonSocial = "";
@@ -83,10 +84,10 @@ public class Usuario {
                     }
             );
             sqLiteDatabase.close();
-            Log.d("TAG", "USUARIO INGRESADO LOCALMENTE");
+            Log.d(TAG, "USUARIO INGRESADO LOCALMENTE");
             return Permiso.SaveLista(this.permisos);
         } catch (SQLException ex){
-            Log.d("TAG", ex.getMessage());
+            Log.d(TAG, ex.getMessage());
             return false;
         }
     }
@@ -121,8 +122,7 @@ public class Usuario {
         return Item;
     }
 
-    static public Usuario Login(String Pin)
-    {
+    static public Usuario Login(String Pin){
         Usuario Item = null;
         try {
             sqLiteDatabase = SQLite.sqlDB.getReadableDatabase();
@@ -134,10 +134,10 @@ public class Usuario {
             sqLiteDatabase.close();
         } catch(SQLException ex)
         {
-            Log.d("LOGINERROR",String.valueOf(ex));
+            Log.d(TAG,String.valueOf(ex));
             ex.printStackTrace();
         }
-        Log.d("LOGINITEM",String.valueOf(Item));
+        Log.d(TAG,String.valueOf(Item));
         return Item;
     }
 
@@ -154,10 +154,10 @@ public class Usuario {
             sqLiteDatabase.close();
         } catch(SQLException ex)
         {
-            Log.d("LOGINERROR",String.valueOf(ex));
+            Log.d(TAG,String.valueOf(ex));
             ex.printStackTrace();
         }
-        Log.d("LOGINITEM",String.valueOf(Item));
+        Log.d(TAG,String.valueOf(Item));
         return Item;
     }
 
@@ -269,7 +269,7 @@ public class Usuario {
             sqLiteDatabase.close();
 
         }catch (SQLiteException e){
-            Log.d("TAG_USUARIO", "getResumenDocumentos(): " + e.getMessage());
+            Log.d(TAG, "getResumenDocumentos(): " + e.getMessage());
         }
         return resumen;
     }
@@ -305,7 +305,7 @@ public class Usuario {
             if (cursor.moveToFirst())
                 cant = cursor.getInt(0);
         }catch (Exception e){
-            Log.d("TAGUSUARIO", "numDocNoSincronizados(): " + e.getMessage());
+            Log.d(TAG, "numDocNoSincronizados(): " + e.getMessage());
         }
         return cant;
     }
@@ -368,7 +368,7 @@ public class Usuario {
                 }
             }
         }catch (Exception e){
-            Log.d("TAGPERMISO", "VerificarPermiso(): " + e.getMessage());
+            Log.d(TAG, "VerificarPermiso(): " + e.getMessage());
             retorno = false;
         }
 
@@ -394,14 +394,14 @@ public class Usuario {
                                         SQLite.gpsTracker.updateGPSCoordinates();
                                         Ubicacion.Save(usuario.IdUsuario, usuario.sucursal.RUC,
                                                 SQLite.gpsTracker.getLatitude(), SQLite.gpsTracker.getLongitude());
-                                        Log.d("addPosition", "Agregando position local");
+                                        Log.d(TAG, "Agregando position local");
                                     }
                                     return null;
                                 }
                             };
                             myTask.execute();
                         } catch (Exception e) {
-                            Log.d("erroraddPosition", e.getMessage());
+                            Log.d(TAG, e.getMessage());
                         }
                     }
                 });
@@ -430,7 +430,7 @@ public class Usuario {
             cursor.close();
             sqLiteDatabase.close();
         }catch (Exception e){
-            Log.d("TAGUSUARIO", e.getMessage());
+            Log.d(TAG, e.getMessage());
         }
         return retorno;
     }
@@ -440,10 +440,10 @@ public class Usuario {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
             sqLiteDatabase.update("usuario",values, "idusuario = ?",new String[]{idusuario.toString()});
             sqLiteDatabase.close();
-            Log.d("TAGUSUARIO","UPDATE USUARIO OK");
+            Log.d(TAG,"UPDATE USUARIO OK");
             return true;
         } catch (SQLException ex){
-            Log.d("TAGUSUARIO", "Update(): " + ex.getMessage());
+            Log.d(TAG, "Update(): " + ex.getMessage());
             return false;
         }
     }

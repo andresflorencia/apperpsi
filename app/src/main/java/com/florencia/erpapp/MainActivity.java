@@ -43,7 +43,7 @@ import com.florencia.erpapp.activities.PedidoActivity;
 import com.florencia.erpapp.activities.PedidoInventarioActivity;
 import com.florencia.erpapp.activities.RecepcionActivity;
 import com.florencia.erpapp.activities.TransferenciaActivity;
-import com.florencia.erpapp.activities.actLogin;
+import com.florencia.erpapp.activities.LoginActivity;
 import com.florencia.erpapp.fragments.ClienteFragment;
 import com.florencia.erpapp.fragments.PrincipalFragment;
 import com.florencia.erpapp.interfaces.ICliente;
@@ -87,7 +87,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
-
+    private static String TAG = "TAGMAIN_ACTIVITY";
     Toolbar toolbar;
     private DrawerLayout drawerLayout;
     public Fragment fragment;
@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
         txtPerfil = navigation.getHeaderView(0).findViewById(R.id.txtPerfil);
         txtUltimaConexion =  navigation.findViewById(R.id.txtUltimoAcceso);
         try{
-            Log.d("TAG", SQLite.configuracion.urlbase);
+            Log.d(TAG, SQLite.configuracion.urlbase);
             if(sPreferencesSesion!=null){
                 String ultimoacceso = sPreferencesSesion.getString("ultimaconexion","");
                 String url =(SQLite.configuracion.hasSSL?Constants.HTTPs:Constants.HTTP)+SQLite.configuracion.urlbase;
@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
             cliente_cf.Save();
 
         }catch (Exception e){
-            Log.d("TAGNAV", e.getMessage());
+            Log.d(TAG, e.getMessage());
         }
         navigation.inflateMenu(R.menu.menu_navigation);
         initNavigationDrawer();
@@ -282,7 +282,7 @@ public class MainActivity extends AppCompatActivity {
                                 v -> {
                                     if(SQLite.usuario.CerrarSesionLocal(getApplicationContext())) {
                                         DetenerServicio();
-                                        Intent in = new Intent(MainActivity.this, actLogin.class);
+                                        Intent in = new Intent(MainActivity.this, LoginActivity.class);
                                         startActivity(in);
                                         alertDialog.dismiss();
                                         finish();
@@ -445,7 +445,7 @@ public class MainActivity extends AppCompatActivity {
                                             List<Fragment> fragments = fragmentManager.getFragments();
                                             if (fragments != null) {
                                                 for (Fragment f : fragments) {
-                                                    Log.d("TAGMAIN", "Fls: " + f.getClass().getSimpleName());
+                                                    Log.d(TAG, "Fls: " + f.getClass().getSimpleName());
                                                     if (f.getClass().getSimpleName().equalsIgnoreCase("clientefragment") && f.isVisible()) {
                                                         fragment = f;
                                                         break;
@@ -462,7 +462,7 @@ public class MainActivity extends AppCompatActivity {
                                                     ((PrincipalFragment) fragment).BuscaResumen("");
                                             }
                                         }catch (Exception e){
-                                            Log.d("TAGMAIN", e.getMessage());
+                                            Log.d(TAG, e.getMessage());
                                         }
                                     }else
                                         Banner.make(rootView, MainActivity.this, Banner.WARNING, Constants.MSG_PROCESO_NO_COMPLETADO + "\nSe sincronizó " + numClientUpdate +"/" + jsonClientes.size() +" registro(s). " + obj.get("message").getAsString(), Banner.BOTTOM,3500).show();
@@ -473,7 +473,7 @@ public class MainActivity extends AppCompatActivity {
                             Banner.make(rootView, MainActivity.this, Banner.ERROR, Constants.MSG_USUARIO_CLAVE_INCORRECTO, Banner.BOTTOM,3000).show();
                         }
                     }catch (JsonParseException ex){
-                        Log.d("TAG", ex.getMessage());
+                        Log.d(TAG, ex.getMessage());
                     }
                     pbProgreso.dismiss();
                 }
@@ -481,14 +481,14 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onFailure(Call<JsonObject> call, Throwable t) {
                     Utils.showErrorDialog(MainActivity.this, "Error",t.getMessage());
-                    Log.d("TAG", t.getMessage());
+                    Log.d(TAG, t.getMessage());
                     call.cancel();
                     pbProgreso.dismiss();
                 }
             });
         }catch (Exception e){
             e.printStackTrace();
-            Log.d("TAG", e.getMessage());
+            Log.d(TAG, e.getMessage());
             Utils.showErrorDialog(MainActivity.this, "Error",e.getMessage());
             pbProgreso.dismiss();
         }
@@ -523,7 +523,6 @@ public class MainActivity extends AppCompatActivity {
             post.put("comprobantes", listComprobantes);
             post.put("establecimientoid", SQLite.usuario.sucursal.IdEstablecimiento);
             String json = post.toString();
-            Log.d("TAGJSON", json);
             Call<JsonObject> call=null;
             call=miInterface.LoadComprobantes(post);
             call.enqueue(new Callback<JsonObject>() {
@@ -552,7 +551,7 @@ public class MainActivity extends AppCompatActivity {
                                             if (miProducto != null) {
                                                 if (miProducto.Save()) {
                                                     num++;
-                                                    Log.d("TAG", prod.get("nombreproducto").getAsString());
+                                                    Log.d(TAG, prod.get("nombreproducto").getAsString());
                                                 }
                                             }
                                         }
@@ -585,7 +584,7 @@ public class MainActivity extends AppCompatActivity {
                                         List<Fragment> fragments = fragmentManager.getFragments();
                                         if (fragments != null) {
                                             for (Fragment f : fragments) {
-                                                Log.d("TAGMAIN", "Fls: " + f.getClass().getSimpleName());
+                                                Log.d(TAG, "Fls: " + f.getClass().getSimpleName());
                                                 if(f.getClass().getSimpleName().equalsIgnoreCase("principalfragment") && f.isVisible()) {
                                                     fragment = f;
                                                     break;
@@ -612,7 +611,7 @@ public class MainActivity extends AppCompatActivity {
                             Banner.make(rootView, MainActivity.this, Banner.ERROR, Constants.MSG_USUARIO_CLAVE_INCORRECTO, Banner.BOTTOM, 3000).show();
                         }
                     }catch (JsonParseException ex){
-                        Log.d("TAG", ex.getMessage());
+                        Log.d(TAG, ex.getMessage());
                     }
                     pbProgreso.dismiss();
                 }
@@ -620,14 +619,14 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onFailure(Call<JsonObject> call, Throwable t) {
                     Utils.showErrorDialog(MainActivity.this, "Error",t.getMessage());
-                    Log.d("TAG", t.getMessage());
+                    Log.d(TAG, t.getMessage());
                     call.cancel();
                     pbProgreso.dismiss();
                 }
             });
         }catch (Exception e){
             e.printStackTrace();
-            Log.d("TAG", e.getMessage());
+            Log.d(TAG, e.getMessage());
             Utils.showErrorDialog(this, "Error",e.getMessage());
             pbProgreso.dismiss();
         }
@@ -661,7 +660,6 @@ public class MainActivity extends AppCompatActivity {
             post.put("clave",SQLite.usuario.Clave);
             post.put("pedidos", listPedidos);
             String json = post.toString();
-            Log.d("TAGJSON", json);
             Call<JsonObject> call=null;
             call=miInterface.LoadPedidos(post);
             call.enqueue(new Callback<JsonObject>() {
@@ -716,7 +714,7 @@ public class MainActivity extends AppCompatActivity {
                                             List<Fragment> fragments = fragmentManager.getFragments();
                                             if (fragments != null) {
                                                 for (Fragment f : fragments) {
-                                                    Log.d("TAGMAIN", "Fls: " + f.getClass().getSimpleName());
+                                                    Log.d(TAG, "Fls: " + f.getClass().getSimpleName());
                                                     if(f.getClass().getSimpleName().equalsIgnoreCase("principalfragment") && f.isVisible()) {
                                                         fragment = f;
                                                         break;
@@ -724,14 +722,14 @@ public class MainActivity extends AppCompatActivity {
                                                 }
                                             }
                                             if(fragment!=null) {
-                                                Log.d("TAGMAIN1", fragment.getClass().getSimpleName());
+                                                Log.d(TAG, fragment.getClass().getSimpleName());
                                                 if (fragment.getClass().getSimpleName().equalsIgnoreCase("principalfragment") ||
                                                         (listaFragments.size() > 0 && listaFragments.get(listaFragments.size() - 1).toLowerCase().contains("principalfragment"))) {
                                                     ((PrincipalFragment) fragment).BuscaResumen("");
                                                 }
                                             }
                                         }catch (Exception e){
-                                            Log.d("TAGMAIN", e.getMessage());
+                                            Log.d(TAG, e.getMessage());
                                         }
                                     }else {
                                         Banner.make(rootView, MainActivity.this, Banner.SUCCESS, Constants.MSG_PROCESO_NO_COMPLETADO
@@ -746,7 +744,7 @@ public class MainActivity extends AppCompatActivity {
                             Banner.make(rootView,MainActivity.this,Banner.ERROR, Constants.MSG_USUARIO_CLAVE_INCORRECTO, Banner.BOTTOM,3000).show();
                         }
                     }catch (JsonParseException ex){
-                        Log.d("TAG", ex.getMessage());
+                        Log.d(TAG, ex.getMessage());
                     }
                     pbProgreso.dismiss();
                 }
@@ -754,14 +752,14 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onFailure(Call<JsonObject> call, Throwable t) {
                     Utils.showErrorDialog(MainActivity.this,"Error",t.getMessage());
-                    Log.d("TAG", t.getMessage());
+                    Log.d(TAG, t.getMessage());
                     call.cancel();
                     pbProgreso.dismiss();
                 }
             });
         }catch (Exception e){
             e.printStackTrace();
-            Log.d("TAG", e.getMessage());
+            Log.d(TAG, e.getMessage());
             Utils.showErrorDialog(this, "Error",e.getMessage());
             pbProgreso.dismiss();
         }
@@ -833,7 +831,7 @@ public class MainActivity extends AppCompatActivity {
                                         if (miProducto != null) {
                                             if (miProducto.Save())
                                                 numProd++;
-                                            Log.d("TAG", prod.get("nombreproducto").getAsString());
+                                            Log.d(TAG, prod.get("nombreproducto").getAsString());
                                         }
                                     }
                                     if (numProd == jsonProductos.size())
@@ -846,7 +844,7 @@ public class MainActivity extends AppCompatActivity {
                         } else
                             Banner.make(rootView,MainActivity.this,Banner.ERROR, Constants.MSG_USUARIO_CLAVE_INCORRECTO, Banner.BOTTOM,3000).show();
                     }catch (JsonParseException ex){
-                        Log.d("TAG", ex.getMessage());
+                        Log.d(TAG, ex.getMessage());
                     }
                     pbProgreso.dismiss();
                 }
@@ -854,14 +852,14 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onFailure(Call<JsonObject> call, Throwable t) {
                     Utils.showErrorDialog(MainActivity.this,"Error",t.getMessage());
-                    Log.d("TAG", t.getMessage());
+                    Log.d(TAG, t.getMessage());
                     call.cancel();
                     pbProgreso.dismiss();
                 }
             });
         }catch (Exception e){
             e.printStackTrace();
-            Log.d("TAG", e.getMessage());
+            Log.d(TAG, e.getMessage());
             Utils.showErrorDialog(this,"Error",e.getMessage());
             pbProgreso.dismiss();
         }
@@ -941,7 +939,7 @@ public class MainActivity extends AppCompatActivity {
                                             List<Fragment> fragments = fragmentManager.getFragments();
                                             if (fragments != null) {
                                                 for (Fragment f : fragments) {
-                                                    Log.d("TAGMAIN", "Fls: " + f.getClass().getSimpleName());
+                                                    Log.d(TAG, "Fls: " + f.getClass().getSimpleName());
                                                     if(f.getClass().getSimpleName().equalsIgnoreCase("principalfragment") && f.isVisible()) {
                                                         fragment = f;
                                                         break;
@@ -949,14 +947,14 @@ public class MainActivity extends AppCompatActivity {
                                                 }
                                             }
                                             if(fragment!=null) {
-                                                Log.d("TAGMAIN1", fragment.getClass().getSimpleName());
+                                                Log.d(TAG, fragment.getClass().getSimpleName());
                                                 if (fragment.getClass().getSimpleName().equalsIgnoreCase("principalfragment") ||
                                                         (listaFragments.size() > 0 && listaFragments.get(listaFragments.size() - 1).toLowerCase().contains("principalfragment"))) {
                                                     ((PrincipalFragment) fragment).BuscaResumen("");
                                                 }
                                             }
                                         }catch (Exception e){
-                                            Log.d("TAGMAIN", e.getMessage());
+                                            Log.d(TAG, e.getMessage());
                                         }
                                     }else {
                                         Banner.make(rootView, MainActivity.this, Banner.SUCCESS, Constants.MSG_PROCESO_NO_COMPLETADO
@@ -971,7 +969,7 @@ public class MainActivity extends AppCompatActivity {
                             Banner.make(rootView,MainActivity.this,Banner.ERROR, Constants.MSG_USUARIO_CLAVE_INCORRECTO, Banner.BOTTOM,3000).show();
                         }
                     }catch (JsonParseException ex){
-                        Log.d("TAG", ex.getMessage());
+                        Log.d(TAG, ex.getMessage());
                     }
                     pbProgreso.dismiss();
                 }
@@ -979,14 +977,14 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onFailure(Call<JsonObject> call, Throwable t) {
                     Utils.showErrorDialog(MainActivity.this,"Error",t.getMessage());
-                    Log.d("TAG", t.getMessage());
+                    Log.d(TAG, t.getMessage());
                     call.cancel();
                     pbProgreso.dismiss();
                 }
             });
         }catch (Exception e){
             e.printStackTrace();
-            Log.d("TAG", e.getMessage());
+            Log.d(TAG, e.getMessage());
             Utils.showErrorDialog(this, "Error",e.getMessage());
             pbProgreso.dismiss();
         }
@@ -1012,7 +1010,7 @@ public class MainActivity extends AppCompatActivity {
                                 path);
                         ingreso.fotos.get(i).image_base = Utils.convertImageToString(ingreso.fotos.get(i).bitmap);
                     } catch (IOException e) {
-                        Log.d("TAGMAINACTIVITY", "NotFound(): " + e.getMessage());
+                        Log.d(TAG, "NotFound(): " + e.getMessage());
                     }
                 }
             }
@@ -1091,7 +1089,7 @@ public class MainActivity extends AppCompatActivity {
                                                 }
                                             }
                                         }catch (Exception e){
-                                            Log.d("TAGMAIN", e.getMessage());
+                                            Log.d(TAG, e.getMessage());
                                         }
                                     }else {
                                         Banner.make(rootView, MainActivity.this, Banner.SUCCESS, Constants.MSG_PROCESO_NO_COMPLETADO
@@ -1106,7 +1104,7 @@ public class MainActivity extends AppCompatActivity {
                             Banner.make(rootView,MainActivity.this,Banner.ERROR, Constants.MSG_USUARIO_CLAVE_INCORRECTO, Banner.BOTTOM,3000).show();
                         }
                     }catch (JsonParseException ex){
-                        Log.d("TAG", ex.getMessage());
+                        Log.d(TAG, ex.getMessage());
                     }
                     pbProgreso.dismiss();
                 }
@@ -1114,7 +1112,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onFailure(Call<JsonObject> call, Throwable t) {
                     Utils.showErrorDialog(MainActivity.this,"Error",t.getMessage());
-                    Log.d("TAG", t.getMessage());
+                    Log.d(TAG, t.getMessage());
                     call.cancel();
                     pbProgreso.dismiss();
                 }
@@ -1122,7 +1120,7 @@ public class MainActivity extends AppCompatActivity {
 
         }catch (Exception e){
             e.printStackTrace();
-            Log.d("TAG", e.getMessage());
+            Log.d(TAG, e.getMessage());
             Utils.showErrorDialog(this, "Error",e.getMessage());
             pbProgreso.dismiss();
         }
@@ -1145,7 +1143,7 @@ public class MainActivity extends AppCompatActivity {
             navigation.getMenu().findItem(R.id.nav_home).setVisible(true);
 
         }catch (Exception e){
-            Log.d("TAGPERMISO", "VerificarPermisos(): " + e.getMessage());
+            Log.d(TAG, "VerificarPermisos(): " + e.getMessage());
         }
     }
 
@@ -1165,16 +1163,16 @@ public class MainActivity extends AppCompatActivity {
             if(fragmentManager.getBackStackEntryCount()> 0) {
                 try {
                     listaFragments.remove(listaFragments.size() - 1);
-                    Log.d("TAGMAIN", "onBackPressed: " + fragment.getClass().getSimpleName());
+                    Log.d(TAG, "onBackPressed: " + fragment.getClass().getSimpleName());
                     List<Fragment> fragments = fragmentManager.getFragments();
                     if (fragments != null) {
                         for (Fragment f : fragments)
-                            Log.d("TAGMAIN", "F: " + f.getClass().getSimpleName());
+                            Log.d(TAG, "F: " + f.getClass().getSimpleName());
                     }
                     for (String n : listaFragments)
-                        Log.d("TAGMAIN", "N: " + n);
+                        Log.d(TAG, "N: " + n);
                 } catch (Exception e) {
-                    Log.d("TAGMAIN", e.getMessage());
+                    Log.d(TAG, e.getMessage());
                 }
                 super.onBackPressed();
             }else{
@@ -1207,11 +1205,11 @@ public class MainActivity extends AppCompatActivity {
             JobScheduler scheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
             int result = scheduler.schedule(info);
             if(result == JobScheduler.RESULT_SUCCESS)
-                Log.d("TAG", "Completado correctamente");
+                Log.d(TAG, "Completado correctamente");
             else
-                Log.d("TAG", "Ha ocurrido un error en el job!!!");
+                Log.d(TAG, "Ha ocurrido un error en el job!!!");
         }catch (Exception e){
-            Log.d("TAG", e.getMessage());
+            Log.d(TAG, e.getMessage());
         }
     }
 
@@ -1219,9 +1217,9 @@ public class MainActivity extends AppCompatActivity {
         try {
             JobScheduler schedule = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
             schedule.cancel(ID_SERVICE_LOCATION);
-            Log.d("TAG", "Job Cancelado por el usuario!");
+            Log.d(TAG, "Job Cancelado por el usuario!");
         }catch (Exception e){
-            Log.d("TAG",e.getMessage());
+            Log.d(TAG,e.getMessage());
         }
     }
 
@@ -1235,11 +1233,11 @@ public class MainActivity extends AppCompatActivity {
             }
             if(jInfo!=null){
                 result = true;
-                Log.d("TAG","EL SERVICIO ESTA INICIADO");
+                Log.d(TAG,"EL SERVICIO ESTA INICIADO");
             }else
-                Log.d("TAG","EL SERVICIO NO ESTÀ INICIADO");
+                Log.d(TAG,"EL SERVICIO NO ESTÀ INICIADO");
         }catch (Exception e){
-            Log.d("TAG",e.getMessage());
+            Log.d(TAG,e.getMessage());
         }
         return result;
     }
@@ -1249,11 +1247,11 @@ public class MainActivity extends AppCompatActivity {
             Map<String,Object> datos = new HashMap<>();
             List<Ubicacion> ubicaciones = Ubicacion.getListSC(SQLite.usuario.IdUsuario);
             if(ubicaciones == null) {
-                Log.d("TAGMAIN", "La lista es nula");
+                Log.d(TAG, "La lista es nula");
                 return;
             }
             if(ubicaciones.size()==0) {
-                Log.d("TAGMAIN", "La lista está vacía");
+                Log.d(TAG, "La lista está vacía");
                 return;
             }
             datos.put("ubicaciones",ubicaciones);
@@ -1284,24 +1282,24 @@ public class MainActivity extends AppCompatActivity {
                                         if (Ubicacion.Update(upd.get("idubicacion").getAsInt(), values))
                                             numUpdate++;
                                     }
-                                    Log.d("TAGMAIN", "Se subieron " + numUpdate + "/" + jsonUpdate.size() + " ubicaciones");
+                                    Log.d(TAG, "Se subieron " + numUpdate + "/" + jsonUpdate.size() + " ubicaciones");
                                 }else
-                                    Log.d("TAGMAIN", "Error: El webservice no devolvió valores");
+                                    Log.d(TAG, "Error: El webservice no devolvió valores");
                             }else
-                                Log.d("TAGMAIN", "Error: " + obj.get("message").getAsString());
+                                Log.d(TAG, "Error: " + obj.get("message").getAsString());
                         }
                     } catch (Exception e) {
-                        Log.d("TAGMAIN1", e.getMessage());
+                        Log.d(TAG, e.getMessage());
                     }
                 }
 
                 @Override
                 public void onFailure(Call<JsonObject> call, Throwable t) {
-                    Log.d("TAGMAIN2", t.getMessage());
+                    Log.d(TAG, t.getMessage());
                 }
             });
         }catch (Exception e){
-            Log.d("TAGMAIN3", e.getMessage());
+            Log.d(TAG, e.getMessage());
         }
     }
 
@@ -1329,17 +1327,17 @@ public class MainActivity extends AppCompatActivity {
                             }
                         }
                     } catch (Exception e) {
-                        Log.d("TAG", e.getMessage());
+                        Log.d(TAG, e.getMessage());
                     }
                 }
 
                 @Override
                 public void onFailure(Call<JsonObject> call, Throwable t) {
-                    Log.d("TAG", t.getMessage());
+                    Log.d(TAG, t.getMessage());
                 }
             });
         } catch (Exception e) {
-            Log.d("TAG", e.getMessage());
+            Log.d(TAG, e.getMessage());
         }
     }
 
@@ -1364,7 +1362,7 @@ public class MainActivity extends AppCompatActivity {
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
             alertDialog.show();
         }catch (Exception e){
-            Log.d("TAG", e.getMessage());
+            Log.d(TAG, e.getMessage());
         }
     }
 }

@@ -30,7 +30,7 @@ import java.util.List;
 
 public class DetalleRecepcionAdapter extends RecyclerView.Adapter<DetalleRecepcionAdapter.ProductoViewHolder>{
 
-
+    private static String TAG = "TAGDETALLERECEP_ADAPTER";
     public List<DetalleComprobante> detalleComprobante;
     Activity activity;
     String categoria, tipotransaccion;
@@ -162,7 +162,7 @@ public class DetalleRecepcionAdapter extends RecyclerView.Adapter<DetalleRecepci
                 });
 
             }catch (Exception e){
-                Log.d("TAGPRODUCTO",e.getMessage());
+                Log.d(TAG,e.getMessage());
             }
 
         }

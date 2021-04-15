@@ -24,6 +24,7 @@ public class Comprobante {
     public Cliente cliente;
 
     public static SQLiteDatabase sqLiteDatabase;
+    public static String TAG = "TAGCOMPROBANTE";
 
     public Comprobante(){
         this.idcomprobante = 0;
@@ -73,7 +74,7 @@ public class Comprobante {
                                 valPro.put("stock", (milote.stock + midetalle.cantidad));
                                 retorno = retorno && Lote.Update(new String[]{}, valPro);
                             }else {
-                                Log.d("TAGCOMPROBANTE", "Lote null: P: " + midetalle.producto.idproducto +" - E: "+ micomprobante.establecimientoid +" - L: "+ midetalle.numerolote);
+                                Log.d(TAG, "Lote null: P: " + midetalle.producto.idproducto +" - E: "+ micomprobante.establecimientoid +" - L: "+ midetalle.numerolote);
                                 retorno = false;
                             }
                         }
@@ -85,10 +86,10 @@ public class Comprobante {
                 sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
                 sqLiteDatabase.update("comprobante", values, "idcomprobante = ?", new String[]{idcomprobante.toString()});
                 sqLiteDatabase.close();
-                Log.d("TAGCOMPROBANTE", "UPDATE COMPROBANTE OK");
+                Log.d(TAG, "UPDATE COMPROBANTE OK");
             }
         } catch (SQLException ex){
-            Log.d("TAGCOMPROBANTE", "Update(): " + String.valueOf(ex));
+            Log.d(TAG, "Update(): " + ex.getMessage());
             return false;
         }
         return retorno;
@@ -115,11 +116,11 @@ public class Comprobante {
             else
                 sqLiteDatabase.execSQL("DELETE FROM detallecomprobante WHERE comprobanteid = ?", new String[]{String.valueOf(this.idcomprobante)});
             sqLiteDatabase.close();
-            Log.d("TAGCOMPROBANTE","GUARDO ENCABEZADO - ID: " + this.idcomprobante);
+            Log.d(TAG,"GUARDO ENCABEZADO - ID: " + this.idcomprobante);
             return this.SaveDetalle(this.idcomprobante, updateStock);
         } catch (SQLException ex) {
             //Toast.makeText(context,ex.getMessage(),Toast.LENGTH_LONG).show();
-            Log.d("TAGCOMPROBANTE", "Save(): " + ex.getMessage());
+            Log.d(TAG, "Save(): " + ex.getMessage());
             return false;
         }
     }
@@ -162,11 +163,11 @@ public class Comprobante {
             if(updateStock)
                 this.actualizasecuencial();
             sqLiteDatabase.close();
-            Log.d("TAGDETALLECOMPROBANTE","Guardó detalle comprobante");
+            Log.d(TAG,"Guardó detalle comprobante");
             return true;
         } catch (Exception ex) {
             ex.printStackTrace();
-            Log.d("TAGDETALLECOMPROBANTE", "SaveDetalle(): " + ex.getMessage());
+            Log.d(TAG, "SaveDetalle(): " + ex.getMessage());
             return false;
         }
     }
@@ -179,7 +180,7 @@ public class Comprobante {
             if (cursor.moveToFirst()) Item = Comprobante.AsignaDatos(cursor);
             sqLiteDatabase.close();
         }catch (Exception e){
-            Log.d("TAGCOMPROBANTE", "get(): " + e.getMessage());
+            Log.d(TAG, "get(): " + e.getMessage());
         }
         return Item;
     }
@@ -198,7 +199,7 @@ public class Comprobante {
             }
             sqLiteDatabase.close();
         }catch (Exception e){
-            Log.d("TAGCOMPROBANTE", "getByCliente(): " + e.getMessage());
+            Log.d(TAG, "getByCliente(): " + e.getMessage());
         }
         return Items;
     }
@@ -240,9 +241,9 @@ public class Comprobante {
             }
             cursor.close();
             sqLiteDatabase.close();
-            Log.d("TAGCOMPROBANTE", "NUMERO COMPROBANTES: " + Items.size());
+            Log.d(TAG, "NUMERO COMPROBANTES: " + Items.size());
         }catch (SQLiteException e){
-            Log.d("TAGCOMPROBANTE", "getByUsuario(): " + e.getMessage());
+            Log.d(TAG, "getByUsuario(): " + e.getMessage());
         }
         return Items;
     }
@@ -261,9 +262,9 @@ public class Comprobante {
             }
             cursor.close();
             sqLiteDatabase.close();
-            Log.d("TAGCOMPROBANTE", "NUMERO COMPROBANTES PS: " + Items.size());
+            Log.d(TAG, "NUMERO COMPROBANTES PS: " + Items.size());
         }catch (SQLiteException e){
-            Log.d("TAGCOMPROBANTE", "getPorSincronizar(): " + e.getMessage());
+            Log.d(TAG, "getPorSincronizar(): " + e.getMessage());
         }
         return Items;
     }
@@ -300,10 +301,9 @@ public class Comprobante {
             Item.longdate = cursor.getLong(23);
             Item.formapago = cursor.getInt(24);
             Item.detalle = DetalleComprobante.getDetalle(Item.idcomprobante);
-            Log.d("TAG", Item.observacion);
         } catch (Exception ec) {
             ec.printStackTrace();
-            Log.d("TAGCOMRPROBANTE", "AsignaDatos(): " + ec.getMessage());
+            Log.d(TAG, "AsignaDatos(): " + ec.getMessage());
             Item = null;
         }
         return Item;
@@ -331,9 +331,9 @@ public class Comprobante {
             String[] params = new String[listParams.size()];
             sqLiteDatabase = SQLite.sqlDB.getReadableDatabase();
             retorno = sqLiteDatabase.delete("comprobante", WHERE, listParams.toArray(params));
-            Log.d("TAGCOMPROBANTE", "Registros eliminados: " + retorno);
+            Log.d(TAG, "Registros eliminados: " + retorno);
         }catch (Exception e){
-            Log.d("TAGCOMPROBANTE", "Delete(): " + e.getMessage());
+            Log.d(TAG, "Delete(): " + e.getMessage());
             retorno = 0;
         }
         return retorno;
@@ -345,7 +345,7 @@ public class Comprobante {
             codigo = this.codigoestablecimiento + "-" + this.puntoemision + "-" + String.format("%09d", this.secuencial);
             this.codigotransaccion = codigo;
         }catch (Exception e){
-            Log.d("TAGCOMPROBANTE", "getCodigoTransaccion(): " + e.getMessage());
+            Log.d(TAG, "getCodigoTransaccion(): " + e.getMessage());
         }
         return codigo;
     }
@@ -371,7 +371,7 @@ public class Comprobante {
             //sqLiteDatabase.close();
         } catch (Exception ec) {
             ec.printStackTrace();
-            Log.d("TAGCOMPROBANTE", "actualizasecuencial(): " + ec.getMessage());
+            Log.d(TAG, "actualizasecuencial(): " + ec.getMessage());
             return false;
         }
         return true;
@@ -380,12 +380,12 @@ public class Comprobante {
     public String GenerarClaveAcceso() {
         String cod;
         this.secuencial = this.ultimosecuencial();
-        cod = Utils.getDateFormat("ddMMyyyy");
-        cod = cod.concat("01");
-        cod = cod.concat(SQLite.usuario.sucursal.RUC);
-        cod = cod.concat(SQLite.usuario.sucursal.Ambiente);
-        cod = cod.concat(getCodigoTransaccion().replace("-",""));
-        cod = cod.concat("123456781");
+        cod = Utils.getDateFormat("ddMMyyyy")
+                .concat("01")
+                .concat(SQLite.usuario.sucursal.RUC)
+                .concat(SQLite.usuario.sucursal.Ambiente)
+                .concat(getCodigoTransaccion().replace("-",""))
+                .concat("123456781");
         cod = cod.concat(String.valueOf(SQLite.DigitoVerificador(cod)));
         this.claveacceso = cod;
         return cod;

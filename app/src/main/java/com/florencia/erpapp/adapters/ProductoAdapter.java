@@ -52,6 +52,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.ProductoViewHolder>{
+    private static String TAG = "TAGDETALLEPRODUCTO_ADAPTER";
     public List<Producto> listProductos;
     private List<Producto> orginalItems = new ArrayList<>();
     public List<DetalleComprobante> productosSelected = new ArrayList<>(); //LISTA PARA COMPROBANTE
@@ -140,7 +141,7 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.Produc
             }
             notifyDataSetChanged();
         }catch (Exception e){
-            Log.d("TAGPRODUCTOADAPTER", "filter_by_clasif(): " + e.getMessage());
+            Log.d(TAG, "filter_by_clasif(): " + e.getMessage());
         }
     }
 
@@ -200,7 +201,7 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.Produc
                         dialogFragment.show(activity.getSupportFragmentManager(), "dialog");
                     });
             }catch (Exception e){
-                Log.d("TAGPRODUCTO",e.getMessage());
+                Log.d(TAG,e.getMessage());
             }
 
         }
@@ -367,7 +368,7 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.Produc
                     alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
                 alertDialog.show();
             }catch (Exception e){
-                Log.d("TAGPRODUCTO", e.getMessage());
+                Log.d(TAG, e.getMessage());
             }
 
         }

@@ -28,6 +28,8 @@ import com.shasin.notificationbanner.Banner;
 import java.util.List;
 
 public class DetallePedidoInvAdapter extends RecyclerView.Adapter<DetallePedidoInvAdapter.ProductoViewHolder>{
+
+    private static String TAG = "TAGDETALLEPEDIDOINV_ADAPTER";
     public List<DetallePedidoInv> detallePedido;
     Activity activity;
     String tipotransaccion;
@@ -144,7 +146,7 @@ public class DetallePedidoInvAdapter extends RecyclerView.Adapter<DetallePedidoI
                     }
                 });
             }catch (Exception e){
-                Log.d("TAG", e.getMessage());
+                Log.d(TAG, e.getMessage());
             }
         }
     }

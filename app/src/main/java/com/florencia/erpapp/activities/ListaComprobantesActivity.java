@@ -45,6 +45,7 @@ import java.util.Locale;
 
 public class ListaComprobantesActivity extends AppCompatActivity implements SearchView.OnQueryTextListener  {
 
+    public static String TAG = "TAGLISTACOMPRO_ACT";
     ImageView imgFondo;
     RecyclerView rvComprobantes;
     List<Comprobante> listComprobantes = null;
@@ -136,7 +137,7 @@ public class ListaComprobantesActivity extends AppCompatActivity implements Sear
                                     toolbar.getMenu().findItem(R.id.option_delete).setVisible(false);
                                 }
                             }catch (Exception e){
-                                Log.d("TAG", e.getMessage());
+                                Log.d(TAG, e.getMessage());
                             }
                         }
                     );
@@ -144,7 +145,7 @@ public class ListaComprobantesActivity extends AppCompatActivity implements Sear
             };
             th.start();
         }catch (Exception e){
-            Log.d("TAGCOMPROBANTE_BUSQUEDA",e.getMessage());
+            Log.d(TAG, e.getMessage());
         }
     }
 
@@ -315,7 +316,7 @@ public class ListaComprobantesActivity extends AppCompatActivity implements Sear
             builder.setNegativeButton(getResources().getString(R.string.Cancel), null);
             builder.show();
         }catch (Exception e){
-            Log.d("TAG", e.getMessage());
+            Log.d(TAG, e.getMessage());
         }
     }
 

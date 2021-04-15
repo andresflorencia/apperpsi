@@ -29,6 +29,7 @@ public class Cliente {
     public Double montocredito, deudatotal, montodisponible;
 
     public static SQLiteDatabase sqLiteDatabase;
+    public static String TAG = "TAGCLIENTE";
 
     public Cliente(){
         this.idcliente= 0;
@@ -66,11 +67,11 @@ public class Cliente {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
             sqLiteDatabase.execSQL("DELETE FROM cliente WHERE usuarioid = ? AND codigosistema <> 0", new String[] {idUsuario.toString()});
             sqLiteDatabase.close();
-            Log.d("TAGCLIENTE", "CLIENTES ELIMINADOS");
+            Log.d(TAG, "CLIENTES ELIMINADOS");
             return true;
         } catch (Exception ec) {
             ec.printStackTrace();
-            Log.d("TAGCLIENTE", ec.getMessage());
+            Log.d(TAG, ec.getMessage());
         }
         return false;
     }
@@ -104,10 +105,10 @@ public class Cliente {
             if (this.idcliente == 0) this.idcliente = SQLite.sqlDB.getLastId();
 
             this.sqLiteDatabase.close();
-            Log.d("TAGCLIENTE","SAVE CLIENTE OK");
+            Log.d(TAG,"SAVE CLIENTE OK");
             return true;
         } catch (SQLException ex){
-            Log.d("TAGCLIENTE", this.nip + " - " + ex.getMessage());
+            Log.d(TAG, this.nip + " - " + ex.getMessage());
             return false;
         }
     }
@@ -120,7 +121,7 @@ public class Cliente {
             if (cursor.moveToFirst()) Item = Cliente.AsignaDatos(cursor);
             sqLiteDatabase.close();
         }catch (Exception e){
-            Log.d("TAGCLIENTE",e.getMessage());
+            Log.d(TAG, e.getMessage());
         }
         return Item;
     }
@@ -133,7 +134,7 @@ public class Cliente {
             if (cursor.moveToFirst()) Item = Cliente.AsignaDatos(cursor);
             sqLiteDatabase.close();
         }catch (SQLiteException e){
-            Log.d("TAGCLIENTE", e.getMessage());
+            Log.d(TAG, e.getMessage());
         }
         return Item;
     }
@@ -170,7 +171,7 @@ public class Cliente {
             Item.deudatotal = cursor.getDouble(25);
             Item.plazomaximo = cursor.getInt(26);
         } catch (SQLiteException ec) {
-            Log.d("TAGCLIENTE", ec.getMessage());
+            Log.d(TAG, ec.getMessage());
         }
         return Item;
     }
@@ -207,7 +208,7 @@ public class Cliente {
             cursor.close();
             sqLiteDatabase.close();
         } catch (Exception ec) {
-            Log.d("TAGCLIENTE",ec.getMessage());
+            Log.d(TAG, ec.getMessage());
             ec.printStackTrace();
         }
         return lista;
@@ -228,6 +229,7 @@ public class Cliente {
             cursor.close();
             sqLiteDatabase.close();
         } catch (Exception ec) {
+            Log.d(TAG, "getClientesSC: " + ec.getMessage());
             ec.printStackTrace();
         }
         return items;
@@ -238,10 +240,10 @@ public class Cliente {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
             sqLiteDatabase.update("cliente",data, "idcliente = ?",new String[]{id.toString()});
             sqLiteDatabase.close();
-            Log.d("TAGCLIENTE","UPDATE CLIENTE OK");
+            Log.d(TAG,"UPDATE CLIENTE OK");
             return true;
         } catch (SQLException ex){
-            Log.d("TAGCLIENTE", "Update(): " + String.valueOf(ex));
+            Log.d(TAG, "Update(): " + String.valueOf(ex));
             return false;
         }
     }

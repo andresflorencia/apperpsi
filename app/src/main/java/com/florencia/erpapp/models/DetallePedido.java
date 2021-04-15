@@ -17,6 +17,7 @@ public class DetallePedido {
     public Producto producto;
 
     public static SQLiteDatabase sqLiteDatabase;
+    public static String TAG = "TAGDETALLEPEDIDO";
 
     public DetallePedido(){
         this.pedidoid = 0;
@@ -34,7 +35,7 @@ public class DetallePedido {
         try{
             retorno =this.cantidad * this.precio;
         }catch (Exception e){
-            Log.d("TAGDETALLEPEDIDO", "Subtotal(): " + e.getMessage());
+            Log.d(TAG, "Subtotal(): " + e.getMessage());
         }
         return retorno;
     }
@@ -44,7 +45,7 @@ public class DetallePedido {
         try{
             retorno =this.cantidad * (this.precio +(this.precio * this.producto.porcentajeiva/100));
         }catch (Exception e){
-            Log.d("TAGDETALLEPEDIDO", "Subtotaliva(): " + e.getMessage());
+            Log.d(TAG, "Subtotaliva(): " + e.getMessage());
         }
         return retorno;
     }
@@ -63,7 +64,7 @@ public class DetallePedido {
             }
             sqLiteDatabase.close();
         }catch (SQLiteException e){
-            Log.d("TAGPEDIDO", "getDetalle(): " + e.getMessage());
+            Log.d(TAG, "getDetalle(): " + e.getMessage());
         }
         return Items;
     }
@@ -92,7 +93,7 @@ public class DetallePedido {
             }
         } catch (Exception ec) {
             ec.printStackTrace();
-            Log.d("TAGPEDIDO", "AsignaDatos(): " + ec.getMessage());
+            Log.d(TAG, "AsignaDatos(): " + ec.getMessage());
             Item = null;
         }
         return Item;
@@ -114,7 +115,7 @@ public class DetallePedido {
             if (ptemp < this.precio)
                 this.precio = ptemp;
         }catch (Exception e){
-            Log.d("TAGDETALLECOMPROBANTE", "getPrecio(): " + e.getMessage());
+            Log.d(TAG, "getPrecio(): " + e.getMessage());
         }
         return this.precio;
     }
@@ -151,7 +152,7 @@ public class DetallePedido {
                     this.precio = categ_temp.valor;
             }
         }catch (Exception e){
-            Log.d("TAGDETALLECOMPROBANTE", "getPrecio2(): " + e.getMessage());
+            Log.d(TAG, "getPrecio2(): " + e.getMessage());
         }
         return this.precio;
     }

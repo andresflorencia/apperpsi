@@ -75,6 +75,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
     public static final int REQUEST_BUSQUEDA = 1;
     public static final int REQUEST_CLIENTE = 2;
     public static final int REQUEST_BUSQUEDA_COMPROBANTE = 3;
+    public static String TAG = "TAGCOMPROBANTE_ACT";
     Button btnBuscarProducto;
     EditText txtCliente;
     RecyclerView rvDetalle;
@@ -171,7 +172,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                     else
                         txtCliente.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_user,0, 0,0);
                 }catch (Exception e){
-                    Log.d("TAG_COMPROBANTEACT", e.getMessage());
+                    Log.d(TAG, e.getMessage());
                 }
             }
         });
@@ -401,7 +402,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
             th.start();
         }catch (Exception e){
             pgCargando.dismiss();
-            Log.d("TAG", e.getMessage());
+            Log.d(TAG, e.getMessage());
         }
 
     }
@@ -610,7 +611,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
             }else
                 Banner.make(rootView,ComprobanteActivity.this,Banner.ERROR,Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM, 3500).show();
         }catch (Exception e){
-            Log.d("TAGCOMPROBANTE", e.getMessage());
+            Log.d(TAG, e.getMessage());
         }
     }
 
@@ -653,7 +654,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
             alertDialog.show();
         }catch (Exception e){
-            Log.d("TAGRECEPCION_ACT", "ConsultaImpresion(): "+ e.getMessage());
+            Log.d(TAG, "ConsultaImpresion(): "+ e.getMessage());
         }
     }
 
@@ -688,7 +689,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
             toolbar.getMenu().findItem(R.id.option_save).setVisible(true);
             lblLeyendaCF.setVisibility(View.VISIBLE);
         }catch (Exception e){
-            Log.d("TAGCOMPROBANTE_ACT", "LimpiarDatos(): " + e.getMessage());
+            Log.d(TAG, "LimpiarDatos(): " + e.getMessage());
         }
     }
 
@@ -826,7 +827,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
 
             } else fImp = false;
         }catch (Exception e){
-            Log.d("TAGIMPRIMIR1", e.getMessage());
+            Log.d(TAG, e.getMessage());
             fImp = false;
         }
         return fImp;
@@ -872,18 +873,18 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                             }
                         }
                     }catch (Exception e){
-                        Log.d("TAGCOMPROBANTE_ACT","onResponse(): " + e.getMessage());
+                        Log.d(TAG,"onResponse(): " + e.getMessage());
                     }
                 }
 
                 @Override
                 public void onFailure(Call<JsonObject> call, Throwable t) {
-                    Log.d("TAGCOMPROBANTE_ACT", "onFailure(): " + t.getMessage());
+                    Log.d(TAG, "onFailure(): " + t.getMessage());
                     call.cancel();
                 }
             });
         }catch (Exception e){
-            Log.d("TAGCOMPROBANTE_ACT", "ConsultaDeuda(): " + e.getMessage());
+            Log.d(TAG, "ConsultaDeuda(): " + e.getMessage());
         }
     }
 
@@ -941,10 +942,10 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                             Utils.showMessageShort(this,"Imprimiendo comprobante");
                             imprimirFactura(idcomprobante==0?"* ORIGINAL CLIENTE *": "* REIMPRESIÓN DE FACTURA *",
                                     idcomprobante>0);
-                            Log.d("TAGIMPRIMIR2", "IMPRESORA SELECCIONADA");
+                            Log.d(TAG, "IMPRESORA SELECCIONADA");
                         }
                     }catch (Exception e){
-                        Log.d("TAGIMPRIMIR2",e.getMessage());
+                        Log.d(TAG,e.getMessage());
                     }
                     break;
                 case REQUEST_BUSQUEDA_COMPROBANTE:

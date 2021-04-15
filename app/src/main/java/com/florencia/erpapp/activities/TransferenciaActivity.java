@@ -416,7 +416,6 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
                 post.put("puntoemisionid", SQLite.usuario.sucursal.IdPuntoEmision);
                 post.put("transacciones", listTransacciones);
                 String json = post.toString();
-                Log.d("TAGJSON", json);
                 Call<JsonObject> call=miInterface.saveTransferencia(post);
                 call.enqueue(new Callback<JsonObject>() {
                     @Override
@@ -530,7 +529,7 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
             alertDialog.show();
         }catch (Exception e){
-            Log.d("TAGRECEPCION_ACT", "ConsultaImpresion(): "+ e.getMessage());
+            Log.d(TAG, "ConsultaImpresion(): "+ e.getMessage());
         }
     }
 
@@ -767,10 +766,10 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
                             Utils.showMessageShort(this,"Imprimiendo comprobante");
                             imprimirFactura(idtransferencia==0?"* ORIGINAL *": "* REIMPRESIÓN DE DOCUMENTO *",
                                     idtransferencia>0);
-                            Log.d("TAGIMPRIMIR2", "IMPRESORA SELECCIONADA");
+                            Log.d(TAG, "IMPRESORA SELECCIONADA");
                         }
                     }catch (Exception e){
-                        Log.d("TAGIMPRIMIR2",e.getMessage());
+                        Log.d(TAG,e.getMessage());
                     }
                     break;
                 case REQUEST_BUSQUEDA_TRANSFERENCIA:

@@ -143,9 +143,9 @@ public class PedidoInventario {
             }
             cursor.close();
             sqLiteDatabase.close();
-            Log.d("TAGPEDIDO", "NUMERO COMPROBANTES: " + Items.size());
+            Log.d(TAG, "NUMERO COMPROBANTES: " + Items.size());
         }catch (SQLiteException e){
-            Log.d("TAGPEDIDO", "getByUsuario(): " + e.getMessage());
+            Log.d(TAG, "getByUsuario(): " + e.getMessage());
         }
         return Items;
     }

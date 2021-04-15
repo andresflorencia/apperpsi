@@ -32,6 +32,7 @@ public class Producto
     public List<PrecioCategoria> precioscategoria;
 
     public static SQLiteDatabase sqLiteDatabase;
+    private static String TAG = "TAGPRODUCTO";
 
     public Producto() {
         this.idproducto = 0;
@@ -97,7 +98,7 @@ public class Producto
             PrecioCategoria.InsertMultiple(this.idproducto, this.establecimientoid, this.precioscategoria);
             return true;
         } catch (SQLException ex){
-            Log.d("TAGPRODUCTO",ex.getMessage());
+            Log.d(TAG, ex.getMessage());
             return false;
         }
     }
@@ -130,7 +131,7 @@ public class Producto
             Item.reglas = Regla.getAll(Item.idproducto, Item.establecimientoid);
             Item.precioscategoria = PrecioCategoria.getAll(Item.idproducto, Item.establecimientoid);
         }catch (Exception e){
-            Log.d("TAGPRODUCTO","Asigna(): " +e.getMessage());
+            Log.d(TAG,"Asigna(): " +e.getMessage());
         }finally {}
         return Item;
     }
@@ -170,7 +171,7 @@ public class Producto
             Item.lotes.add(milote);
             //Item.lotes = Lote.getAll(Item.idproducto, Item.establecimientoid);
         }catch (Exception e){
-            Log.d("TAGLOTE", "AsignaLote(): " + e.getMessage());
+            Log.d(TAG, "AsignaLote(): " + e.getMessage());
         }finally {
 
         }
@@ -185,7 +186,7 @@ public class Producto
             if (cursor.moveToFirst()) Item = Producto.AsignaDatos(cursor);
             sqLiteDatabase.close();
         }catch (Exception e){
-            Log.d("TAGPRODUCTO","get():" + e.getMessage());
+            Log.d(TAG,"get():" + e.getMessage());
         }
         return Item;
     }
@@ -195,10 +196,10 @@ public class Producto
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
             sqLiteDatabase.update("producto",data, "idproducto = ? and establecimientoid = ?",new String[]{idproducto.toString(), establecimientoid.toString()});
             //sqLiteDatabase.close();
-            Log.d("TAGLOTE","UPDATE 1 LOTE OK");
+            Log.d(TAG,"UPDATE 1 LOTE OK");
             return true;
         } catch (SQLException ex){
-            Log.d("TAGLOTE",String.valueOf(ex));
+            Log.d(TAG,String.valueOf(ex));
             return false;
         }
     }
@@ -208,10 +209,10 @@ public class Producto
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
             sqLiteDatabase.delete("producto","establecimientoid = ?",new String[]{idestablecimiento.toString()});
             //sqLiteDatabase.close();
-            Log.d("TAGPRODUCTO","DELETE PRODUCTOS OK");
+            Log.d(TAG,"DELETE PRODUCTOS OK");
             return true;
         } catch (SQLException ex){
-            Log.d("TAGPRODUCTO", "Delete(): " + ex.getMessage());
+            Log.d(TAG, "Delete(): " + ex.getMessage());
             return false;
         }
     }
@@ -235,7 +236,7 @@ public class Producto
             }
             sqLiteDatabase.close();
         }catch (Exception e){
-            Log.d("TAGPRODUCTO", "getAll(): " + e.getMessage());
+            Log.d(TAG, "getAll(): " + e.getMessage());
         }
         return Items;
     }
@@ -256,7 +257,7 @@ public class Producto
             }
             sqLiteDatabase.close();
         }catch (Exception e){
-            Log.d("TAGPRODUCTO", "getForTransferencia(): " + e.getMessage());
+            Log.d(TAG, "getForTransferencia(): " + e.getMessage());
         }
         return Items;
     }
@@ -285,7 +286,7 @@ public class Producto
             cursor.close();
             sqLiteDatabase.close();
         }catch (Exception e){
-            Log.d("TAGPRODUCTO", "getCategorias(): ".concat(e.getMessage()));
+            Log.d(TAG, "getCategorias(): ".concat(e.getMessage()));
         }
         return categorias;
     }

@@ -41,6 +41,7 @@ import java.util.stream.Collectors;
 
 public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapter.ComprobanteViewHolder> {
 
+    private static String TAG = "TAGCLOMPROBANTE_ADAPTER";
     public List<Comprobante> listComprobantes;
     public List<Pedido> listPedidos;
     public List<PedidoInventario> listPedidosInv;
@@ -346,7 +347,7 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                     }
                 }
             }catch (Exception e){
-                Log.d("TAGCOMPROBANTEADAPTER", "bindComprobante(): " + e.getMessage());
+                Log.d(TAG, "bindComprobante(): " + e.getMessage());
             }
 
             itemView.setOnClickListener(v -> {

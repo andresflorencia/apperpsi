@@ -42,6 +42,7 @@ import java.util.List;
  */
 public class ClienteFragment extends Fragment implements SearchView.OnQueryTextListener{
 
+    private static String TAG = "TAGCLIENTE_FRAGMENT";
     View view;
     Toolbar toolbar;
     ImageView imgFondo;
@@ -87,13 +88,13 @@ public class ClienteFragment extends Fragment implements SearchView.OnQueryTextL
                     try {
                         CargarDatos(true);
                     } catch (Exception e) {
-                        Log.d("TAGCLIENTEFRAGMENT", "SwipeRefresh(): " + e.getMessage());
+                        Log.d(TAG, "SwipeRefresh(): " + e.getMessage());
                     }
                 });
             //Fin Refrescar el contenido del RecyclerView
 
         }catch (Exception e){
-            Log.d("TAGCLIENTEFRAGMENT", "onCreate(): " + e.getMessage());
+            Log.d(TAG, "onCreate(): " + e.getMessage());
         }
         return view;
     }
@@ -123,14 +124,14 @@ public class ClienteFragment extends Fragment implements SearchView.OnQueryTextL
                                 if (isSwipe)
                                     ClienteFragment.this.swipeRefreshClientes.setRefreshing(false);
                             }catch (Exception e){
-                                Log.d("TAGCLIENTEFRAGMENT", "CargaDatos(): " + e.getMessage());
+                                Log.d(TAG, "CargaDatos(): " + e.getMessage());
                             }
                         });
                 }
             };
             th.start();
         }catch (Exception e){
-            Log.d("TAGCLIENTE",e.getMessage());
+            Log.d(TAG,e.getMessage());
         }
     }
 
