@@ -14,6 +14,9 @@ import com.google.gson.JsonParseException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Sucursal {
     public String IdSucursal;
     public String RUC;
@@ -25,7 +28,7 @@ public class Sucursal {
     public String PuntoEmision;
     public String Ambiente;
     public String SucursalPadreID;
-    public Integer IdEstablecimiento, IdPuntoEmision, periodo, mesactual;
+    public Integer IdEstablecimiento, IdPuntoEmision, periodo, mesactual, usuarioid;
 
     public static SQLiteDatabase sqLiteDatabase;
     public static String TAG = "TAGSUCURSAL";
@@ -45,16 +48,18 @@ public class Sucursal {
         this.IdPuntoEmision =0;
         this.periodo = 0;
         this.mesactual = 0;
+        this.usuarioid = 0;
     }
 
     public boolean Guardar(){
         try {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
             sqLiteDatabase.execSQL("INSERT OR REPLACE INTO " +
-                    "sucursal(idsucursal, ruc, razonsocial, nombrecomercial, nombresucursal, direccion, codigoestablecimiento, puntoemision, ambiente, idestablecimiento, idpuntoemision, periodo, mesactual) " +
-                    "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", new String[]{this.IdSucursal, this.RUC, this.RazonSocial, this.NombreComercial, this.NombreSucursal, this.Direcion, this.CodigoEstablecimiento,
+                    "sucursal(idsucursal, ruc, razonsocial, nombrecomercial, nombresucursal, direccion, codigoestablecimiento, " +
+                    "puntoemision, ambiente, idestablecimiento, idpuntoemision, periodo, mesactual, usuarioid) " +
+                    "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", new String[]{this.IdSucursal, this.RUC, this.RazonSocial, this.NombreComercial, this.NombreSucursal, this.Direcion, this.CodigoEstablecimiento,
                     this.PuntoEmision, this.Ambiente, this.IdEstablecimiento.toString() , this.IdPuntoEmision.toString(),
-                    this.periodo.toString(), this.mesactual.toString()});
+                    this.periodo.toString(), this.mesactual.toString(), this.usuarioid.toString()});
             sqLiteDatabase.close();
             return true;
         } catch (SQLException ex) {
@@ -88,6 +93,23 @@ public class Sucursal {
         return Item;
     }
 
+    static public List<Sucursal> getSucursales(Integer idusuario){
+        List<Sucursal> retorno = new ArrayList<>();
+        Sucursal Item = null;
+        sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM sucursal WHERE usuarioid = ?",
+                new String[] { idusuario.toString() });
+        if (cursor.moveToFirst()) {
+            do {
+                Item = AsignaDatos(cursor);
+                retorno.add(Item);
+            }while (cursor.moveToNext());
+        }
+        cursor.close();
+        sqLiteDatabase.close();
+        return retorno;
+    }
+
     private static Sucursal AsignaDatos(Cursor cursor)
     {
         Sucursal Item = new Sucursal();
@@ -104,6 +126,7 @@ public class Sucursal {
         Item.IdPuntoEmision = cursor.getInt(11);
         Item.periodo = cursor.getInt(12);
         Item.mesactual = cursor.getInt(13);
+        Item.usuarioid = cursor.getInt(14);
         return Item;
     }
 
@@ -125,8 +148,9 @@ public class Sucursal {
                 Item.NombreSucursal = object.get("nombreestablecimiento").getAsString();
                 Item.periodo =  object.has("periodo")? object.get("periodo").getAsInt():0;
                 Item.mesactual =  object.has("mesactual")? object.get("mesactual").getAsInt():0;
+                Item.usuarioid =  object.has("usuarioid")? object.get("usuarioid").getAsInt():0;
                 Sucursal.Delete(Item.IdEstablecimiento);
-                if(Item.Guardar())
+                if(Item.Guardar() && object.has("s01"))
                     Item.actualizasecuencial(object.get("s01").getAsInt(), "01");
             }
         }catch (JsonParseException e){

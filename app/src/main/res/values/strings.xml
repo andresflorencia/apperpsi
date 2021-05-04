@@ -44,6 +44,7 @@
         ALTER TABLE sucursal ADD COLUMN idpuntoemision integer DEFAULT 0;
         ALTER TABLE sucursal ADD COLUMN periodo integer DEFAULT 0;
         ALTER TABLE sucursal ADD COLUMN mesactual integer DEFAULT 0;
+        ALTER TABLE sucursal ADD COLUMN usuarioid integer DEFAULT 0;
     </string>
 
     <string name="dbSecuencial">
@@ -156,6 +157,7 @@
         ALTER TABLE comprobante ADD COLUMN sucursalrecibe TEXT DEFAULT \'\';
         ALTER TABLE comprobante ADD COLUMN longdate INTEGER DEFAULT 0;
         ALTER TABLE comprobante ADD COLUMN formapago INTEGER DEFAULT 1;
+        ALTER TABLE comprobante ADD COLUMN establecimientoprecioid INTEGER DEFAULT 0;
     </string>
 
     <string name="dbDetalleComprobante">
@@ -412,4 +414,11 @@
 
     <string name="textFecha"><![CDATA[<strong>Fecha Registro: </strong>]]></string>
     <string name="textCategoria"><![CDATA[<strong>Categoría: </strong>]]></string>
+
+    <string name="leyendaFactura"><![CDATA[*Este comprobante no tiene validez tributaria.
+    Puede revisar su factura en <strong>https://comprobantes.sanisidrosa.com/</strong>,
+    utilice como usuario y contraseña su número de indentificación.]]></string>
+    <string name="leyendaFactura2">Este comprobante no tiene validez tributaria.
+    Puede revisar su factura en https://comprobantes.sanisidrosa.com/,
+    por primera vez utilice como usuario y contraseña su número de indentificación.</string>
 </resources>

@@ -175,16 +175,15 @@ public class DetalleComprobanteAdapter  extends RecyclerView.Adapter<DetalleComp
                         ((Button)view.findViewById(R.id.btnCancel)).setText(activity.getResources().getString(R.string.Cancel));
                         ((Button)view.findViewById(R.id.btnYes)).setText(activity.getResources().getString(R.string.Confirm));
                         final AlertDialog alertDialog = builder.create();
-                        view.findViewById(R.id.btnYes).setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
+                        view.findViewById(R.id.btnYes).setOnClickListener((vi)-> {
                                 detalleComprobante.remove(getAdapterPosition());
                                 notifyDataSetChanged();
                                 CalcularTotal();
                                 Banner.make(rootView,activity,Banner.INFO,"Ítem eliminado de la lista.", Banner.BOTTOM,2000).show();
+                                if(detalleComprobante.size()==0)
+                                    activity.btnCambiaEstablecimiento.setVisibility(View.VISIBLE);
                                 alertDialog.dismiss();
-                            }
-                        });
+                            });
 
                         view.findViewById(R.id.btnCancel).setOnClickListener(new View.OnClickListener() {
                             @Override

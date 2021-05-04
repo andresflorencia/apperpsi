@@ -84,7 +84,7 @@ public class InfoDialogFragment extends AppCompatDialogFragment {
                                         (cliente.nombrecategoria.equals("")?
                                                 "Sin categoría":
                                                 "Categoría: ".concat(cliente.nombrecategoria))
-                                        .concat("\nMonto Crédito: " + Utils.FormatoMoneda(cliente.montocredito,2))
+                                        .concat("\n\nMonto Crédito: " + Utils.FormatoMoneda(cliente.montocredito,2))
                                         .concat("\nDeuda Total: " + Utils.FormatoMoneda(cliente.deudatotal,2))
                                         .concat("\nMonto Disponible: " + Utils.FormatoMoneda(cliente.montocredito - cliente.deudatotal,2)));
                             }

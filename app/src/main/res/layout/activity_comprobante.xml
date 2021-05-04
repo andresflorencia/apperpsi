@@ -131,6 +131,40 @@
                                         android:textSize="13sp"/>
                                 </RadioGroup>
                             </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/lyEstablecimiento"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:padding="5dp"
+                                android:layout_gravity="center"
+                                android:gravity="center"
+                                android:visibility="gone">
+
+                                <TextView
+                                    android:id="@+id/lblEstablecimiento"
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_height="wrap_content"
+                                    android:text="PVP Establecimiento:"
+                                    style="@style/EstiloText_Black"
+                                    android:textAlignment="center"
+                                    android:textSize="14sp"
+                                    android:paddingLeft="10dp"
+                                    android:layout_marginRight="5dp"/>
+
+                                <Button
+                                    android:id="@+id/btnCambiaEstablecimiento"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="30dp"
+                                    android:text="Cambiar"
+                                    android:textColor="@color/colorWhite"
+                                    android:paddingHorizontal="10dp"
+                                    android:background="@drawable/bg_button_neutral"
+                                    android:drawableRight="@drawable/ic_store"
+                                    android:drawableTint="@color/colorWhite"/>
+                            </LinearLayout>
                         </LinearLayout>
                     </LinearLayout>
 
@@ -170,21 +204,36 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:orientation="horizontal"
-                                android:weightSum="2"
-                                android:layout_marginBottom="7dp">
-                                <Button
-                                    android:id="@+id/btnFechaDocumento"
+                                android:layout_marginBottom="7dp"
+                                android:paddingVertical="3dp"
+                                android:gravity="center">
+                                <LinearLayout
                                     android:layout_width="0dp"
-                                    android:layout_height="35dp"
                                     android:layout_weight="1"
-                                    android:text="01-01-0001"
-                                    android:drawableLeft="@drawable/ic_date"
-                                    android:paddingLeft="10dp"
-                                    android:textColor="@color/colorDate"
-                                    android:background="@drawable/bg_btn_date"
-                                    android:visibility="invisible"
-                                    android:layout_marginRight="3dp"
-                                    android:textAllCaps="false"/>
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical">
+                                    <TextView
+                                        android:id="@+id/lblTitleFecha"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Fecha de entrega"
+                                        android:textSize="10sp"
+                                        android:textColor="@color/colorDate"
+                                        android:layout_marginLeft="10dp"
+                                        android:visibility="gone"/>
+                                    <Button
+                                        android:id="@+id/btnFechaDocumento"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="35dp"
+                                        android:text="01-01-0001"
+                                        android:drawableLeft="@drawable/ic_date"
+                                        android:paddingLeft="10dp"
+                                        android:textColor="@color/colorDate"
+                                        android:background="@drawable/bg_btn_date"
+                                        android:visibility="invisible"
+                                        android:layout_marginRight="3dp"
+                                        android:textAllCaps="false"/>
+                                </LinearLayout>
                                 <Button
                                     android:id="@+id/btnBuscarProducto"
                                     android:layout_width="0dp"
@@ -196,7 +245,9 @@
                                     android:background="@drawable/border2"
                                     android:focusedByDefault="true"
                                     android:layout_marginLeft="3dp"
-                                    android:textSize="13sp"/>
+                                    android:textSize="13sp"
+                                    android:textAllCaps="false"
+                                    android:layout_gravity="bottom"/>
                             </LinearLayout>
 
                             <androidx.recyclerview.widget.RecyclerView
@@ -260,6 +311,15 @@
                 android:weightSum="2"
                 android:layout_marginHorizontal="10dp"
                 android:layout_marginTop="5dp">
+                <ImageButton
+                    android:id="@+id/btnObservacion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_eye_white"
+                    android:background="@drawable/bg_button_confirmation"
+                    android:paddingHorizontal="20dp"
+                    android:tooltipText="Observación del pedido"
+                    android:visibility="gone"/>
                 <TextView
                     android:id="@+id/lblTotal"
                     android:layout_width="match_parent"

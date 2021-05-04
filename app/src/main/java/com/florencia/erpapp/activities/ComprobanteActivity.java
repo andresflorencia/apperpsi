@@ -12,6 +12,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -28,11 +29,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,6 +48,7 @@ import com.florencia.erpapp.models.Cliente;
 import com.florencia.erpapp.models.Comprobante;
 import com.florencia.erpapp.models.DetalleComprobante;
 import com.florencia.erpapp.models.Lote;
+import com.florencia.erpapp.models.Sucursal;
 import com.florencia.erpapp.services.DeviceList;
 import com.florencia.erpapp.services.Printer;
 import com.florencia.erpapp.services.SQLite;
@@ -54,6 +58,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.google.gson.internal.bind.ReflectiveTypeAdapterFactory;
 import com.shasin.notificationbanner.Banner;
 
 import java.io.IOException;
@@ -92,15 +97,18 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
     ImageButton btViewSubtotales;
 
     //CONTROLES DEL DIALOG_BOTTOMSHEET
-    TextView lblMessage, lblTitle, lblCliente, lblProducto, lblLeyendaCF;
-    LinearLayout lyCliente, lyProductos, lyBotones, lyFormaPago;
+    TextView lblMessage, lblTitle, lblCliente, lblProducto, lblLeyendaCF, lblEstablecimiento;
+    LinearLayout lyCliente, lyProductos, lyBotones, lyFormaPago, lyEstablecimiento;
     BottomSheetDialog btsDialog;
     Button btnPositive, btnNegative;
+    public Button btnCambiaEstablecimiento;
     View viewSeparator, rootView;
     RadioButton rbEfectivo, rbCredito;
     String tipoAccion="";
     OkHttpClient okHttpClient;
     Retrofit retrofit;
+
+    Integer posEstablec = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -228,6 +236,10 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
         lyFormaPago = findViewById(R.id.lyFormaPago);
         rbEfectivo = findViewById(R.id.rbEfectivo);
         rbCredito = findViewById(R.id.rbCredito);
+        lblEstablecimiento = findViewById(R.id.lblEstablecimiento);
+        btnCambiaEstablecimiento = findViewById(R.id.btnCambiaEstablecimiento);
+        lyEstablecimiento = findViewById(R.id.lyEstablecimiento);
+        lyEstablecimiento.setVisibility(View.VISIBLE);
         lyFormaPago.setVisibility(View.VISIBLE);
         rbCredito.setEnabled(false);
 
@@ -237,6 +249,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
         btnBuscarProducto.setOnClickListener(this::onClick);
         lblCliente.setOnClickListener(this::onClick);
         lblProducto.setOnClickListener(this::onClick);
+        btnCambiaEstablecimiento.setOnClickListener(this::onClick);
 
         okHttpClient = new OkHttpClient().newBuilder()
                 .connectTimeout(60, TimeUnit.SECONDS)
@@ -314,6 +327,14 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                 detalleAdapter.notifyDataSetChanged();
             }
         );
+
+        for(Sucursal e:SQLite.usuario.establecimientos){
+            if(e.IdEstablecimiento == SQLite.usuario.establecimiento_fact){
+                posEstablec = SQLite.usuario.establecimientos.indexOf(e);
+                lblEstablecimiento.setText("PVP >> " + e.NombreSucursal);
+                break;
+            }
+        }
     }
 
     @Override
@@ -346,7 +367,33 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
             case R.id.lblProducto:
                 Utils.EfectoLayout(lyProductos, lblProducto);
                 break;
+            case R.id.btnCambiaEstablecimiento:
+                CambiarEstablecimiento();
+                break;
         }
+    }
+
+    private void CambiarEstablecimiento(){
+
+        final ArrayAdapter<Sucursal> adapter =
+                new ArrayAdapter<Sucursal>(ComprobanteActivity.this,
+                        android.R.layout.select_dialog_singlechoice, SQLite.usuario.establecimientos);
+
+        AlertDialog.Builder alt_bld = new AlertDialog.Builder(this);
+        //alt_bld.setIcon(R.drawable.icon);
+        alt_bld.setTitle("Seleccione el establecimiento");
+        alt_bld.setSingleChoiceItems(adapter, posEstablec,
+                (dialog,item) ->{
+                posEstablec = item;
+                lblEstablecimiento.setText("PVP >> " + SQLite.usuario.establecimientos.get(item).NombreSucursal);
+                SQLite.usuario.establecimiento_fact = SQLite.usuario.establecimientos.get(item).IdEstablecimiento;
+                SQLite.usuario.GuardarSesionLocal(ComprobanteActivity.this);
+                Utils.showMessage(ComprobanteActivity.this,
+                        "Los productos se facturarán con los precios y reglas de precio de «" + SQLite.usuario.establecimientos.get(item).NombreSucursal + "»");
+                dialog.dismiss();
+            });
+        AlertDialog alert = alt_bld.create();
+        alert.show();
     }
 
     private void MostrarInfoDialog(Integer idcliente){
@@ -391,6 +438,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                                 rbCredito.setText("Crédito");
                                 rbEfectivo.setEnabled(false);
                                 rbCredito.setEnabled(false);
+                                lyEstablecimiento.setVisibility(View.GONE);
                             } else {
                                 Banner.make(rootView, ComprobanteActivity.this,Banner.ERROR,"Ocurrió un error al obtener los datos para esta factura.", Banner.BOTTOM, 3500).show();
                             }
@@ -595,6 +643,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
             comprobante.usuarioid = SQLite.usuario.IdUsuario;
             comprobante.longdate = Utils.longDate(comprobante.fechadocumento);
             comprobante.formapago = rbCredito.isChecked()?0:1;
+            comprobante.establecimientoprecioid = SQLite.usuario.establecimiento_fact;
 
             SQLite.gpsTracker.getLastKnownLocation();
             comprobante.lat = SQLite.gpsTracker.getLatitude();
@@ -688,6 +737,8 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
             idcomprobante = 0;
             toolbar.getMenu().findItem(R.id.option_save).setVisible(true);
             lblLeyendaCF.setVisibility(View.VISIBLE);
+            lyEstablecimiento.setVisibility(View.VISIBLE);
+            btnCambiaEstablecimiento.setVisibility(View.VISIBLE);
         }catch (Exception e){
             Log.d(TAG, "LimpiarDatos(): " + e.getMessage());
         }
@@ -921,6 +972,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                     detalleAdapter.CambiarPrecio(cliente.categoria.equals("")?"0":cliente.categoria, rbCredito.isChecked());
                     detalleAdapter.CalcularTotal();
                     detalleAdapter.notifyDataSetChanged();
+                    btnCambiaEstablecimiento.setVisibility(View.GONE);
                     break;
                 case REQUEST_CLIENTE:
                     Integer idcliente = data.getExtras().getInt("idcliente",0);

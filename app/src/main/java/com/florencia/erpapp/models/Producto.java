@@ -128,8 +128,8 @@ public class Producto
             Item.clasificacionid = cursor.getInt(18);
             Item.nombreclasificacion = cursor.getString(19);
             Item.lotes = Lote.getAll(Item.idproducto, Item.establecimientoid);
-            Item.reglas = Regla.getAll(Item.idproducto, Item.establecimientoid);
-            Item.precioscategoria = PrecioCategoria.getAll(Item.idproducto, Item.establecimientoid);
+            Item.reglas = Regla.getAll(Item.idproducto, SQLite.usuario.establecimiento_fact);
+            Item.precioscategoria = PrecioCategoria.getAll(Item.idproducto, SQLite.usuario.establecimiento_fact);
         }catch (Exception e){
             Log.d(TAG,"Asigna(): " +e.getMessage());
         }finally {}
@@ -262,27 +262,35 @@ public class Producto
         return Items;
     }
 
-    public static List<Categoria> getCategorias(Integer establecimientoid){
+    public static List<Categoria> getCategorias(Integer establecimientoid, String tipobusqueda){
         List<Categoria> categorias = new ArrayList<>();
+        String WHERE = "";
         try {
+            if(tipobusqueda.equals("01")) //FACTURACION
+                WHERE = " AND (tipo = 'S' OR stock > 0) ";
+            if(tipobusqueda.equals("4,20") | tipobusqueda.equals("20,4")) //TRANSFERENCIAS
+                WHERE = " AND tipo = 'P' AND stock > 0 ";
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
-            Cursor cursor = sqLiteDatabase.rawQuery("SELECT DISTINCT clasificacionid, nombreclasificacion FROM producto " +
-                            "WHERE establecimientoid = ? GROUP BY clasificacionid, nombreclasificacion ORDER BY nombreclasificacion",
+            Cursor cursor = sqLiteDatabase.rawQuery("SELECT DISTINCT clasificacionid, nombreclasificacion, count(clasificacionid) AS cantidad FROM producto " +
+                            "WHERE establecimientoid = ? " + WHERE + " GROUP BY clasificacionid, nombreclasificacion ORDER BY nombreclasificacion",
                     new String[]{establecimientoid.toString()});
+            Integer total = 0;
             Categoria micategoria = new Categoria();
             micategoria.categoriaid = -1;
             micategoria.nombrecategoria = "Todos";
             micategoria.seleccionado = true;
             categorias.add(micategoria);
-
             if (cursor.moveToFirst()) {
                 do {
                     micategoria = new Categoria();
                     micategoria.categoriaid = cursor.getInt(0);
                     micategoria.nombrecategoria = cursor.getString(1);
+                    micategoria.cantidad = cursor.getInt(2);
+                    total += micategoria.cantidad;
                     categorias.add(micategoria);
                 } while (cursor.moveToNext());
             }
+            categorias.get(0).cantidad = total;
             cursor.close();
             sqLiteDatabase.close();
         }catch (Exception e){

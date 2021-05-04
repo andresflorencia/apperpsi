@@ -50,10 +50,9 @@
                     android:textColor="@color/colorend_splash"
                     android:drawableRight="@drawable/ic_cloud_arrow_up"
                     android:drawableTint="@color/colorend_splash"
-                    android:paddingEnd="30dp"
-                    android:paddingStart="20dp"
+                    android:paddingEnd="5dp"
                     android:textSize="30sp"
-                    android:textAlignment="center"/>
+                    android:textAlignment="viewEnd"/>
             </LinearLayout>
             <TextView
                 android:id="@+id/tvTotal"

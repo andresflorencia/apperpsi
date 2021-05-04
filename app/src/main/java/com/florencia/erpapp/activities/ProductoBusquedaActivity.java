@@ -108,7 +108,7 @@ public class ProductoBusquedaActivity extends AppCompatActivity implements Searc
             Thread th = new Thread(){
                 @Override
                 public void run(){
-                    categorias = Producto.getCategorias(SQLite.usuario.sucursal.IdEstablecimiento);
+                    categorias = Producto.getCategorias(SQLite.usuario.sucursal.IdEstablecimiento, tipobusqueda);
                     switch (tipobusqueda) {
                         case "01":
                         case "PC":
@@ -125,10 +125,10 @@ public class ProductoBusquedaActivity extends AppCompatActivity implements Searc
                                 lyLoading.setVisibility(View.VISIBLE);
                                 lyContainer.setVisibility(View.GONE);
                             } else {
-                                clasificacionAdapter = new ClasificacionAdapter(ProductoBusquedaActivity.this, categorias);
-                                rvCategorias.setAdapter(clasificacionAdapter);
                                 productoAdapter = new ProductoAdapter(toolbar,lstProductos, tipobusqueda, ProductoBusquedaActivity.this);
                                 rvProductos.setAdapter(productoAdapter);
+                                clasificacionAdapter = new ClasificacionAdapter(ProductoBusquedaActivity.this, categorias);
+                                rvCategorias.setAdapter(clasificacionAdapter);
                                 lyLoading.setVisibility(View.GONE);
                                 lyContainer.setVisibility(View.VISIBLE);
                                 svBusqueda.setEnabled(true);

@@ -41,8 +41,10 @@ public class Usuario {
     public int Perfil;
     public String nombrePerfil;
     public String nip;
+    public Integer establecimiento_fact;
 
     public List<Permiso> permisos;
+    public List<Sucursal> establecimientos;
 
     public static SQLiteDatabase sqLiteDatabase;
     public static String TAG = "TAGUSUARIO";
@@ -59,7 +61,8 @@ public class Usuario {
         this.permisos = new ArrayList<>();
         this.nombrePerfil = "";
         this.nip = "";
-        //this.context = context;
+        this.establecimientos = new ArrayList<>();
+        this.establecimiento_fact = 0;
     }
 
     public String Codigo() {return String.valueOf(this.IdUsuario); }
@@ -118,7 +121,8 @@ public class Usuario {
         Item.nombrePerfil = cursor.getString(9);
         Item.nip = cursor.getString(10);
         Item.permisos = Permiso.getPermisos(Item.Perfil);
-
+        Item.establecimientos = Sucursal.getSucursales(Item.IdUsuario);
+        Item.establecimiento_fact = Item.sucursal.IdEstablecimiento;
         return Item;
     }
 
@@ -320,7 +324,8 @@ public class Usuario {
                 .putString("pin", this.Pin)
                 .putString("ultimaconexion", conexionactual)
                 .putString("conexionactual", Utils.getDateFormat("dd MMM yyyy HH:mm"))
-                .putString("rucempresa", this.sucursal.RUC);
+                .putString("rucempresa", this.sucursal.RUC)
+                .putInt("establecimiento_fac", this.establecimiento_fact!=0?this.establecimiento_fact:this.sucursal.IdEstablecimiento);
         return editor.commit();
     }
 

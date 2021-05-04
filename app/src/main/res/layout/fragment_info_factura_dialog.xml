@@ -8,6 +8,7 @@
     android:background="@android:color/transparent">
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/cvContent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:elevation="5dp"
@@ -15,9 +16,11 @@
         android:layout_margin="5dp"
         android:padding="5dp">
         <LinearLayout
+            android:id="@+id/lyContent"
             android:layout_width="380dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:background="@color/colorWhite">
 
             <!--ENCABEZADO-->
             <LinearLayout android:id="@+id/lyEncabezado"
@@ -63,6 +66,16 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_margin="5dp">
+                <!--DATOS DE EMPRESA-->
+                <TextView
+                    android:id="@+id/lblEmpresa"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/black"
+                    android:textAlignment="center"/>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -151,7 +164,6 @@
                             android:layout_weight="3"
                             android:layout_height="wrap_content"
                             android:text=""
-                            android:textAlignment="center"
                             android:textSize="13sp"
                             android:textColor="@android:color/black"/>
                         <TextView
@@ -218,6 +230,41 @@
                     android:layout_height="250dp"
                     android:layout_margin="5dp"
                     android:visibility="gone"/>
+                <TextView
+                    android:id="@+id/txtLeyenda"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="11sp"
+                    android:textColor="@android:color/black"
+                    android:textAlignment="center"/>
+            </LinearLayout>
+
+            <!--OPCIONES-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="end">
+                <ImageButton
+                    android:id="@+id/btnShareW"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/whatsapp"
+                    android:layout_gravity="end"
+                    android:background="@null"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginRight="10dp"/>
+                <ImageButton
+                    android:id="@+id/btnShare"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_share"
+                    android:layout_gravity="end"
+                    android:background="@null"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginRight="10dp"
+                    android:scaleX="1.5"
+                    android:scaleY="1.5"/>
             </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>

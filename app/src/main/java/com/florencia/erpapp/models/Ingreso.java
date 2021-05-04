@@ -158,9 +158,9 @@ public class Ingreso {
         ArrayList<Ingreso> Items = new ArrayList<>();
         try {
             List<String> listparams = new ArrayList<>();
-            String WHERE = "usuarioid = ? and establecimientoid = ? and estado not in (-1) ";
+            String WHERE = "usuarioid = ? and estado not in (-1) ";
             listparams.add(idUser.toString());
-            listparams.add(establecimientoid.toString());
+            //listparams.add(establecimientoid.toString());
             if(!fechadesde.equals("")) {
                 WHERE += " and longdater >= ?";
                 listparams.add(String.valueOf(Utils.longDate(fechadesde)));

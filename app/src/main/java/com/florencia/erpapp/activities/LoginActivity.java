@@ -68,6 +68,7 @@ public class LoginActivity extends AppCompatActivity {
     private ProgressDialog pbProgreso;
     View rootView;
     Retrofit retrofit;
+    Gson gson;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,7 +95,7 @@ public class LoginActivity extends AppCompatActivity {
                 .writeTimeout(60, TimeUnit.SECONDS)
                 .build();
 
-        Gson gson = new GsonBuilder()
+        gson = new GsonBuilder()
                 .setLenient()
                 .create();
 
@@ -105,12 +106,6 @@ public class LoginActivity extends AppCompatActivity {
                     + (SQLite.configuracion.hasSSL ? "" : "/erpproduccion")
                     + Constants.ENDPOINT;
         }
-
-        retrofit = new Retrofit.Builder()
-                .baseUrl(SQLite.configuracion.url_ws)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .client(okHttpClient)
-                .build();
 
         sPreferencesSesion = getSharedPreferences("DatosSesion", MODE_PRIVATE);
         if(sPreferencesSesion != null){
@@ -180,6 +175,7 @@ public class LoginActivity extends AppCompatActivity {
             Usuario user = Usuario.getUsuario(id);
             if(user != null) {
                 SQLite.usuario = user;
+                SQLite.usuario.establecimiento_fact = sPreferencesSesion.getInt("establecimiento_fac",SQLite.usuario.sucursal.IdEstablecimiento);
                 SQLite.usuario.GuardarSesionLocal(this);
                 Intent i = new Intent(this, MainActivity.class);
                 startActivity(i);
@@ -281,11 +277,11 @@ public class LoginActivity extends AppCompatActivity {
             //String User = etUser.getText().toString().trim();
             //String Clave = etPassword.getText().toString();
             if (User.equals("")) {
-                etUser.setError("Ingrese el usuario");
+                Banner.make(rootView, LoginActivity.this, Banner.ERROR, "Debe ingresar el usuario...", Banner.TOP, 2000).show();
                 return;
             }
             if(Clave.equals("")){
-                etUser.setError("Ingrese la contraseña");
+                Banner.make(rootView, LoginActivity.this, Banner.ERROR, "Debe ingresar la contraseña...", Banner.TOP, 2000).show();
                 return;
             }
 
@@ -322,6 +318,18 @@ public class LoginActivity extends AppCompatActivity {
                                 usuario.ParroquiaID = jsonUsuario.get("parroquiaid").getAsInt();
                                 usuario.nombrePerfil = jsonUsuario.has("nombreperfil")?jsonUsuario.get("nombreperfil").getAsString():"";
                                 usuario.nip = jsonUsuario.has("nip")?jsonUsuario.get("nip").getAsString():"";
+                                usuario.establecimiento_fact = usuario.sucursal.IdEstablecimiento;
+
+                                usuario.establecimientos.clear();
+                                usuario.establecimientos.add(usuario.sucursal);
+                                if(jsonUsuario.has("establecimientos")) {
+                                    JsonArray jsonEstablecimientos = jsonUsuario.get("establecimientos").getAsJsonArray();
+                                    if(jsonEstablecimientos!=null){
+                                        for(JsonElement est:jsonEstablecimientos){
+                                            usuario.establecimientos.add((Sucursal.AsignaDatos(est.getAsJsonObject())));
+                                        }
+                                    }
+                                }
 
                                 JsonArray jsonPermisos = jsonUsuario.get("permisos").getAsJsonArray();
                                 //usuario.permisos = new Gson().fromJson(jsonPermisos, usuario.permisos.getClass());
@@ -492,6 +500,13 @@ public class LoginActivity extends AppCompatActivity {
                     + SQLite.configuracion.urlbase
                     + (SQLite.configuracion.hasSSL?"":"/erpproduccion")
                     + Constants.ENDPOINT;
+
+
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(SQLite.configuracion.url_ws)
+                    .addConverterFactory(GsonConverterFactory.create(gson))
+                    .client(okHttpClient)
+                    .build();
         }
         super.onResume();
     }

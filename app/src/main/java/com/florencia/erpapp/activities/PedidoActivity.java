@@ -3,10 +3,12 @@ package com.florencia.erpapp.activities;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -78,8 +80,8 @@ public class PedidoActivity extends AppCompatActivity {
     Integer idpedido=0;
     ProgressDialog pgCargando;
     Toolbar toolbar;
-    ImageButton btViewSubtotales;
-    TextView lblLeyendaCF, lblMessage, lblTitle, lblCliente, lblProducto;
+    ImageButton btViewSubtotales, btnObservacion;
+    TextView lblLeyendaCF, lblMessage, lblTitle, lblCliente, lblProducto, lblTitleFecha;
     LinearLayout lyCliente, lyProductos, lyBotones;
     DatePickerDialog dtpDialog;
     Calendar calendar;
@@ -191,8 +193,12 @@ public class PedidoActivity extends AppCompatActivity {
         btViewSubtotales = findViewById(R.id.btViewSubtotales);
         lblLeyendaCF = findViewById(R.id.lblLeyendaCF);
         btnFecha = findViewById(R.id.btnFechaDocumento);
+        btnObservacion = findViewById(R.id.btnObservacion);
+        lblTitleFecha = findViewById(R.id.lblTitleFecha);
+        btnObservacion.setVisibility(View.VISIBLE);
         lblLeyendaCF.setVisibility(View.GONE);
         btnFecha.setVisibility(View.VISIBLE);
+        lblTitleFecha.setVisibility(View.VISIBLE);
         EstablecerFecha("");
         //btnFecha.setText(Utils.getDateFormat("yyyy-MM-dd"));
         lblCliente = findViewById(R.id.lblCliente);
@@ -209,11 +215,14 @@ public class PedidoActivity extends AppCompatActivity {
         btnFecha.setOnClickListener(onClick);
         lblCliente.setOnClickListener(onClick);
         lblProducto.setOnClickListener(onClick);
+        btnObservacion.setOnClickListener(onClick);
 
         if(SQLite.gpsTracker==null)
             SQLite.gpsTracker = new GPSTracker(this);
         if (!SQLite.gpsTracker.checkGPSEnabled())
             SQLite.gpsTracker.showSettingsAlert(PedidoActivity.this);
+
+        btnObservacion.setTag("");
 
         if(getIntent().getExtras()!=null){
             int idcliente = getIntent().getExtras().getInt("idcliente",0);
@@ -273,8 +282,48 @@ public class PedidoActivity extends AppCompatActivity {
                 case R.id.lblProducto:
                     Utils.EfectoLayout(lyProductos, lblProducto);
                     break;
+                case R.id.btnObservacion:
+                    IngresaObservacion(btnObservacion.getTag().toString());
+                    break;
             }
         };
+
+    void IngresaObservacion(String observacion){
+        try {
+
+            EditText txtObservacion;
+            Button btnOk;
+            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(PedidoActivity.this,
+                    R.style.AlertDialogTheme);
+            View view = LayoutInflater.from(PedidoActivity.this).inflate(R.layout.layout_observacion_dialog,
+                    (ConstraintLayout) findViewById(R.id.lyDialogContainer));
+            builder.setView(view);
+            txtObservacion = view.findViewById(R.id.txtObservacion);
+            btnOk = (Button)view.findViewById(R.id.btnConfirm);
+            ((Button)view.findViewById(R.id.btnCancel)).setText("Cancelar");
+            btnOk.setText("Confirmar");
+            txtObservacion.setText(observacion); txtObservacion.setSelectAllOnFocus(true);
+
+            txtObservacion.setEnabled(idpedido == 0);
+
+            final android.app.AlertDialog alertDialog = builder.create();
+            btnOk.setOnClickListener(
+                    v -> {
+                        btnObservacion.setTag(txtObservacion.getText().toString());
+                        alertDialog.dismiss();
+                    }
+            );
+
+            view.findViewById(R.id.btnCancel).setOnClickListener(v -> alertDialog.dismiss());
+
+            if(alertDialog.getWindow()!=null)
+                alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+            alertDialog.show();
+        }catch (Exception e){
+            Log.d(TAG, e.getMessage());
+        }
+
+    }
 
     public void showDatePickerDialog(View v) {
         Locale l = new Locale("ES-es");
@@ -336,6 +385,7 @@ public class PedidoActivity extends AppCompatActivity {
                                 pedido.getTotal();
                                 detalleAdapter.notifyDataSetChanged();
                                 setSubtotales(pedido.total, pedido.subtotal, pedido.subtotaliva);
+                                btnObservacion.setTag(pedido.observacion);
                             } else {
                                 //Utils.showMessage(PedidoActivity.this, "Ocurrió un error al obtener los datos para este comprobante.");
                                 Banner.make(rootView,PedidoActivity.this, Banner.ERROR,"Ocurrió un error al obtener los datos para este pedido.", Banner.BOTTOM, 3000).show();
@@ -463,6 +513,7 @@ public class PedidoActivity extends AppCompatActivity {
             pedido.categoria = cliente.categoria.equals("")?"0":cliente.categoria;
             pedido.parroquiaid = SQLite.usuario.ParroquiaID;
             pedido.longdate = Utils.longDate(Utils.getDateFormat("yyyy-MM-dd"));
+            pedido.observacion = btnObservacion.getTag().toString();
 
             SQLite.gpsTracker.getLastKnownLocation();
             pedido.lat = SQLite.gpsTracker.getLatitude();
@@ -520,6 +571,7 @@ public class PedidoActivity extends AppCompatActivity {
             detalleAdapter.notifyDataSetChanged();
             btnBuscarProducto.setVisibility(View.VISIBLE);
             idpedido = 0;
+            btnObservacion.setTag("");
             EstablecerFecha("");
             btnFecha.setEnabled(true);
         }catch (Exception e){

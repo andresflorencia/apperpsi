@@ -55,8 +55,9 @@ public class Regla {
         try {
             ContentValues values;
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
-            sqLiteDatabase.delete("reglaprecio","productoid = ? and establecimientoid in (?, ?)", new String[]{idproducto.toString(), establecimientoid.toString(), "0"});
+            sqLiteDatabase.delete("reglaprecio","productoid = ?", new String[]{idproducto.toString()});
             for(Regla regla: reglas) {
+                sqLiteDatabase.delete("reglaprecio","idproductoregla = ?", new String[]{regla.idproductoregla.toString()});
                 regla.longdate = Utils.longDate(regla.fechamaxima);
                 values= new ContentValues();
                 values.put("idproductoregla", regla.idproductoregla);

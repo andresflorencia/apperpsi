@@ -61,7 +61,7 @@ public class ClasificacionAdapter extends RecyclerView.Adapter<ClasificacionAdap
         }
 
         void bindClasificacion(final Categoria categoria){
-            tvNombre.setText(categoria.nombrecategoria.toUpperCase());
+            tvNombre.setText(categoria.nombrecategoria.toUpperCase().concat(" (" + categoria.cantidad + ")"));
             if(categoria.seleccionado){
                 tvNombre.setTextColor(Color.WHITE);
                 itemView.setBackgroundResource(R.drawable.bg_button_confirmation);

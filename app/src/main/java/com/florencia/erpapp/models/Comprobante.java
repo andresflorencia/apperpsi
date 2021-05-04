@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Comprobante {
-    public Integer idcomprobante, establecimientoid, usuarioid, codigosistema, formapago;
+    public Integer idcomprobante, establecimientoid, usuarioid, codigosistema, formapago, establecimientoprecioid;
     public String codigotransaccion, tipotransaccion, fechacelular, fechadocumento, observacion,
                     codigoestablecimiento, puntoemision, claveacceso, nip, sucursalenvia, sucursalrecibe;
     public Double subtotal, subtotaliva, descuento, porcentajeiva, total, lat, lon;
@@ -53,6 +53,7 @@ public class Comprobante {
         this.detalle = new ArrayList<>();
         this.longdate = 0l;
         this.formapago = 1;
+        this.establecimientoprecioid = 0;
     }
 
     public static boolean Update(Integer idcomprobante, ContentValues values) {
@@ -104,13 +105,13 @@ public class Comprobante {
             sqLiteDatabase.execSQL("INSERT OR REPLACE INTO " +
                     "comprobante(idcomprobante, establecimientoid, clienteid, usuarioid, codigosistema, codigotransaccion, tipotransaccion, " +
                     "fechacelular, fechadocumento, observacion, subtotal, subtotaliva, descuento, porcentajeiva, total, estado, lat, lon, claveacceso, " +
-                            "secuencial, nip, sucursalenvia, sucursalrecibe, longdate, formapago) " +
-                    "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                            "secuencial, nip, sucursalenvia, sucursalrecibe, longdate, formapago, establecimientoprecioid) " +
+                    "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     new String[]{this.idcomprobante == 0?null:this.idcomprobante.toString(), this.establecimientoid.toString(), this.cliente.idcliente.toString(), this.usuarioid.toString(), this.codigosistema.toString(),
                         this.codigotransaccion, this.tipotransaccion, this.fechacelular, this.fechadocumento, this.observacion, this.subtotal.toString(),
                         this.subtotaliva.toString(), this.descuento.toString(), this.porcentajeiva.toString(), this.total.toString(), this.estado.toString(),
                         this.lat.toString(), this.lon.toString(), this.claveacceso, this.secuencial.toString(), this.nip, this.sucursalenvia, this.sucursalrecibe,
-                        this.longdate.toString(), this.formapago.toString()});
+                        this.longdate.toString(), this.formapago.toString(), this.establecimientoprecioid.toString()});
             if (this.idcomprobante == 0)
                 this.idcomprobante = SQLite.sqlDB.getLastId();
             else
@@ -209,14 +210,14 @@ public class Comprobante {
         try {
             List<String> listparams = new ArrayList<>();
             listparams.add(idUser.toString());
-            listparams.add(establecimientoid.toString());
+            //listparams.add(establecimientoid.toString());
             String[]tiptrans = tipotransaccion.split(",");
             String in = "";
             for (int i=0; i<tiptrans.length;i++) {
                 in += i==tiptrans.length-1?"?":"?,";
                 listparams.add(tiptrans[i]);
             }
-            String WHERE = "usuarioid = ? and establecimientoid = ? and estado not in (-1) and tipotransaccion in ("+in+") ";
+            String WHERE = "usuarioid = ? and estado not in (-1) and tipotransaccion in ("+in+") ";
 
             if(!fechadesde.equals("")) {
                 WHERE += "and longdate >= ? ";
@@ -300,6 +301,7 @@ public class Comprobante {
             Item.sucursalrecibe = cursor.getString(22);
             Item.longdate = cursor.getLong(23);
             Item.formapago = cursor.getInt(24);
+            Item.establecimientoprecioid = cursor.getInt(25);
             Item.detalle = DetalleComprobante.getDetalle(Item.idcomprobante);
         } catch (Exception ec) {
             ec.printStackTrace();
