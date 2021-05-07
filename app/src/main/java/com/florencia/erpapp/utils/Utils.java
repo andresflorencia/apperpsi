@@ -407,10 +407,7 @@ public class Utils {
             ((TextView) view.findViewById(R.id.lblMessage)).setText(message);
             ((Button)view.findViewById(R.id.btnAction)).setText("Ok");
             final AlertDialog alertDialog = builder.create();
-            view.findViewById(R.id.btnAction).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {alertDialog.dismiss();}
-            });
+            view.findViewById(R.id.btnAction).setOnClickListener(v -> alertDialog.dismiss());
             if(alertDialog.getWindow()!=null)
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
             alertDialog.show();
@@ -430,9 +427,8 @@ public class Utils {
             ((TextView) view.findViewById(R.id.lblMessage)).setText(message);
             ((Button)view.findViewById(R.id.btnAction)).setText("Ok");
             final AlertDialog alertDialog = builder.create();
-            view.findViewById(R.id.btnAction).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            view.findViewById(R.id.btnAction).setOnClickListener(
+                (v)-> {
                     if(returnOK){
                         context.setResult(Activity.RESULT_OK);
                         context.finish();
@@ -441,7 +437,7 @@ public class Utils {
                     else
                         alertDialog.dismiss();
                 }
-            });
+            );
             if(alertDialog.getWindow()!=null)
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
             alertDialog.show();

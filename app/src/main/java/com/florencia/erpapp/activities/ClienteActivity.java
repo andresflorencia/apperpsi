@@ -377,7 +377,8 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
                 //Banner.make(rootView, this, Banner.SUCCESS, Constants.MSG_DATOS_GUARDADOS, Banner.BOTTOM, 3000).show();
                 if(this.isReturn)
                     setResult(Activity.RESULT_OK,new Intent().putExtra("idcliente",miCliente.idcliente));
-                finish();
+                onBackPressed();
+                overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
                 //this.LimpiarDatos();
             }else
                 Banner.make(rootView,this,Banner.ERROR,Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM,3500).show();
@@ -476,7 +477,11 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
             ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
             ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
             final AlertDialog alertDialog = builder.create();
-            view.findViewById(R.id.btnConfirm).setOnClickListener(v -> finish());
+            view.findViewById(R.id.btnConfirm).setOnClickListener(v ->
+                {
+                    onBackPressed();
+                    overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
+                });
 
             view.findViewById(R.id.btnCancel).setOnClickListener(v -> alertDialog.dismiss());
 

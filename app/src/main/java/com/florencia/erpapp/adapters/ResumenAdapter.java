@@ -124,8 +124,10 @@ public class ResumenAdapter extends RecyclerView.Adapter<ResumenAdapter.ResumenV
                                 i = new Intent(activity, DepositoActivity.class);
                                 break;
                         }
-                        if(i != null)
+                        if(i != null) {
                             activity.startActivity(i);
+                            activity.overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
+                        }
                     }
                 }
             );

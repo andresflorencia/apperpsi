@@ -104,6 +104,7 @@ public class ClienteBusquedaActivity extends AppCompatActivity implements Search
                 i = new Intent(this, ClienteActivity.class);
                 i.putExtra("nuevo_cliente",true);
                 startActivityForResult(i, REQUEST_NEW_CLIENTE);
+                overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -142,5 +143,11 @@ public class ClienteBusquedaActivity extends AppCompatActivity implements Search
         if(clienteAdapter!=null)
             clienteAdapter.filter(newText);
         return false;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.right_in, R.anim.right_out);
     }
 }

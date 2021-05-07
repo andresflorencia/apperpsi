@@ -366,6 +366,7 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                     if(retornar) {
                         activity.setResult(Activity.RESULT_OK, new Intent().putExtra("idcomprobante", idcomprobante));
                         activity.finish();
+                        activity.overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
                     } else{
                         Intent i = null;
                         switch (tipobusqueda) {
@@ -389,6 +390,7 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                         }
                         i.putExtra("idcomprobante", idcomprobante);
                         activity.startActivity(i);
+                        activity.overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
                     }
                 }
             );

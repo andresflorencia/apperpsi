@@ -577,7 +577,10 @@ public class DepositoActivity extends AppCompatActivity implements View.OnClickL
             ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
             ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
             final android.app.AlertDialog alertDialog = builder.create();
-            view.findViewById(R.id.btnConfirm).setOnClickListener(v -> finish());
+            view.findViewById(R.id.btnConfirm).setOnClickListener(v -> {
+                onBackPressed();
+                overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
+            });
 
             view.findViewById(R.id.btnCancel).setOnClickListener(v -> alertDialog.dismiss());
 

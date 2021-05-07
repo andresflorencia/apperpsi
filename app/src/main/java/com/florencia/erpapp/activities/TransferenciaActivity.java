@@ -839,6 +839,7 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
                 Intent i = new Intent(this, ListaComprobantesActivity.class);
                 i.putExtra("tipobusqueda","4,20"); //TRANSFERENCIA - DEVOLUCIONES
                 startActivityForResult(i, REQUEST_BUSQUEDA_TRANSFERENCIA);
+                overridePendingTransition(R.anim.left_in, R.anim.left_out);
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -866,7 +867,10 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
             ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
             ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
             final AlertDialog alertDialog = builder.create();
-            view.findViewById(R.id.btnConfirm).setOnClickListener(v ->finish());
+            view.findViewById(R.id.btnConfirm).setOnClickListener(v ->{
+                onBackPressed();
+                overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
+            });
 
             view.findViewById(R.id.btnCancel).setOnClickListener(v -> alertDialog.dismiss());
 

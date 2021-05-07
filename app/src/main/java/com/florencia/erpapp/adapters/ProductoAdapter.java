@@ -145,6 +145,12 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.Produc
         }
     }
 
+    /*@Override
+    public void onViewAttachedToWindow(ProductoViewHolder holder) {
+        super.onViewAttachedToWindow(holder);
+        Utils.animateCircularReveal(holder.itemView);
+    }*/
+
     class ProductoViewHolder extends RecyclerView.ViewHolder{
 
         TextView tvNombreProducto, tvPrecio, tvStock;

@@ -163,7 +163,8 @@ public class ConfigActivity extends AppCompatActivity {
                 //Utils.showSuccessDialog(this, "Configuración",Constants.MSG_DATOS_GUARDADOS,true,false);
                 //Banner.make(rootView, ConfigActivity.this, Banner.SUCCESS, Constants.MSG_DATOS_GUARDADOS, Banner.BOTTOM,2000).show();
                 Utils.showMessage(ConfigActivity.this, Constants.MSG_DATOS_GUARDADOS);
-                finish();
+                onBackPressed();
+                overridePendingTransition(R.anim.right_in, R.anim.right_out);
             }else{
                 //Utils.showErrorDialog(this, "Error",Constants.MSG_DATOS_NO_GUARDADOS);
                 Banner.make(rootView, this, Banner.ERROR, Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM,3000).show();
@@ -178,5 +179,11 @@ public class ConfigActivity extends AppCompatActivity {
         toolbar.setTitle("Configuración");
         toolbar.setTitleTextColor(Color.WHITE);
         super.onResume();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.right_in, R.anim.right_out);
     }
 }

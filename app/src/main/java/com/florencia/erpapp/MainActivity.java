@@ -245,26 +245,32 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.nav_factura:
                         i = new Intent(MainActivity.this, ComprobanteActivity.class);
                         startActivity(i);
+                        overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
                         break;
                     case R.id.nav_pedido:
                         i = new Intent(MainActivity.this, PedidoActivity.class);
                         startActivity(i);
+                        overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
                         break;
                     case R.id.nav_recepcion:
                         i = new Intent(MainActivity.this, RecepcionActivity.class);
                         startActivity(i);
+                        overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
                         break;
                     case R.id.nav_transferencia:
                         i = new Intent(MainActivity.this, TransferenciaActivity.class);
                         startActivity(i);
+                        overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
                         break;
                     case R.id.nav_pedidoinv:
                         i = new Intent(MainActivity.this, PedidoInventarioActivity.class);
                         startActivity(i);
+                        overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
                         break;
                     case R.id.nav_config:
                         i = new Intent(MainActivity.this, ConfigActivity.class);
                         startActivity(i);
+                        overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
                         break;
                     case R.id.nav_cerrarsesion:
                         if(SQLite.usuario != null) {
@@ -285,6 +291,7 @@ public class MainActivity extends AppCompatActivity {
                                         Intent in = new Intent(MainActivity.this, LoginActivity.class);
                                         startActivity(in);
                                         alertDialog.dismiss();
+                                        overridePendingTransition(R.anim.right_in, R.anim.right_out);
                                         finish();
                                     }
                                 }

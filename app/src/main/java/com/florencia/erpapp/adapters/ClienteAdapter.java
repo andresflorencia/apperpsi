@@ -92,6 +92,12 @@ public class ClienteAdapter extends RecyclerView.Adapter<ClienteAdapter.ClienteV
         notifyDataSetChanged();
     }
 
+    /*@Override
+    public void onViewAttachedToWindow(ClienteViewHolder holder) {
+        super.onViewAttachedToWindow(holder);
+        Utils.animateCircularReveal(holder.itemView);
+    }*/
+
     class ClienteViewHolder extends RecyclerView.ViewHolder implements PopupMenu.OnMenuItemClickListener {
 
         TextView tvNombreComercial, tvRazonSocial, tvDireccion, tvContacto, tvEstado;
@@ -111,7 +117,6 @@ public class ClienteAdapter extends RecyclerView.Adapter<ClienteAdapter.ClienteV
             cvCliente = itemView.findViewById(R.id.cvCliente);
             tvEstado = itemView.findViewById(R.id.tv_Estado);
             //cvCliente.setOnCreateContextMenuListener(this);
-
         }
 
         void bindCliente(final Cliente cliente){

@@ -104,7 +104,7 @@ public class ProductoBusquedaActivity extends AppCompatActivity implements Searc
             //pgCargando.show();
             pbCargando.setVisibility(View.VISIBLE);
             lyLoading.setVisibility(View.VISIBLE);
-            svBusqueda.setEnabled(false);
+            svBusqueda.setVisibility(View.GONE);
             Thread th = new Thread(){
                 @Override
                 public void run(){
@@ -120,10 +120,12 @@ public class ProductoBusquedaActivity extends AppCompatActivity implements Searc
                             lstProductos = Producto.getForTransferencia(SQLite.usuario.sucursal.IdEstablecimiento);
                             break;
                     }
-                    runOnUiThread(() -> {
+                    runOnUiThread(
+                        () -> {
                             if (lstProductos == null || lstProductos.size() == 0) {
                                 lyLoading.setVisibility(View.VISIBLE);
                                 lyContainer.setVisibility(View.GONE);
+                                ((TextView)findViewById(R.id.lblMessage)).setText("No hay productos disponibles. \nIntente descargar los productos.");
                             } else {
                                 productoAdapter = new ProductoAdapter(toolbar,lstProductos, tipobusqueda, ProductoBusquedaActivity.this);
                                 rvProductos.setAdapter(productoAdapter);
@@ -131,11 +133,13 @@ public class ProductoBusquedaActivity extends AppCompatActivity implements Searc
                                 rvCategorias.setAdapter(clasificacionAdapter);
                                 lyLoading.setVisibility(View.GONE);
                                 lyContainer.setVisibility(View.VISIBLE);
+                                svBusqueda.setVisibility(View.VISIBLE);
                                 svBusqueda.setEnabled(true);
                             }
                             //pgCargando.dismiss();
                             pbCargando.setVisibility(View.GONE);
-                        });
+                        }
+                    );
                 }
             };
             th.start();
@@ -161,7 +165,14 @@ public class ProductoBusquedaActivity extends AppCompatActivity implements Searc
             PedidoInventarioActivity.productBusqueda.addAll(productoAdapter.productosSelectedPI);
         }
         setResult(RESULT_OK);
-        finish();
+        onBackPressed();
+        overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
     }
 
     @Override

@@ -50,6 +50,7 @@ import com.florencia.erpapp.models.DetalleComprobante;
 import com.florencia.erpapp.models.Lote;
 import com.florencia.erpapp.models.Sucursal;
 import com.florencia.erpapp.services.DeviceList;
+import com.florencia.erpapp.services.GPSTracker;
 import com.florencia.erpapp.services.Printer;
 import com.florencia.erpapp.services.SQLite;
 import com.florencia.erpapp.utils.Constants;
@@ -130,6 +131,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                     Intent i = new Intent(v.getContext(), ClienteBusquedaActivity.class);
                     i.putExtra("busqueda", txtCliente.getText().toString().trim());
                     startActivityForResult(i, REQUEST_CLIENTE);
+                    overridePendingTransition(R.anim.left_in, R.anim.left_out);
                     return true;
                 }
                 return false;
@@ -277,6 +279,11 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
         cliente.deudatotal = 0d;
         cliente.montodisponible = 0d;
 
+        if(SQLite.gpsTracker==null)
+            SQLite.gpsTracker = new GPSTracker(this);
+        if (!SQLite.gpsTracker.checkGPSEnabled())
+            SQLite.gpsTracker.showSettingsAlert(ComprobanteActivity.this);
+
         if(getIntent().getExtras()!=null){
             int idcliente = getIntent().getExtras().getInt("idcliente",0);
             if(idcliente>0) {
@@ -349,6 +356,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                 Intent i = new Intent(v.getContext(),ProductoBusquedaActivity.class);
                 i.putExtra("tipobusqueda", "01");
                 startActivityForResult(i, REQUEST_BUSQUEDA);
+                overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
                 break;
             case R.id.btnPositive:
                 if(tipoAccion.equals("MESSAGE")) {
@@ -388,14 +396,16 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                 lblEstablecimiento.setText("PVP >> " + SQLite.usuario.establecimientos.get(item).NombreSucursal);
                 SQLite.usuario.establecimiento_fact = SQLite.usuario.establecimientos.get(item).IdEstablecimiento;
                 SQLite.usuario.GuardarSesionLocal(ComprobanteActivity.this);
-                Utils.showMessage(ComprobanteActivity.this,
-                        "Los productos se facturarán con los precios y reglas de precio de «" + SQLite.usuario.establecimientos.get(item).NombreSucursal + "»");
+                Banner.make(rootView, ComprobanteActivity.this, Banner.INFO,
+                        "Los productos se facturarán con los precios y reglas de precio de «" + SQLite.usuario.establecimientos.get(item).NombreSucursal + "»",
+                        Banner.BOTTOM, 3000).show();
                 dialog.dismiss();
             });
         AlertDialog alert = alt_bld.create();
         alert.show();
     }
 
+    //MUESTRA INFORMACIÓN DEL CLIENTE EN UN DIALOG
     private void MostrarInfoDialog(Integer idcliente){
         DialogFragment dialogFragment = new InfoDialogFragment();
         Bundle bundle = new Bundle();
@@ -418,7 +428,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                     comprobante = new Comprobante();
                     comprobante = Comprobante.get(idcomprobante);
                     runOnUiThread(
-                            () -> {
+                        () -> {
                             if (comprobante != null) {
                                 toolbar.setTitle("N°: " + comprobante.codigotransaccion);
                                 toolbar.setSubtitle("Fecha: " + Utils.fechaMes(comprobante.fechadocumento));
@@ -516,6 +526,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                 Intent i = new Intent(this, ListaComprobantesActivity.class);
                 i.putExtra("tipobusqueda","01");
                 startActivityForResult(i, REQUEST_BUSQUEDA_COMPROBANTE);
+                overridePendingTransition(R.anim.left_in, R.anim.left_out);
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -1036,7 +1047,12 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
             ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
             ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
             final AlertDialog alertDialog = builder.create();
-            view.findViewById(R.id.btnConfirm).setOnClickListener(v -> finish());
+            view.findViewById(R.id.btnConfirm).setOnClickListener(
+                    v -> {
+                        onBackPressed();
+                        overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
+                    }
+            );
 
             view.findViewById(R.id.btnCancel).setOnClickListener(v -> alertDialog.dismiss());
 

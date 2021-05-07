@@ -113,6 +113,7 @@ public class PedidoActivity extends AppCompatActivity {
                     i.putExtra("busqueda",txtCliente.getText().toString().trim());
                     i.putExtra("tipobusqueda", "PC");
                     startActivityForResult(i, REQUEST_CLIENTE);
+                    overridePendingTransition(R.anim.left_in, R.anim.left_out);
                     return true;
                 }
                 return false;
@@ -254,6 +255,7 @@ public class PedidoActivity extends AppCompatActivity {
                     Intent i = new Intent(v.getContext(),ProductoBusquedaActivity.class);
                     i.putExtra("tipobusqueda", "PC");
                     startActivityForResult(i, REQUEST_BUSQUEDA);
+                    overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
                     break;
                 case R.id.btnFechaDocumento:
                     showDatePickerDialog(v);
@@ -486,6 +488,7 @@ public class PedidoActivity extends AppCompatActivity {
                 Intent i = new Intent(this, ListaComprobantesActivity.class);
                 i.putExtra("tipobusqueda","PC");
                 startActivityForResult(i, REQUEST_BUSQUEDA_PEDIDO);
+                overridePendingTransition(R.anim.left_in, R.anim.left_out);
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -792,7 +795,10 @@ public class PedidoActivity extends AppCompatActivity {
             ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
             ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
             final AlertDialog alertDialog = builder.create();
-            view.findViewById(R.id.btnConfirm).setOnClickListener(v -> finish());
+            view.findViewById(R.id.btnConfirm).setOnClickListener(v -> {
+                onBackPressed();
+                overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
+            });
 
             view.findViewById(R.id.btnCancel).setOnClickListener(v -> alertDialog.dismiss());
 

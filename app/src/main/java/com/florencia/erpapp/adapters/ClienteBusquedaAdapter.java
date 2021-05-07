@@ -115,7 +115,8 @@ public class ClienteBusquedaAdapter extends RecyclerView.Adapter<ClienteBusqueda
                         return;
                     }
                     activity.setResult(Activity.RESULT_OK,new Intent().putExtra("idcliente",listClients.get(getAdapterPosition()).idcliente));
-                    activity.finish();
+                    activity.onBackPressed();
+                    activity.overridePendingTransition(R.anim.right_in, R.anim.right_out);
                 });
 
         }

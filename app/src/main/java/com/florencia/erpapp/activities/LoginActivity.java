@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -56,6 +57,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import android.provider.Settings.Secure;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -111,14 +113,14 @@ public class LoginActivity extends AppCompatActivity {
         if(sPreferencesSesion != null){
             int id = sPreferencesSesion.getInt("idUser",0);
             if(id > 0)
-                this.LoginLocal(id);
+                this.LoginPreferences(id);
         }
 
         etPassword.setOnKeyListener(
             (v, keyCode,  event) -> {
                 if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
                         (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                    IniciarSesion(v.getContext(), etUser.getText().toString().trim(), etPassword.getText().toString());
+                    LoginRemot(v.getContext(), etUser.getText().toString().trim(), etPassword.getText().toString());
                     return true;
                 }
                 return false;
@@ -148,6 +150,7 @@ public class LoginActivity extends AppCompatActivity {
                 public void onClick(DialogInterface dialog, int which) {
                     Intent i = new Intent(LoginActivity.this, ConfigActivity.class);
                     startActivity(i);
+                    overridePendingTransition(R.anim.left_in, R.anim.left_out);
                     dialog.dismiss();
                 }
             });
@@ -161,16 +164,18 @@ public class LoginActivity extends AppCompatActivity {
         v -> {
             switch (v.getId()){
                 case R.id.btnLogin:
-                    IniciarSesion(v.getContext(), etUser.getText().toString().trim(), etPassword.getText().toString());
+                    LoginRemot(v.getContext(), etUser.getText().toString().trim(), etPassword.getText().toString());
                     break;
                 case R.id.btnConfig:
                     Intent i = new Intent(LoginActivity.this,ConfigActivity.class);
                     startActivity(i);
+                    overridePendingTransition(R.anim.left_in, R.anim.left_out);
                     break;
             }
         };
 
-    private void LoginLocal(Integer id) {
+    //INGRESA SIN SOLICITAR USUARIO Y CONTRASEÑA, UTILIZANDO EL ID DEL USUARIO DESDE SHARED PREFERENCES
+    private void LoginPreferences(Integer id) {
         try {
             Usuario user = Usuario.getUsuario(id);
             if(user != null) {
@@ -179,6 +184,7 @@ public class LoginActivity extends AppCompatActivity {
                 SQLite.usuario.GuardarSesionLocal(this);
                 Intent i = new Intent(this, MainActivity.class);
                 startActivity(i);
+                overridePendingTransition(R.anim.left_in, R.anim.left_out);
                 finish();
             }
         }catch (Exception e){
@@ -222,6 +228,7 @@ public class LoginActivity extends AppCompatActivity {
                                 SQLite.usuario.GuardarSesionLocal(LoginActivity.this);
                                 Intent i = new Intent(LoginActivity.this, MainActivity.class);
                                 startActivity(i);
+                                overridePendingTransition(R.anim.left_in, R.anim.left_out);
                                 finish();
                             }
                         }else{
@@ -232,6 +239,7 @@ public class LoginActivity extends AppCompatActivity {
                         SQLite.usuario.GuardarSesionLocal(LoginActivity.this);
                         Intent i = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(i);
+                        overridePendingTransition(R.anim.left_in, R.anim.left_out);
                         finish();
                     }
                 }
@@ -242,6 +250,7 @@ public class LoginActivity extends AppCompatActivity {
                     SQLite.usuario.GuardarSesionLocal(LoginActivity.this);
                     Intent i = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(i);
+                    overridePendingTransition(R.anim.left_in, R.anim.left_out);
                     finish();
                 }
             });
@@ -250,7 +259,8 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private void IniciarSesionLocal(String User, String Clave){
+    //INGRESA SOLICITANDO USUARIO Y CONTRASEÑA, VERIFICANDO EN LA BASE LOCAL DEL DISPOSITIVO
+    private void LoginLocal(String User, String Clave){
         try{
             Usuario miUser = Usuario.Login(User, Clave);
             if(miUser == null){
@@ -262,6 +272,7 @@ public class LoginActivity extends AppCompatActivity {
                 Utils.showMessage(LoginActivity.this, "Bienvenido...");
                 Intent i = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(i);
+                overridePendingTransition(R.anim.left_in, R.anim.left_out);
                 finish();
             }
         }catch (Exception e){
@@ -270,12 +281,9 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private void IniciarSesion(final Context context, String User, String Clave){
+    //INGRESA SOLICITANDO USUARIO Y CONTRASEÑA, VERIFICANDO DESDE EL WEBSERVICE
+    private void LoginRemot(final Context context, String User, String Clave){
         try{
-            Usuario miUser = new Usuario();
-
-            //String User = etUser.getText().toString().trim();
-            //String Clave = etPassword.getText().toString();
             if (User.equals("")) {
                 Banner.make(rootView, LoginActivity.this, Banner.ERROR, "Debe ingresar el usuario...", Banner.TOP, 2000).show();
                 return;
@@ -292,14 +300,16 @@ public class LoginActivity extends AppCompatActivity {
 
             IUsuario miInterface = retrofit.create(IUsuario.class);
 
-            Call<JsonObject> call = miInterface.IniciarSesion(User,Clave,"");
+            String device = Build.MANUFACTURER.concat(" ").concat(Build.MODEL).concat(" - Android: ").concat(Build.VERSION.RELEASE);
+
+            Call<JsonObject> call = miInterface.IniciarSesion(User, Clave, device);
             call.enqueue(new Callback<JsonObject>() {
                 @Override
                 public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                     if(!response.isSuccessful()){
                         Toast.makeText(context,"Code:" + response.code(),Toast.LENGTH_SHORT).show();
                         pbProgreso.dismiss();
-                        IniciarSesionLocal(User, Clave);
+                        LoginLocal(User, Clave);
                         return;
                     }
                     try {
@@ -454,6 +464,7 @@ public class LoginActivity extends AppCompatActivity {
                                     pbProgreso.dismiss();
                                     Intent i = new Intent(LoginActivity.this, MainActivity.class);
                                     startActivity(i);
+                                    overridePendingTransition(R.anim.left_in, R.anim.left_out);
                                     finish();
                                 }else
                                     Banner.make(rootView, LoginActivity.this, Banner.ERROR, Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM, 2000).show();
@@ -464,7 +475,7 @@ public class LoginActivity extends AppCompatActivity {
 
                     }catch (JsonParseException ex){
                         Log.d(TAG, ex.getMessage());
-                        IniciarSesionLocal(User, Clave);
+                        LoginLocal(User, Clave);
                     }
                     pbProgreso.dismiss();
                 }
@@ -474,13 +485,13 @@ public class LoginActivity extends AppCompatActivity {
                     //Utils.showErrorDialog(LoginActivity.this, "Error",t.getMessage());
                     Log.d(TAG, t.getMessage());
                     pbProgreso.dismiss();
-                    IniciarSesionLocal(User, Clave);
+                    LoginLocal(User, Clave);
                 }
             });
         }catch (Exception e){
             e.printStackTrace();
             Log.d(TAG, e.getMessage());
-            Utils.showErrorDialog(this, "Error",e.getMessage());
+            Utils.showErrorDialog(this, "Error: ",e.getMessage());
             pbProgreso.dismiss();
         }
     }
@@ -494,6 +505,7 @@ public class LoginActivity extends AppCompatActivity {
             btnLogin.setEnabled(false);
             Intent i = new Intent(LoginActivity.this, ConfigActivity.class);
             startActivity(i);
+            overridePendingTransition(R.anim.left_in, R.anim.left_out);
         }else{
             btnLogin.setEnabled(true);
             SQLite.configuracion.url_ws = (SQLite.configuracion.hasSSL?Constants.HTTPs:Constants.HTTP)
@@ -501,7 +513,7 @@ public class LoginActivity extends AppCompatActivity {
                     + (SQLite.configuracion.hasSSL?"":"/erpproduccion")
                     + Constants.ENDPOINT;
 
-
+            //VOLVEMOS A INSTANCIAR EL OBJETO RETROFIT CON LA NUEVA URL
             retrofit = new Retrofit.Builder()
                     .baseUrl(SQLite.configuracion.url_ws)
                     .addConverterFactory(GsonConverterFactory.create(gson))

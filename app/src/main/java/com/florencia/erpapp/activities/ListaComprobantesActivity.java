@@ -330,4 +330,10 @@ public class ListaComprobantesActivity extends AppCompatActivity implements Sear
         comprobanteAdapter.filter(newText);
         return false;
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.right_in, R.anim.right_out);
+    }
 }
