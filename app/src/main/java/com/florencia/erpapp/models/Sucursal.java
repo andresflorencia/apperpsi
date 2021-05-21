@@ -81,6 +81,19 @@ public class Sucursal {
         }
     }
 
+    public static boolean DeleteByUser (Integer idusuario){
+        try {
+            sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
+            sqLiteDatabase.delete("sucursal","usuarioid = ?",new String[]{idusuario.toString()});
+            sqLiteDatabase.close();
+            Log.d(TAG,"DELETE SUCURSAL OK");
+            return true;
+        } catch (SQLException ex){
+            Log.d(TAG, "Delete(): " + ex.getMessage());
+            return false;
+        }
+    }
+
     static public Sucursal getSucursal(String cod){
         Sucursal Item = null;
         sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();

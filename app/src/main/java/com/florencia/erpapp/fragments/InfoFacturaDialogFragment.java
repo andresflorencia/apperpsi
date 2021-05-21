@@ -111,6 +111,7 @@ public class InfoFacturaDialogFragment extends AppCompatDialogFragment {
             if(id>0) {
                 switch (tipotransaccion){
                     case "01":
+                    case "PR":
                         lyLotes.setVisibility(View.VISIBLE);
                         lyReglasPrecio.setVisibility(View.VISIBLE);
                         BuscarDatosFactura(id);
@@ -165,19 +166,19 @@ public class InfoFacturaDialogFragment extends AppCompatDialogFragment {
 
                                 textLeft = textLeft.concat("Cliente:\n")
                                         .concat("CI/RUC:\n")
-                                        .concat("Factura #:\n")
+                                        .concat((comprobante.tipotransaccion.equals("PR")?"Proforma":"Recibo") + " #:\n")
                                         .concat("Fecha:\n")
-                                        .concat("Núm. Aut.:\n\n")
                                         .concat("Estado:\n")
-                                        .concat("Forma Pago:");
+                                        .concat("Forma Pago:\n")
+                                        .concat("ID:");
 
                                 textRight = textRight.concat(comprobante.cliente.razonsocial).concat("\n")
                                         .concat(comprobante.cliente.nip).concat("\n")
                                         .concat(comprobante.codigotransaccion).concat("\n")
                                         .concat(comprobante.fechacelular).concat("\n")
-                                        .concat(comprobante.claveacceso).concat("\n")
                                         .concat(comprobante.estado == 0 && comprobante.codigosistema == 0?"No sincronizado":"Sincronizado").concat("\n")
-                                        .concat(comprobante.formapago==0?"Crédito":"Efectivo").concat("\n");
+                                        .concat(comprobante.formapago==0?"Crédito":"Efectivo").concat("\n")
+                                        .concat(comprobante.idcomprobante.toString()).concat("\n");
 
                                 txtInfoLeft.setText(textLeft);
                                 txtInfoRight.setText(textRight);
@@ -201,11 +202,11 @@ public class InfoFacturaDialogFragment extends AppCompatDialogFragment {
 
                                 lblLeyenda.setVisibility(View.VISIBLE);
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                    lblLeyenda.setText(Html.fromHtml(getResources().getString(R.string.leyendaFactura)
+                                    lblLeyenda.setText(Html.fromHtml((comprobante.tipotransaccion.equals("PR")?getResources().getString(R.string.leyendaProforma):getResources().getString(R.string.leyendaFactura))
                                                     + "<br><strong>Vendedor: </strong> " + SQLite.usuario.RazonSocial + "           <strong>Generado: </strong> " + Utils.getDateFormat("yyyy-MM-dd HH:mm:ss"),
                                             Html.FROM_HTML_MODE_COMPACT));
                                 }else {
-                                    lblLeyenda.setText(Html.fromHtml(getResources().getString(R.string.leyendaFactura)
+                                    lblLeyenda.setText(Html.fromHtml((comprobante.tipotransaccion.equals("PR")?getResources().getString(R.string.leyendaProforma):getResources().getString(R.string.leyendaFactura))
                                                     + "<br><strong>Vendedor: </strong> " + SQLite.usuario.RazonSocial + "           <strong>Generado: </strong> " + Utils.getDateFormat("yyyy-MM-dd HH:mm:ss")
                                     ));
                                 }
@@ -406,6 +407,7 @@ public class InfoFacturaDialogFragment extends AppCompatDialogFragment {
         }
     }
 
+    //PERMITE COMPARTIR IMAGEN VIA WHATSAPP
     private void sendImageWhatsApp(String phoneNumber, String nombreImagen) {
         try {
             Intent intent = new Intent("android.intent.action.MAIN");
@@ -423,6 +425,7 @@ public class InfoFacturaDialogFragment extends AppCompatDialogFragment {
         }
     }
 
+    //PERMITE COMPARTIR IMAGEN MEDIANTE APLICACIONES MULTIMEDIA
     private void sendImage(File fileImage){
         try{
             String PACKAGE_NAME = BuildConfig.APPLICATION_ID + ".services.GenericFileProvider";

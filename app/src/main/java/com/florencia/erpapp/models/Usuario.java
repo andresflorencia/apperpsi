@@ -217,8 +217,8 @@ public class Usuario {
             String query = "";
             if(SQLite.usuario.VerificaPermiso(ctx, Constants.PUNTO_VENTA, "lectura"))
                 query = "select 'FACTURAS' documento, count(co.idcomprobante) as cantidad, round(ifnull(sum(co.total),0),2) as total, " +
-                        "(select count(idcomprobante) from comprobante where tipotransaccion = '01' and estado >= 0 and codigosistema = 0 and fechadocumento = '"+fecha+"' and usuarioid = "+SQLite.usuario.IdUsuario+") as cantidadns " +
-                        "from comprobante co where co.tipotransaccion = '01' and estado >= 0 and fechadocumento = '"+fecha+"' and usuarioid =" + SQLite.usuario.IdUsuario;
+                        "(select count(idcomprobante) from comprobante where tipotransaccion in ('01') and estado >= 0 and codigosistema = 0 and fechadocumento = '"+fecha+"' and usuarioid = "+SQLite.usuario.IdUsuario+") as cantidadns " +
+                        "from comprobante co where co.tipotransaccion in ('01') and estado >= 0 and fechadocumento = '"+fecha+"' and usuarioid =" + SQLite.usuario.IdUsuario;
             if(SQLite.usuario.VerificaPermiso(ctx, Constants.RECEPCION_INVENTARIO, "lectura")) {
                 if(query.length()>0) query += " UNION";
                 query += " select 'RECEPCIONES', count(co.idcomprobante), round(ifnull(sum(co.total),0),2), 0 " +

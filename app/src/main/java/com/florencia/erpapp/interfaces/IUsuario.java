@@ -44,4 +44,9 @@ public interface IUsuario {
     @FormUrlEncoded
     @POST("getpermisos")
     Call<JsonObject> getPermisos(@Field("usuario") String user, @Field("clave") String clave);
+
+    @FormUrlEncoded
+    @POST("gettotalventas")
+    Call<JsonObject> getTotalVentas(@Field("usuario") String user, @Field("clave") String clave,
+                                    @Field("fecha") String fecha, @Field("establecimientoid") Integer establecimientoid);
 }

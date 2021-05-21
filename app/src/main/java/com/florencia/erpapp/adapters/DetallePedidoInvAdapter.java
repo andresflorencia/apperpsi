@@ -100,20 +100,14 @@ public class DetallePedidoInvAdapter extends RecyclerView.Adapter<DetallePedidoI
                         ((Button)view.findViewById(R.id.btnCancel)).setText(v.getContext().getResources().getString(R.string.Cancel));
                         ((Button)view.findViewById(R.id.btnYes)).setText(v.getContext().getResources().getString(R.string.Confirm));
                         final AlertDialog alertDialog = builder.create();
-                        view.findViewById(R.id.btnYes).setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
+                        view.findViewById(R.id.btnYes).setOnClickListener(vi -> {
                                 detallePedido.remove(getAdapterPosition());
                                 notifyDataSetChanged();
                                 Banner.make(rootView,activity,Banner.INFO,"Ítem eliminado de la lista.", Banner.BOTTOM,2000).show();
                                 alertDialog.dismiss();
-                            }
-                        });
+                            });
 
-                        view.findViewById(R.id.btnCancel).setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) { alertDialog.dismiss();}
-                        });
+                        view.findViewById(R.id.btnCancel).setOnClickListener(vi -> alertDialog.dismiss());
 
                         if(alertDialog.getWindow()!=null)
                             alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));

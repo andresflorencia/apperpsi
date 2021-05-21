@@ -206,6 +206,7 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
                 Intent i = new Intent(v.getContext(),ProductoBusquedaActivity.class);
                 i.putExtra("tipobusqueda", "4,20");
                 startActivityForResult(i, REQUEST_BUSQUEDA_PRODUCTO);
+                overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
                 break;
             case R.id.btnPositive:
                 if(tipoAccion.equals("MESSAGE")) {

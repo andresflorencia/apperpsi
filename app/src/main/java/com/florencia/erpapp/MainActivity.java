@@ -344,7 +344,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        Intent i;
         switch (item.getItemId()){
             case R.id.option_descargaproductos:
                 descargaProductos(getApplicationContext());
@@ -391,6 +390,7 @@ public class MainActivity extends AppCompatActivity {
             post.put("usuario",SQLite.usuario.Usuario);
             post.put("clave",SQLite.usuario.Clave);
             post.put("clientes", listClientes);
+            post.put("version", BuildConfig.VERSION_NAME);
             Call<JsonObject> call = miInterface.LoadCliente2(post);
             call.enqueue(new Callback<JsonObject>() {
                 @Override
@@ -529,6 +529,10 @@ public class MainActivity extends AppCompatActivity {
             post.put("clave",SQLite.usuario.Clave);
             post.put("comprobantes", listComprobantes);
             post.put("establecimientoid", SQLite.usuario.sucursal.IdEstablecimiento);
+            post.put("codestablecimientosri", SQLite.usuario.sucursal.CodigoEstablecimiento);
+            post.put("codestablecimiento", SQLite.usuario.sucursal.IdSucursal);
+            post.put("puntoemision", SQLite.usuario.sucursal.PuntoEmision);
+            post.put("version", BuildConfig.VERSION_NAME);
             String json = post.toString();
             Call<JsonObject> call=null;
             call=miInterface.LoadComprobantes(post);
@@ -666,6 +670,7 @@ public class MainActivity extends AppCompatActivity {
             post.put("usuario",SQLite.usuario.Usuario);
             post.put("clave",SQLite.usuario.Clave);
             post.put("pedidos", listPedidos);
+            post.put("version", BuildConfig.VERSION_NAME);
             String json = post.toString();
             Call<JsonObject> call=null;
             call=miInterface.LoadPedidos(post);
@@ -769,14 +774,6 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, e.getMessage());
             Utils.showErrorDialog(this, "Error",e.getMessage());
             pbProgreso.dismiss();
-        }
-    }
-
-    private void contarproductos(Context context) {
-        try {
-            //Log.d("TAG", String.valueOf(Producto.getAll(SQLite.usuario.sucursal.IdEstablecimiento).size()));
-        }catch (Exception e){
-            Log.d("TAG",e.getMessage());
         }
     }
 
@@ -901,6 +898,7 @@ public class MainActivity extends AppCompatActivity {
             post.put("pedidos", listPedidos);
             post.put("periodo", SQLite.usuario.sucursal.periodo.toString() + SQLite.usuario.sucursal.mesactual);
             post.put("codigoestablecimiento", SQLite.usuario.sucursal.IdSucursal);
+            post.put("version", BuildConfig.VERSION_NAME);
             Call<JsonObject> call = miInterface.LoadPedidosInv(post);
             call.enqueue(new Callback<JsonObject>() {
                 @Override
@@ -1037,6 +1035,7 @@ public class MainActivity extends AppCompatActivity {
             post.put("periodoactual", SQLite.usuario.sucursal.periodo);
             post.put("mesactual", SQLite.usuario.sucursal.mesactual);
             post.put("establecimientoid", SQLite.usuario.sucursal.IdEstablecimiento);
+            post.put("version", BuildConfig.VERSION_NAME);
             Call<JsonObject> call = miInterface.LoadDepositos(post);
 
             call.enqueue(new Callback<JsonObject>() {
@@ -1182,11 +1181,12 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, e.getMessage());
                 }
                 super.onBackPressed();
+                overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
             }else{
                 if (presionado + 2000 > System.currentTimeMillis())
                     super.onBackPressed();
                 else
-                    Utils.showMessage(this, "Vuelve a presionar para salir");
+                    Utils.showMessageShort(this, "Vuelve a presionar para salir");
                 presionado = System.currentTimeMillis();
             }
         }

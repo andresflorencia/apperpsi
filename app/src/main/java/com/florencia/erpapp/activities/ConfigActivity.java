@@ -110,8 +110,7 @@ public class ConfigActivity extends AppCompatActivity {
                         .build();
                 IUsuario miInterface = retrofit.create(IUsuario.class);
 
-                Call<String> call = null;
-                call = miInterface.verificaconexion();
+                Call<String> call = miInterface.verificaconexion();
                 call.enqueue(new Callback<String>() {
                     @Override
                     public void onResponse(Call<String> call, Response<String> response) {

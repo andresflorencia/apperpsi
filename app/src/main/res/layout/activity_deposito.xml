@@ -64,17 +64,42 @@
                                     android:textSize="11sp"
                                     android:textColor="@color/colorDate"
                                     android:layout_marginLeft="5dp"/>
-                                <Button
-                                    android:id="@+id/btnFechaVenta"
+                                <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="35dp"
-                                    android:text="01-01-0001"
-                                    android:drawableLeft="@drawable/ic_date"
-                                    android:paddingLeft="10dp"
-                                    android:textColor="@color/colorDate"
-                                    android:background="@drawable/bg_btn_date"
-                                    android:layout_marginRight="3dp"
-                                    android:paddingRight="10dp"/>
+                                    android:orientation="horizontal">
+                                    <Button
+                                        android:id="@+id/btnFechaVenta"
+                                        android:layout_width="0dp"
+                                        android:layout_weight="1"
+                                        android:layout_height="match_parent"
+                                        android:text="01-01-0001"
+                                        android:drawableLeft="@drawable/ic_date"
+                                        android:paddingLeft="10dp"
+                                        android:textColor="@color/colorDate"
+                                        android:background="@drawable/bg_btn_date"
+                                        android:layout_marginRight="3dp"
+                                        android:paddingRight="10dp"/>
+                                    <ImageButton
+                                        android:id="@+id/btnRefresh"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:src="@drawable/ic_refresh"
+                                        android:tint="@color/colorDate"
+                                        android:layout_gravity="center"
+                                        android:background="@null"
+                                        android:scaleX="1.8"
+                                        android:scaleY="1.8"
+                                        android:layout_marginVertical="5dp"
+                                        android:layout_marginHorizontal="15dp"
+                                        android:tooltipText="Refrescar valores"
+                                        android:visibility="visible"/>
+                                    <ProgressBar
+                                        android:id="@+id/pbCargando"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:visibility="gone"/>
+                                </LinearLayout>
                             </LinearLayout>
                             <TextView
                                 android:id="@+id/lblTotalVentas"

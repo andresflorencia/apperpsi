@@ -415,6 +415,7 @@
     <string name="textFecha"><![CDATA[<strong>Fecha Registro: </strong>]]></string>
     <string name="textCategoria"><![CDATA[<strong>Categoría: </strong>]]></string>
 
+    <string name="leyendaProforma"><![CDATA[*Este comprobante no tiene validez tributaria.]]></string>
     <string name="leyendaFactura"><![CDATA[*Este comprobante no tiene validez tributaria.
     Puede revisar su factura en <strong>https://comprobantes.sanisidrosa.com/</strong>,
     utilice como usuario y contraseña su número de indentificación.]]></string>

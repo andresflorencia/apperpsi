@@ -31,18 +31,21 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.florencia.erpapp.R;
 import com.florencia.erpapp.adapters.DetalleComprobanteAdapter;
 import com.florencia.erpapp.fragments.InfoDialogFragment;
+import com.florencia.erpapp.fragments.InfoFacturaDialogFragment;
 import com.florencia.erpapp.interfaces.ICliente;
 import com.florencia.erpapp.models.Cliente;
 import com.florencia.erpapp.models.Comprobante;
@@ -76,7 +79,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.florencia.erpapp.services.Printer.btsocket;
-public class ComprobanteActivity extends AppCompatActivity implements View.OnClickListener{
+public class ComprobanteActivity extends AppCompatActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener{
 
     public static final int REQUEST_BUSQUEDA = 1;
     public static final int REQUEST_CLIENTE = 2;
@@ -104,7 +107,8 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
     Button btnPositive, btnNegative;
     public Button btnCambiaEstablecimiento;
     View viewSeparator, rootView;
-    RadioButton rbEfectivo, rbCredito;
+    RadioButton rbEfectivo, rbCredito, rbFactura, rbProforma;
+    RadioGroup rgTipoDocumento;
     String tipoAccion="";
     OkHttpClient okHttpClient;
     Retrofit retrofit;
@@ -241,8 +245,12 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
         lblEstablecimiento = findViewById(R.id.lblEstablecimiento);
         btnCambiaEstablecimiento = findViewById(R.id.btnCambiaEstablecimiento);
         lyEstablecimiento = findViewById(R.id.lyEstablecimiento);
+        rgTipoDocumento = findViewById(R.id.rgTipoDocumento);
+        rbFactura = findViewById(R.id.rbFactura);
+        rbProforma = findViewById(R.id.rbProforma);
         lyEstablecimiento.setVisibility(View.VISIBLE);
         lyFormaPago.setVisibility(View.VISIBLE);
+        rgTipoDocumento.setVisibility(View.VISIBLE);
         rbCredito.setEnabled(false);
 
         lblTotal.setOnClickListener(this::onClick);
@@ -252,6 +260,11 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
         lblCliente.setOnClickListener(this::onClick);
         lblProducto.setOnClickListener(this::onClick);
         btnCambiaEstablecimiento.setOnClickListener(this::onClick);
+
+        rbEfectivo.setOnCheckedChangeListener(this::onCheckedChanged);
+        rbCredito.setOnCheckedChangeListener(this::onCheckedChanged);
+        rbFactura.setOnCheckedChangeListener(this::onCheckedChanged);
+        rbProforma.setOnCheckedChangeListener(this::onCheckedChanged);
 
         okHttpClient = new OkHttpClient().newBuilder()
                 .connectTimeout(60, TimeUnit.SECONDS)
@@ -272,6 +285,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
         else
             lblLeyendaCF.setText(Html.fromHtml(getResources().getString(R.string.leyendaConsumidorFinal)));
 
+        rbFactura.setChecked(true);
         rbEfectivo.setChecked(true);
         rbCredito.setEnabled(false);
         rbCredito.setText("Crédito (Disp:$0.00)");
@@ -311,30 +325,6 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
             BuscaComprobante(idcomprobante);
         }
 
-        rbEfectivo.setOnCheckedChangeListener(
-            (buttonView, isChecked) -> {
-                if(idcomprobante > 0)
-                    return;
-                if(isChecked){
-                    detalleAdapter.isCredito = false;
-                    detalleAdapter.CambiarPrecio(cliente.categoria, false);
-                    detalleAdapter.CalcularTotal();
-                    detalleAdapter.notifyDataSetChanged();
-                }
-            }
-         );
-
-        rbCredito.setOnCheckedChangeListener(
-            (v, isChecked) -> {
-                if(idcomprobante > 0)
-                    return;
-                detalleAdapter.isCredito = isChecked;
-                detalleAdapter.CambiarPrecio(cliente.categoria, isChecked);
-                detalleAdapter.CalcularTotal();
-                detalleAdapter.notifyDataSetChanged();
-            }
-        );
-
         for(Sucursal e:SQLite.usuario.establecimientos){
             if(e.IdEstablecimiento == SQLite.usuario.establecimiento_fact){
                 posEstablec = SQLite.usuario.establecimientos.indexOf(e);
@@ -342,6 +332,8 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                 break;
             }
         }
+        if(SQLite.usuario.establecimientos.size()<=1)
+            btnCambiaEstablecimiento.setVisibility(View.GONE);
     }
 
     @Override
@@ -354,7 +346,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                 break;
             case R.id.btnBuscarProducto:
                 Intent i = new Intent(v.getContext(),ProductoBusquedaActivity.class);
-                i.putExtra("tipobusqueda", "01");
+                i.putExtra("tipobusqueda", rbProforma.isChecked()?"PR":"01");
                 startActivityForResult(i, REQUEST_BUSQUEDA);
                 overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
                 break;
@@ -430,6 +422,10 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                     runOnUiThread(
                         () -> {
                             if (comprobante != null) {
+                                rbFactura.setChecked(comprobante.tipotransaccion.equals("01"));
+                                rbProforma.setChecked(comprobante.tipotransaccion.equals("PR"));
+                                rbFactura.setEnabled(false);
+                                rbProforma.setEnabled(false);
                                 toolbar.setTitle("N°: " + comprobante.codigotransaccion);
                                 toolbar.setSubtitle("Fecha: " + Utils.fechaMes(comprobante.fechadocumento));
                                 txtCliente.setText(comprobante.cliente.razonsocial);
@@ -484,7 +480,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
         switch (item.getItemId()){
             case R.id.option_save:
                 if(!SQLite.usuario.VerificaPermiso(this,Constants.PUNTO_VENTA, "escritura")){
-                    Banner.make(rootView,ComprobanteActivity.this,Banner.ERROR,"No tiene permisos para registrar facturas.", Banner.BOTTOM, 3000).show();
+                    Banner.make(rootView,ComprobanteActivity.this,Banner.ERROR,"No tiene permisos para registrar facturas/proformas.", Banner.BOTTOM, 3000).show();
                     break;
                 }
                 if(detalleAdapter.detalleComprobante.size()==0) {
@@ -495,8 +491,8 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                 View view = LayoutInflater.from(this).inflate(R.layout.layout_confirmation_dialog,
                         (ConstraintLayout) findViewById(R.id.lyDialogContainer));
                 builder.setView(view);
-                ((TextView)view.findViewById(R.id.lblTitle)).setText("Guardar factura");
-                ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Está seguro que desea guardar esta factura?");
+                ((TextView)view.findViewById(R.id.lblTitle)).setText("Guardar " + (rbProforma.isChecked()?"proforma":"factura"));
+                ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Está seguro que desea guardar esta " + (rbProforma.isChecked()?"proforma?":"factura?"));
                 ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_save);
                 ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
                 ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
@@ -540,15 +536,15 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
             List<DetalleComprobante> newDetalleCom = new ArrayList<>();
             DetalleComprobante newDetalle;
             for(DetalleComprobante miDetalle: detalleAdapter.detalleComprobante){
-                if(miDetalle.producto.lotes.size()==1 || !miDetalle.producto.tipo.equals("P")){
+                if(miDetalle.producto.lotes.size()==1 || !miDetalle.producto.tipo.equals("P") || rbProforma.isChecked()){
 
                     newDetalle = new DetalleComprobante();
                     Lote miLote = new Lote();
                     miLote.productoid = miDetalle.producto.idproducto;
-                    miLote.numerolote = miDetalle.producto.tipo.equals("P")?miDetalle.producto.lotes.get(0).numerolote:"";
-                    miLote.stock = miDetalle.producto.tipo.equals("P")?miDetalle.producto.stock - miDetalle.cantidad:0;
-                    miLote.fechavencimiento = miDetalle.producto.tipo.equals("P")?miDetalle.producto.lotes.get(0).fechavencimiento:"1900-01-01";
-                    miLote.preciocosto = miDetalle.producto.tipo.equals("P")?miDetalle.producto.lotes.get(0).preciocosto: miDetalle.producto.preciocosto;
+                    miLote.numerolote = miDetalle.producto.tipo.equals("P") && rbFactura.isChecked()?miDetalle.producto.lotes.get(0).numerolote:"";
+                    miLote.stock = miDetalle.producto.tipo.equals("P") && rbFactura.isChecked()?miDetalle.producto.stock - miDetalle.cantidad:0;
+                    miLote.fechavencimiento = miDetalle.producto.tipo.equals("P") && rbFactura.isChecked()?miDetalle.producto.lotes.get(0).fechavencimiento:"1900-01-01";
+                    miLote.preciocosto = miDetalle.producto.tipo.equals("P") && rbFactura.isChecked()?miDetalle.producto.lotes.get(0).preciocosto: miDetalle.producto.preciocosto;
 
                     newDetalle.producto.lotes.add(miLote);
 
@@ -640,10 +636,10 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                 return;
             comprobante.detalle.addAll(newDetalleCom);
             comprobante.cliente = cliente;
-            comprobante.tipotransaccion = "01";
+            comprobante.tipotransaccion = rbProforma.isChecked()?"PR":"01";
             comprobante.getTotal();
             comprobante.establecimientoid = SQLite.usuario.sucursal.IdEstablecimiento;
-            comprobante.codigoestablecimiento = SQLite.usuario.sucursal.CodigoEstablecimiento;
+            comprobante.codigoestablecimiento = rbProforma.isChecked()?SQLite.usuario.sucursal.IdSucursal: SQLite.usuario.sucursal.CodigoEstablecimiento;
             comprobante.puntoemision = SQLite.usuario.sucursal.PuntoEmision;
             comprobante.GenerarClaveAcceso();
             comprobante.estado = 0;
@@ -664,9 +660,19 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
             if(comprobante.lon == null)
                 comprobante.lon = 0d;
 
-            if (comprobante.Save(true)) {
+            if (comprobante.Save(rbFactura.isChecked())) {
                 toolbar.getMenu().findItem(R.id.option_save).setVisible(false);
-                ConsultaImpresion();
+                if(rbFactura.isChecked())
+                    ConsultaImpresion();
+                else{
+                    DialogFragment dialogFragment = new InfoFacturaDialogFragment(ComprobanteActivity.this);
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("id", comprobante.idcomprobante);
+                    bundle.putString("tipobusqueda", "PR");
+                    dialogFragment.setArguments(bundle);
+                    dialogFragment.show(getSupportFragmentManager(), "dialog");
+                    LimpiarDatos();
+                }
                 Banner.make(rootView,ComprobanteActivity.this,Banner.SUCCESS, Constants.MSG_DATOS_GUARDADOS, Banner.BOTTOM,3000).show();
             }else
                 Banner.make(rootView,ComprobanteActivity.this,Banner.ERROR,Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM, 3500).show();
@@ -696,7 +702,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                         startActivityForResult(BTIntent, DeviceList.REQUEST_CONNECT_BT);
                         return;
                     }else {
-                        imprimirFactura(idcomprobante==0?"* ORIGINAL CLIENTE *":"* REIMPRESIÓN DE FACTURA *", idcomprobante>0);
+                        imprimirFactura(idcomprobante==0?"* ORIGINAL CLIENTE *":"* REIMPRESIÓN DE RECIBO *", idcomprobante>0);
                     }
                     alertDialog.dismiss();
                 }
@@ -721,6 +727,9 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
     private void LimpiarDatos() {
         try{
             toolbar.setTitle("Nueva factura");
+            rbFactura.setEnabled(true);
+            rbProforma.setEnabled(true);
+            rbFactura.setChecked(true);
             toolbar.setSubtitle("");
             comprobante = new Comprobante();
             cliente = new Cliente();
@@ -749,7 +758,11 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
             toolbar.getMenu().findItem(R.id.option_save).setVisible(true);
             lblLeyendaCF.setVisibility(View.VISIBLE);
             lyEstablecimiento.setVisibility(View.VISIBLE);
-            btnCambiaEstablecimiento.setVisibility(View.VISIBLE);
+
+            if(SQLite.usuario.establecimientos.size()<=1)
+                btnCambiaEstablecimiento.setVisibility(View.GONE);
+            else
+                btnCambiaEstablecimiento.setVisibility(View.VISIBLE);
         }catch (Exception e){
             Log.d(TAG, "LimpiarDatos(): " + e.getMessage());
         }
@@ -761,8 +774,11 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
         comprobante.getTotal();
 
         if(cliente == null || cliente.nip.equals("")){
-            txtCliente.setError("Debe especificar un cliente.");
             Banner.make(rootView,ComprobanteActivity.this,Banner.ERROR,"Debe especificar un cliente.", Banner.BOTTOM,3000).show();
+            return false;
+        }
+        if(rbProforma.isChecked() && cliente.nip.contains("999999999")){
+            Banner.make(rootView,ComprobanteActivity.this,Banner.ERROR,"Debe especificar un cliente para la proforma", Banner.BOTTOM,3000).show();
             return false;
         }
         if( SQLite.usuario.sucursal == null){
@@ -784,7 +800,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                     Banner.make(rootView,ComprobanteActivity.this,Banner.ERROR,"Debe ingresar una cantidad mayor a 0 para el producto " + miDetalle.producto.nombreproducto, Banner.BOTTOM, 3500).show();
                     return false;
                 }
-                if(miDetalle.cantidad>miDetalle.producto.stock && miDetalle.producto.tipo.equalsIgnoreCase("P")){
+                if(rbFactura.isChecked() && miDetalle.cantidad>miDetalle.producto.stock && miDetalle.producto.tipo.equalsIgnoreCase("P")){
                     Banner.make(rootView,ComprobanteActivity.this,Banner.ERROR,"El producto: " + miDetalle.producto.nombreproducto +
                             " tiene stock insuficiente para la venta.", Banner.BOTTOM, 3500).show();
                     return false;
@@ -792,7 +808,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
             }
         }
 
-        if(rbCredito.isChecked() && cliente.montodisponible>0 && comprobante.total>cliente.montodisponible){
+        if(rbFactura.isChecked() && rbCredito.isChecked() && cliente.montodisponible>0 && comprobante.total>cliente.montodisponible){
             Banner.make(rootView,ComprobanteActivity.this, Banner.ERROR,
                     "El total de la factura es mayor al monto disponible para ventas a crédito." +
                             "\nMonto disponible: " + Utils.FormatoMoneda(cliente.montodisponible,2),
@@ -841,9 +857,8 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                         printer.printCustom("", 0, 1);
                         printer.printCustom("Cliente: ".concat(comprobante.cliente.razonsocial), 0, 0);
                         printer.printCustom("CI|RUC: ".concat(comprobante.cliente.nip), 0, 0);
-                        printer.printCustom("Fecha: ".concat(comprobante.fechadocumento), 0, 0);
-                        printer.printCustom("Factura #: " + comprobante.codigotransaccion, 0, 0);
-                        printer.printCustom("Clave Acceso: ".concat(comprobante.claveacceso), 0, 0);
+                        printer.printCustom("Fecha: ".concat(comprobante.fechadocumento).concat("            ID: " + comprobante.idcomprobante), 0, 0);
+                        printer.printCustom("Recibo #: " + comprobante.codigotransaccion, 0, 0);
                         printer.printCustom("------------------------------------------", 0, 1);
                         printer.printCustom(" Cant. |     Detalle    | P. Uni | S. Tot", 0, 0);
                         printer.printCustom("------------------------------------------", 0, 1);
@@ -865,6 +880,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                         printer.printCustom("FORMA PAGO: " + (comprobante.formapago==0?"CREDITO":"EFECTIVO"), 0, 0);
                         printer.printCustom("", 1, 1);
                         if(!comprobante.cliente.nip.equals("9999999999999")) {
+                            printer.printCustom("Este documento no tiene validez tributaria.",0,1);
                             printer.printCustom("Descargue su factura electrónica en: https://comprobantes.sanisidrosa.com/. Utilice como usuario y contraseña su número de indentificación: ".concat(comprobante.cliente.nip), 0, 0);
                             printer.printCustom("", 0, 1);
                         }
@@ -995,6 +1011,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                             ConsultarDeudaCliente(ComprobanteActivity.this, cliente.codigosistema);
                         detalleAdapter.categoria = cliente.categoria;
                         detalleAdapter.isCredito = rbCredito.isChecked();
+                        detalleAdapter.isFactura = rbFactura.isChecked();
                         detalleAdapter.CambiarPrecio(cliente.categoria, rbCredito.isChecked());
                     }
                     break;
@@ -1003,7 +1020,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                         btsocket = DeviceList.getSocket();
                         if(btsocket!=null) {
                             Utils.showMessageShort(this,"Imprimiendo comprobante");
-                            imprimirFactura(idcomprobante==0?"* ORIGINAL CLIENTE *": "* REIMPRESIÓN DE FACTURA *",
+                            imprimirFactura(idcomprobante==0?"* ORIGINAL CLIENTE *": "* REIMPRESIÓN DE RECIBO *",
                                     idcomprobante>0);
                             Log.d(TAG, "IMPRESORA SELECCIONADA");
                         }
@@ -1026,7 +1043,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
     @Override
     public void onResume() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.appbar);
-        toolbar.setTitle("Nueva factura");
+        toolbar.setTitle(rbFactura.isChecked()?"Nueva factura":"Nueva proforma");
         toolbar.setTitleTextColor(Color.WHITE);
         toolbar.setSubtitleTextColor(Color.WHITE);
         toolbar.setBackgroundColor(getResources().getColor(R.color.black_overlay));
@@ -1062,5 +1079,45 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
             return true;
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        try{
+            switch (buttonView.getId()){
+                case R.id.rbEfectivo:
+                    if(idcomprobante > 0)
+                        return;
+                    if(isChecked){
+                        detalleAdapter.isCredito = false;
+                        detalleAdapter.CambiarPrecio(cliente.categoria, false);
+                        detalleAdapter.CalcularTotal();
+                        detalleAdapter.notifyDataSetChanged();
+                    }
+                    break;
+                case R.id.rbCredito:
+                    if(idcomprobante > 0)
+                        return;
+                    detalleAdapter.isCredito = isChecked;
+                    detalleAdapter.CambiarPrecio(cliente.categoria, isChecked);
+                    detalleAdapter.CalcularTotal();
+                    detalleAdapter.notifyDataSetChanged();
+                    break;
+                case R.id.rbFactura:
+                    if(isChecked) {
+                        toolbar.setTitle("Nueva factura");
+                        detalleAdapter.isFactura = true;
+                    }
+                    break;
+                case R.id.rbProforma:
+                    if(isChecked) {
+                        toolbar.setTitle("Nueva proforma");
+                        detalleAdapter.isFactura = false;
+                    }
+                    break;
+            }
+        }catch (Exception e){
+            Log.d(TAG, e.getMessage());
+        }
     }
 }

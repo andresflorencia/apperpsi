@@ -108,7 +108,10 @@ public class ListaComprobantesActivity extends AppCompatActivity implements Sear
                                     case "23,8":   //RECEPDEVOLUCION - RECEPCION
                                     case "4,20":   //TRANSFERENCIA - DEVOLUCION
                                     case "20,4":   //DEVOLUCION - TRANSFERENCIA
-                                        listComprobantes = Comprobante.getByUsuario(SQLite.usuario.IdUsuario, SQLite.usuario.sucursal.IdEstablecimiento, tipobusqueda, fechadesde, fechahasta);
+                                        String busqueda = tipobusqueda;
+                                        if(tipobusqueda.equals("01"))
+                                            busqueda = "01,PR";
+                                        listComprobantes = Comprobante.getByUsuario(SQLite.usuario.IdUsuario, SQLite.usuario.sucursal.IdEstablecimiento, busqueda, fechadesde, fechahasta);
                                         band = (listComprobantes != null && listComprobantes.size() > 0);
                                         break;
                                     case "PC":  //PEDIDOS

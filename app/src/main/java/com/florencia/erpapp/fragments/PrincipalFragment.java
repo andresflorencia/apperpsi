@@ -424,17 +424,13 @@ public class PrincipalFragment extends Fragment implements View.OnClickListener,
                 progressBar.setVisibility(View.GONE);
                 Snackbar.make(view, "Se descargó un archivo. ", Snackbar.LENGTH_INDEFINITE)
                         .setActionTextColor(Color.WHITE)
-                        .setAction("Instalar", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
+                        .setAction("Instalar", v -> {
                                 Log.d(TAG, "Pulsada acción snackbar!: " + folder.getAbsolutePath());
                                 //File ar = new File(folder, "image.jpg");
                                 Uri photoURI = FileProvider.getUriForFile(view.getContext(), view.getContext().getApplicationContext().getPackageName() + ".provider", pdfFile);
                                 openFolder(Uri.parse("content://"+photoURI.toString()));
                                 //installPackage(view.getContext(), pdfFile.)
-                            }
-                        })
-                        .show();
+                            }).show();
             }
         }
 

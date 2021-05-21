@@ -173,9 +173,12 @@ public class ResumenAdapter extends RecyclerView.Adapter<ResumenAdapter.ResumenV
                         if(miDoc.get("documento").getAsString().equalsIgnoreCase("CLIENTES")){
                             ((MainActivity)activity).fragment = new ClienteFragment(miDoc.get("cantidad").getAsInt()==0?"":fecha);
                             //Log.d("TAG", ((MainActivity)activity).fragment.getClass().getName());
+
                             ((MainActivity)activity).agregaFragment(((MainActivity)activity).fragment.getClass().getName());
-                        }else
+                        }else {
                             activity.startActivity(i);
+                            activity.overridePendingTransition(R.anim.left_in, R.anim.left_out);
+                        }
                     }
 
             });

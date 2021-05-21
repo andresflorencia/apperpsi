@@ -161,7 +161,7 @@ public class Comprobante {
                     }
                 }
             }
-            if(updateStock)
+            //if(updateStock)
                 this.actualizasecuencial();
             sqLiteDatabase.close();
             Log.d(TAG,"Guardó detalle comprobante");
@@ -253,7 +253,7 @@ public class Comprobante {
         ArrayList<Comprobante> Items = new ArrayList<>();
         try {
             sqLiteDatabase = SQLite.sqlDB.getReadableDatabase();
-            Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM comprobante WHERE usuarioid = ? and estado = 0 and tipotransaccion = ?", new String[]{idUser.toString(), "01"});
+            Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM comprobante WHERE usuarioid = ? and estado = 0 and tipotransaccion in(?,?)", new String[]{idUser.toString(), "01", "PR"});
             Comprobante Item;
             if (cursor.moveToFirst()) {
                 do {
@@ -344,7 +344,11 @@ public class Comprobante {
     public String getCodigoTransaccion(){
         String codigo ="";
         try {
-            codigo = this.codigoestablecimiento + "-" + this.puntoemision + "-" + String.format("%09d", this.secuencial);
+            //codigo = "RB-" + SQLite.usuario.sucursal.IdSucursal + "-" + Utils.getDateFormat("yyyyMMddHHmmss");
+            if(this.tipotransaccion.equals("01"))
+                codigo = this.codigoestablecimiento + "-" + this.puntoemision + "-" + String.format("%09d", this.secuencial);
+            else if(this.tipotransaccion.equals("PR"))
+                codigo = "PRO-" + this.codigoestablecimiento + "-" + String.format("%09d", this.secuencial);
             this.codigotransaccion = codigo;
         }catch (Exception e){
             Log.d(TAG, "getCodigoTransaccion(): " + e.getMessage());

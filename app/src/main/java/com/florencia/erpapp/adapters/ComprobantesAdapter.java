@@ -365,7 +365,7 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
 
                     if(retornar) {
                         activity.setResult(Activity.RESULT_OK, new Intent().putExtra("idcomprobante", idcomprobante));
-                        activity.finish();
+                        activity.onBackPressed();
                         activity.overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
                     } else{
                         Intent i = null;

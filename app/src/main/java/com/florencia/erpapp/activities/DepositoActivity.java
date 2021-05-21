@@ -10,6 +10,9 @@ import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -34,7 +37,9 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
@@ -43,6 +48,8 @@ import android.widget.TextView;
 import com.florencia.erpapp.BuildConfig;
 import com.florencia.erpapp.R;
 import com.florencia.erpapp.adapters.FotoAdapter;
+import com.florencia.erpapp.interfaces.IComprobante;
+import com.florencia.erpapp.interfaces.IUsuario;
 import com.florencia.erpapp.models.Catalogo;
 import com.florencia.erpapp.models.DetalleIngreso;
 import com.florencia.erpapp.models.Foto;
@@ -51,15 +58,30 @@ import com.florencia.erpapp.models.Usuario;
 import com.florencia.erpapp.services.SQLite;
 import com.florencia.erpapp.utils.Constants;
 import com.florencia.erpapp.utils.Utils;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.shasin.notificationbanner.Banner;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
+import okhttp3.OkHttpClient;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Url;
 
 public class DepositoActivity extends AppCompatActivity implements View.OnClickListener {
@@ -69,6 +91,7 @@ public class DepositoActivity extends AppCompatActivity implements View.OnClickL
     private static final int REQUEST_SELECCIONA_FOTO = 30;
 
     Button btnFechaVenta, btnFechaDocumento;
+    ImageButton btnRefresh;
     public Button btnCargaDocumento;
     EditText txtMonto, txtNumDocumento, txtConcepto;
     TextView lblTotalVentas, lblFaltante, lblDepositado;
@@ -88,6 +111,10 @@ public class DepositoActivity extends AppCompatActivity implements View.OnClickL
     String ExternalDirectory = "";
     Integer idingreso = 0;
     Ingreso miIngreso;
+    OkHttpClient okHttpClient;
+    Retrofit retrofit;
+    ProgressDialog pbProgreso;
+    ProgressBar pgCargando;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,10 +147,27 @@ public class DepositoActivity extends AppCompatActivity implements View.OnClickL
             lblDepositado = findViewById(R.id.lblDepositado);
             rgTipoTransaccion = findViewById(R.id.rgTipoTransaccion);
             rgTipoCuenta = findViewById(R.id.rgTipoCuenta);
+            btnRefresh = findViewById(R.id.btnRefresh);
+            pgCargando = findViewById(R.id.pbCargando);
+
+            okHttpClient = new OkHttpClient().newBuilder()
+                    .connectTimeout(60, TimeUnit.SECONDS)
+                    .readTimeout(60, TimeUnit.SECONDS)
+                    .writeTimeout(60, TimeUnit.SECONDS)
+                    .build();
+            Gson gson = new GsonBuilder()
+                    .setLenient()
+                    .create();
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(SQLite.configuracion.url_ws)
+                    .addConverterFactory(GsonConverterFactory.create(gson))
+                    .client(okHttpClient)
+                    .build();
 
             btnFechaVenta.setOnClickListener(this::onClick);
             btnFechaDocumento.setOnClickListener(this::onClick);
             btnCargaDocumento.setOnClickListener(this::onClick);
+            btnRefresh.setOnClickListener(this::onClick);
 
             btnFechaVenta.setText(Utils.getDateFormat("yyyy-MM-dd"));
             btnFechaDocumento.setText(Utils.getDateFormat("yyyy-MM-dd"));
@@ -274,7 +318,7 @@ public class DepositoActivity extends AppCompatActivity implements View.OnClickL
             miIngreso.totalingreso = Double.valueOf(txtMonto.getText().toString().trim());
             miIngreso.fechadiario = btnFechaVenta.getText().toString();
             miIngreso.fechacelular = Utils.getDateFormat("yyyy-MM-dd HH:mm:ss");
-            miIngreso.fechadocumento = btnFechaDocumento.getText().toString();
+            //miIngreso.fechadocumento = btnFechaDocumento.getText().toString();
             miIngreso.longdater = Utils.longDate(miIngreso.fechacelular);
             miIngreso.observacion = txtConcepto.getText().toString().trim();
             DetalleIngreso miDetalle = new DetalleIngreso();
@@ -285,7 +329,7 @@ public class DepositoActivity extends AppCompatActivity implements View.OnClickL
             miDetalle.niptitular = SQLite.usuario.nip;
             miDetalle.tipodecuenta = rbAhorro.isChecked()?"A":"C";
             miDetalle.entidadfinanciera = ((Catalogo)spEntidad.getSelectedItem());
-            miDetalle.fechadocumento = miIngreso.fechadocumento;
+            miDetalle.fechadocumento = btnFechaDocumento.getText().toString();
             miDetalle.numerodocumentoreferencia = txtNumDocumento.getText().toString();
             miDetalle.monto = miIngreso.totalingreso;
             miIngreso.detalle.clear();
@@ -293,15 +337,134 @@ public class DepositoActivity extends AppCompatActivity implements View.OnClickL
             miIngreso.fotos.clear();
             miIngreso.fotos.addAll(fotoAdapter.listFoto);
 
-            if(miIngreso.Save()){
+            SubirDeposito(DepositoActivity.this);
+            /*if(miIngreso.Save()){
                 Banner.make(rootView, DepositoActivity.this, Banner.SUCCESS, Constants.MSG_DATOS_GUARDADOS, Banner.BOTTOM, 3000).show();
                 LimpiarDatos();
             }else{
                 Banner.make(rootView, DepositoActivity.this, Banner.ERROR, Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM, 3000).show();
-            }
+            }*/
         }catch (Exception e){
             Log.d(TAG, e.getMessage());
             Banner.make(rootView, DepositoActivity.this, Banner.ERROR, "Excepcion: " + Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM, 3000).show();
+        }
+    }
+
+    private void SubirDeposito(final Context context){
+        try{
+            List<Ingreso> listIngresos = new ArrayList<>();
+            for (int i = 0; i < miIngreso.fotos.size(); i++) {
+                try {
+                    miIngreso.fotos.get(i).image_base = Utils.convertImageToString(miIngreso.fotos.get(i).bitmap);
+                } catch (Exception e) {
+                    Log.d(TAG, "NotFound(): " + e.getMessage());
+                }
+            }
+            listIngresos.add(miIngreso);
+
+            pbProgreso = new ProgressDialog(DepositoActivity.this);
+            pbProgreso.setTitle("Sincronizando depósitos");
+            pbProgreso.setMessage("Espere un momento...");
+            pbProgreso.setCancelable(false);
+            pbProgreso.show();
+
+            IComprobante miInterface = retrofit.create(IComprobante.class);
+
+            Map<String,Object> post = new HashMap<>();
+            post.put("usuario",SQLite.usuario.Usuario);
+            post.put("clave",SQLite.usuario.Clave);
+            post.put("depositos", listIngresos);
+            post.put("periodo", SQLite.usuario.sucursal.periodo.toString() + SQLite.usuario.sucursal.mesactual);
+            post.put("periodoactual", SQLite.usuario.sucursal.periodo);
+            post.put("mesactual", SQLite.usuario.sucursal.mesactual);
+            post.put("establecimientoid", SQLite.usuario.sucursal.IdEstablecimiento);
+            post.put("version", BuildConfig.VERSION_NAME);
+            Call<JsonObject> call = miInterface.LoadDepositos(post);
+
+            call.enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    if(!response.isSuccessful()){
+                        //Banner.make(rootView,DepositoActivity.this,Banner.ERROR,"Código: " + response.code() + " - " + response.message(), Banner.BOTTOM,3000).show();
+                        if(miIngreso.Save()){
+                            Banner.make(rootView, DepositoActivity.this, Banner.SUCCESS, Constants.MSG_DATOS_GUARDADOS + " Este comprobante aún no se ha sincronizado.", Banner.BOTTOM, 3500).show();
+                            LimpiarDatos();
+                        }else{
+                            Banner.make(rootView, DepositoActivity.this, Banner.ERROR, Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM, 3000).show();
+                        }
+                        pbProgreso.dismiss();
+                        return;
+                    }
+
+                    try {
+
+                        if (response.body() != null) {
+                            JsonObject obj = response.body();
+                            if (!obj.get("haserror").getAsBoolean()) {
+                                JsonArray jsonDepositosUpdate = obj.getAsJsonArray("depositosupdate");
+                                if(jsonDepositosUpdate!=null && jsonDepositosUpdate.size()>0){
+                                    JsonObject upd =  jsonDepositosUpdate.get(0).getAsJsonObject();
+                                    miIngreso.codigosistema = upd.get("codigosistema_deposito").getAsInt();
+                                    miIngreso.estado = upd.get("codigosistema_deposito").getAsInt();
+
+                                    if(miIngreso.Save()) {
+                                        if (obj.has("secuencial_dep")) {
+                                            Integer secuencial_pe = obj.get("secuencial_dep").getAsInt();
+                                            Ingreso comprobante = new Ingreso();
+                                            comprobante.secuencial = secuencial_pe;
+                                            comprobante.establecimientoid = SQLite.usuario.sucursal.IdEstablecimiento;
+                                            comprobante.actualizasecuencial();
+                                        }
+                                        Banner.make(rootView, DepositoActivity.this, Banner.SUCCESS, Constants.MSG_DATOS_GUARDADOS, Banner.BOTTOM, 3000).show();
+                                        LimpiarDatos();
+                                    }else{
+                                        Banner.make(rootView, DepositoActivity.this, Banner.ERROR, Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM, 3000).show();
+                                    }
+                                }else{
+                                    if(miIngreso.Save()){
+                                        Banner.make(rootView, DepositoActivity.this, Banner.SUCCESS, Constants.MSG_DATOS_GUARDADOS + " Este comprobante aún no se ha sincronizado.", Banner.BOTTOM, 3500).show();
+                                        LimpiarDatos();
+                                    }else{
+                                        Banner.make(rootView, DepositoActivity.this, Banner.ERROR, Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM, 3000).show();
+                                    }
+                                }
+
+                            } else
+                                Utils.showErrorDialog(DepositoActivity.this,"Error", obj.get("message").getAsString());
+                        } else {
+                            Banner.make(rootView,DepositoActivity.this,Banner.ERROR, Constants.MSG_USUARIO_CLAVE_INCORRECTO, Banner.BOTTOM,3000).show();
+                        }
+                    }catch (JsonParseException ex){
+                        Log.d(TAG, ex.getMessage());
+                        if(miIngreso.Save()){
+                            Banner.make(rootView, DepositoActivity.this, Banner.SUCCESS, Constants.MSG_DATOS_GUARDADOS + " Este comprobante aún no se ha sincronizado.", Banner.BOTTOM, 3500).show();
+                            LimpiarDatos();
+                        }else{
+                            Banner.make(rootView, DepositoActivity.this, Banner.ERROR, Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM, 3000).show();
+                        }
+                    }
+                    pbProgreso.dismiss();
+                }
+
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    Log.d(TAG, t.getMessage());
+                    call.cancel();
+                    if(miIngreso.Save()){
+                        Banner.make(rootView, DepositoActivity.this, Banner.SUCCESS, Constants.MSG_DATOS_GUARDADOS + " Este comprobante aún no se ha sincronizado.", Banner.BOTTOM, 3500).show();
+                        LimpiarDatos();
+                    }else{
+                        Banner.make(rootView, DepositoActivity.this, Banner.ERROR, Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM, 3000).show();
+                    }
+                    pbProgreso.dismiss();
+                }
+            });
+
+        }catch (Exception e){
+            e.printStackTrace();
+            Log.d(TAG, e.getMessage());
+            Utils.showErrorDialog(this, "Error",e.getMessage());
+            pbProgreso.dismiss();
         }
     }
 
@@ -337,7 +500,7 @@ public class DepositoActivity extends AppCompatActivity implements View.OnClickL
         dtpDialog.show();
     }
 
-    private void BuscarTotalVenta(String fecha){
+    private void BuscarTotalVenta2(String fecha){
         try{
             if(toolbar.getMenu()!=null){
                 toolbar.getMenu().findItem(R.id.option_save).setVisible(true);
@@ -372,6 +535,95 @@ public class DepositoActivity extends AppCompatActivity implements View.OnClickL
             }
         }catch (Exception e){
             Log.d(TAG, e.getMessage());
+        }
+    }
+
+    private void BuscarTotalVenta(String fecha){
+        try{
+            pgCargando.setVisibility(View.VISIBLE);
+            btnRefresh.setVisibility(View.GONE);
+            if(toolbar.getMenu()!=null){
+                toolbar.getMenu().findItem(R.id.option_save).setVisible(true);
+            }
+
+            IUsuario miInterface = retrofit.create(IUsuario.class);
+
+            Call<JsonObject> call = miInterface.getTotalVentas(
+                                            SQLite.usuario.Usuario, SQLite.usuario.Clave,
+                                            fecha, SQLite.usuario.sucursal.IdEstablecimiento);
+            call.enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    if(!response.isSuccessful()){
+                        toolbar.getMenu().findItem(R.id.option_save).setVisible(false);
+                        Banner.make(rootView, DepositoActivity.this, Banner.SUCCESS,
+                        "No se pudo obtener los datos de las ventas. Verifique su conexión a internet.", Banner.BOTTOM, 3000).show();
+                        pgCargando.setVisibility(View.GONE);
+                        btnRefresh.setVisibility(View.VISIBLE);
+                        return;
+                    }
+                    try {
+                        if (response.body() != null) {
+                            JsonObject obj = response.body();
+                            if (!obj.get("haserror").getAsBoolean()) {
+                                JsonObject jVentas = obj.getAsJsonObject("totales");
+                                if(jVentas!=null){
+                                    Double[] totales = Usuario.getTotalVentas(fecha);
+                                    lblTotalVentas.setText("Total: ".concat(Utils.FormatoMoneda(jVentas.get("ventas").getAsDouble(),2)));
+                                    lblTotalVentas.setTag(jVentas.get("ventas").getAsDouble());
+                                    lblDepositado.setText("Depositado: ".concat(Utils.FormatoMoneda(jVentas.get("depositado").getAsDouble(),2)));
+                                    lblDepositado.setTag(jVentas.get("depositado").getAsDouble());
+
+                                    Double m = txtMonto.getText().toString().trim().equals("")?0d:Double.parseDouble(txtMonto.getText().toString().trim());
+                                    lblFaltante.setText("Faltante: ".concat(Utils.FormatoMoneda(jVentas.get("ventas").getAsDouble()-jVentas.get("depositado").getAsDouble()-m,2)));
+                                    lblFaltante.setTag(jVentas.get("ventas").getAsDouble()-jVentas.get("depositado").getAsDouble()-m);
+                                    Log.d(TAG, "Ventas: " + jVentas.get("ventas").getAsDouble() + " - Depositado: " + jVentas.get("depositado").getAsDouble() + " - Monto: " + m);
+
+                                    Integer docNS = Usuario.numDocNoSincronizados(SQLite.usuario.IdUsuario, "01", fecha, SQLite.usuario.sucursal.IdEstablecimiento);
+                                    if(docNS > 0){
+                                        Banner.make(rootView, DepositoActivity.this, Banner.INFO,
+                                                "Tiene facturas pendientes por sincronizar, y no podrá registrar comprobante de depósito", Banner.BOTTOM, 3000).show();
+                                        if(toolbar.getMenu()!=null){
+                                            toolbar.getMenu().findItem(R.id.option_save).setVisible(false);
+                                        }
+                                        return;
+                                    }
+
+                                    if(docNS == 0 && jVentas.get("ventas").getAsDouble() > 0 && jVentas.get("ventas").getAsDouble() == jVentas.get("depositado").getAsDouble()){
+                                        Banner.make(rootView, DepositoActivity.this, Banner.INFO,
+                                                "Las ventas del día " + fecha + " ya han sido depositadas en su totalidad.", Banner.BOTTOM, 3000).show();
+                                        if(toolbar.getMenu()!=null){
+                                            toolbar.getMenu().findItem(R.id.option_save).setVisible(false);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }catch (Exception e){
+                        Log.d(TAG,"onResponse(): " + e.getMessage());
+                        toolbar.getMenu().findItem(R.id.option_save).setVisible(false);
+                        Banner.make(rootView, DepositoActivity.this, Banner.SUCCESS,
+                                "No se pudo obtener los datos de las ventas. Verifique su conexión a internet.", Banner.BOTTOM, 3000).show();
+                    }
+                    pgCargando.setVisibility(View.GONE);
+                    btnRefresh.setVisibility(View.VISIBLE);
+                }
+
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    Log.d(TAG, "onFailure(): " + t.getMessage());
+                    call.cancel();
+                    toolbar.getMenu().findItem(R.id.option_save).setVisible(false);
+                    Banner.make(rootView, DepositoActivity.this, Banner.ERROR,
+                            "No se pudo obtener los datos de las ventas. Verifique su conexión a internet.", Banner.BOTTOM, 3000).show();
+                    pgCargando.setVisibility(View.GONE);
+                    btnRefresh.setVisibility(View.VISIBLE);
+                }
+            });
+        }catch (Exception e){
+            Log.d(TAG, e.getMessage());
+            pgCargando.setVisibility(View.GONE);
+            btnRefresh.setVisibility(View.VISIBLE);
         }
     }
 
@@ -450,7 +702,13 @@ public class DepositoActivity extends AppCompatActivity implements View.OnClickL
                 showDatePickerDialog(v);
                 break;
             case R.id.btnCargaDocumento:
+                File miFile = new File(getExternalMediaDirs()[0], Constants.FOLDER_FILES);
+                if (!miFile.exists())
+                    miFile.mkdirs();
                 ElegirOpcionFoto();
+                break;
+            case R.id.btnRefresh:
+                BuscarTotalVenta(btnFechaVenta.getText().toString().trim());
                 break;
         }
     }

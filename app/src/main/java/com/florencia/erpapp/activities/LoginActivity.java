@@ -324,6 +324,8 @@ public class LoginActivity extends AppCompatActivity {
                                 usuario.Clave = Clave;
                                 usuario.Perfil = jsonUsuario.get("perfil").getAsInt();
                                 usuario.Autorizacion = jsonUsuario.get("auth").getAsInt();
+
+                                Sucursal.DeleteByUser(usuario.IdUsuario);
                                 usuario.sucursal = Sucursal.AsignaDatos(jsonUsuario.getAsJsonObject("sucursal"));
                                 usuario.ParroquiaID = jsonUsuario.get("parroquiaid").getAsInt();
                                 usuario.nombrePerfil = jsonUsuario.has("nombreperfil")?jsonUsuario.get("nombreperfil").getAsString():"";

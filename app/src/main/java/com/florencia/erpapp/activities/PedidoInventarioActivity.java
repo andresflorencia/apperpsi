@@ -121,6 +121,7 @@ public class PedidoInventarioActivity extends AppCompatActivity implements View.
                     Intent i = new Intent(v.getContext(),ProductoBusquedaActivity.class);
                     i.putExtra("tipobusqueda", "PI");
                     startActivityForResult(i, REQUEST_PRODUCTO);
+                    overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
                     break;
                 case R.id.lblProducto:
                     Utils.EfectoLayout(lyProductos, lblProducto);

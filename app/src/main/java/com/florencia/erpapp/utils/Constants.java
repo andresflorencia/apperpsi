@@ -41,7 +41,7 @@ public class Constants {
 
 
     //RUTA IMAGENES
-    public static final String FOLDER_FILES = "ImageSI"; //DIRECTORIO PRINCIPAL
+    public static final String FOLDER_FILES = ".ImageSI"; //DIRECTORIO PRINCIPAL
     public static final String FOLDER_IMAGES = "imagenes"; // CARPETA DONDE SE GUARDAN LAS IMAGENES
     public static final String PATH_IMAGES = FOLDER_FILES + FOLDER_IMAGES; //RUTA CARPETA
 }

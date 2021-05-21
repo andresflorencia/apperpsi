@@ -44,6 +44,7 @@ public class Printer {
 
     public void flush() throws IOException {
         outputStream.flush();
+        outputStream.close();
     }
 
     public void printCustom(String msg, int size, int align) throws IOException {
@@ -261,8 +262,7 @@ public class Printer {
         return dateTime;
     }
 
-    public static byte[] stringABytes(String s)
-    {
+    public static byte[] stringABytes(String s){
         byte[] cad = new byte[s.length()]; int i = 0;
         for(char c: s.toCharArray()){
             switch (c){

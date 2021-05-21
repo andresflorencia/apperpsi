@@ -32,6 +32,7 @@ import com.florencia.erpapp.models.Comprobante;
 import com.florencia.erpapp.models.DetalleComprobante;
 import com.florencia.erpapp.models.Producto;
 import com.florencia.erpapp.models.Regla;
+import com.florencia.erpapp.services.SQLite;
 import com.florencia.erpapp.utils.Utils;
 import com.shasin.notificationbanner.Banner;
 
@@ -48,6 +49,7 @@ public class DetalleComprobanteAdapter  extends RecyclerView.Adapter<DetalleComp
     public String categoria;
     public boolean isCredito = false;
     public boolean visualizacion = false;
+    public boolean isFactura = true;
     View rootView;
 
     public DetalleComprobanteAdapter(ComprobanteActivity activity, List<DetalleComprobante> detalleComprobante, String categoria, boolean visualizacion) {
@@ -180,15 +182,12 @@ public class DetalleComprobanteAdapter  extends RecyclerView.Adapter<DetalleComp
                                 notifyDataSetChanged();
                                 CalcularTotal();
                                 Banner.make(rootView,activity,Banner.INFO,"Ítem eliminado de la lista.", Banner.BOTTOM,2000).show();
-                                if(detalleComprobante.size()==0)
+                                if(SQLite.usuario.establecimientos.size() > 1 && detalleComprobante.size()==0)
                                     activity.btnCambiaEstablecimiento.setVisibility(View.VISIBLE);
                                 alertDialog.dismiss();
                             });
 
-                        view.findViewById(R.id.btnCancel).setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) { alertDialog.dismiss();}
-                        });
+                        view.findViewById(R.id.btnCancel).setOnClickListener(vi -> alertDialog.dismiss());
 
                         if(alertDialog.getWindow()!=null)
                             alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
@@ -214,7 +213,7 @@ public class DetalleComprobanteAdapter  extends RecyclerView.Adapter<DetalleComp
                                 DetalleComprobante det = detalleComprobante.get(getAdapterPosition());
                                 Double cant = Double.parseDouble(s.toString().trim());
                                 if (cant > det.producto.stock
-                                        && !visualizacion && det.producto.tipo.equalsIgnoreCase("P")) {
+                                        && !visualizacion && isFactura && det.producto.tipo.equalsIgnoreCase("P")) {
                                     Banner.make(rootView,activity,Banner.INFO, "«" + det.producto.nombreproducto + "» El stock disponible es: " + det.producto.stock, Banner.BOTTOM,4500).show();
                                     detalleComprobante.get(getAdapterPosition()).cantidad = det.producto.stock;
                                     tvCantidad.setText(detalleComprobante.get(getAdapterPosition()).cantidad.toString());

@@ -215,7 +215,7 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.Produc
         void IngresarCantidad(Context context, Producto producto){
             try {
 
-                if(tipobusqueda.equals("01")) {
+                if(tipobusqueda.equals("01") || tipobusqueda.equals("PR")) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         if (productosSelected.stream().filter(i -> i.producto.equals(producto)).
                                 collect(Collectors.toList()).size() > 0) {
@@ -322,7 +322,7 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.Produc
                                     return;
                                 }
                                 Integer counter = 0;
-                                if (tipobusqueda.equals("01")) { //FACTURA
+                                if (tipobusqueda.equals("01") || tipobusqueda.equals("PR")) { //FACTURA -PROFORMA
                                     DetalleComprobante midetalle = new DetalleComprobante();
                                     midetalle.producto = producto;
                                     midetalle.cantidad = cantidad;
