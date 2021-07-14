@@ -14,17 +14,16 @@ public class Provincia {
     public Integer idprovincia;
     public String nombreprovincia;
 
-
     public static SQLiteDatabase sqLiteDatabase;
     public static final String TAG = "TAGPROVINCIA";
 
-    public Provincia(){
+    public Provincia() {
         this.idprovincia = 0;
         this.nombreprovincia = "";
     }
 
     public static Provincia get(Integer codigo) {
-        Provincia provincia=null;
+        Provincia provincia = null;
         try {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
             Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM provincia where idprovincia = ?", new String[]{codigo.toString()});
@@ -49,7 +48,7 @@ public class Provincia {
                 do {
                     provincia = Provincia.AsignaDatos(cursor);
                     if (provincia != null) lista.add(provincia);
-                }while (cursor.moveToNext());
+                } while (cursor.moveToNext());
             }
             cursor.close();
             sqLiteDatabase.close();
@@ -63,14 +62,14 @@ public class Provincia {
     public static boolean SaveLista(List<Provincia> provincias) {
         try {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
-            for (Provincia item:provincias) {
+            for (Provincia item : provincias) {
                 sqLiteDatabase.execSQL("INSERT OR REPLACE INTO " +
                                 "provincia(idprovincia, nombreprovincia)" +
                                 "values(?, ?)",
                         new String[]{item.idprovincia.toString(), item.nombreprovincia});
             }
             sqLiteDatabase.close();
-            Log.d(TAG,"Guardó lista provincias");
+            Log.d(TAG, "Guardó lista provincias");
             return true;
         } catch (Exception ex) {
             ex.printStackTrace();

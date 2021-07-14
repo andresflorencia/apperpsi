@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorGrayLight2"
     android:fitsSystemWindows="true"
-    tools:context=".activities.TransferenciaActivity"
-    android:background="@color/colorGrayLight2">
+    tools:context=".activities.TransferenciaActivity">
 
-    <com.google.android.material.appbar.AppBarLayout
+    <com.google.android.material.appbar.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        xmlns:android="http://schemas.android.com/apk/res/android">
+        android:layout_height="wrap_content">
+
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/appbar"
             android:layout_width="match_parent"
@@ -20,62 +19,68 @@
             android:background="?attr/colorPrimary" />
     </com.google.android.material.appbar.AppBarLayout>
 
-    <LinearLayout android:orientation="vertical"
-        android:layout_height="fill_parent"
+    <LinearLayout
         android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
         android:layout_marginTop="55dp"
-        android:layout_marginBottom="50dp">
+        android:layout_marginBottom="50dp"
+        android:orientation="vertical">
+
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:layout_margin="5dp">
+                android:layout_margin="5dp"
+                android:orientation="vertical">
 
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:cardCornerRadius="10dp"
-                    app:cardElevation="5dp"
+                    android:layout_marginHorizontal="5dp"
                     android:layout_marginTop="10dp"
-                    android:layout_marginHorizontal="5dp">
+                    app:cardCornerRadius="10dp"
+                    app:cardElevation="5dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:padding="5dp"
                         android:layout_gravity="center"
-                        android:gravity="center">
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:padding="5dp">
+
                         <TextView
+                            style="@style/EstiloText_Black"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="TIPO: "
-                            style="@style/EstiloText_Black"
+                            android:layout_marginRight="5dp"
                             android:clickable="true"
                             android:paddingLeft="10dp"
-                            android:layout_marginRight="5dp"/>
+                            android:text="TIPO: " />
 
                         <RadioGroup
                             android:id="@+id/rgTipoTransaccion"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal">
+
                             <RadioButton
                                 android:id="@+id/rbTransferencia"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Transferencia"
+                                android:layout_marginRight="5dp"
                                 android:checked="false"
-                                android:layout_marginRight="5dp"/>
+                                android:text="Transferencia" />
+
                             <RadioButton
                                 android:id="@+id/rbDevolucion"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Devolución Inventario"
-                                android:checked="false"/>
+                                android:checked="false"
+                                android:text="Devolución Inventario" />
                         </RadioGroup>
                     </LinearLayout>
 
@@ -84,62 +89,67 @@
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:cardCornerRadius="10dp"
-                    app:cardElevation="5dp"
-                    android:background="@color/colorPrimary"
+                    android:layout_marginHorizontal="5dp"
                     android:layout_marginTop="5dp"
-                    android:layout_marginHorizontal="5dp">
+                    android:background="@color/colorPrimary"
+                    app:cardCornerRadius="10dp"
+                    app:cardElevation="5dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:padding="5dp">
+
                         <TextView
                             android:id="@+id/lblTransferencia"
+                            style="@style/EstiloText_Black"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="DESTINO"
-                            style="@style/EstiloText_Black"
+                            android:clickable="true"
                             android:drawableRight="@drawable/ic_row_up"
                             android:gravity="center_vertical"
-                            android:clickable="true"
-                            android:paddingLeft="10dp"/>
+                            android:paddingLeft="10dp"
+                            android:text="DESTINO" />
 
                         <LinearLayout
                             android:id="@+id/lyCombo"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal">
+
                             <LinearLayout
                                 android:id="@+id/lyDestino"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:orientation="vertical"
+                                android:layout_weight="1"
                                 android:background="@drawable/border_radius_spinner"
-                                android:layout_weight="1">
+                                android:orientation="vertical">
+
                                 <androidx.appcompat.widget.AppCompatSpinner
                                     android:id="@+id/cbEstablecimiento"
                                     android:layout_width="match_parent"
                                     android:layout_height="50dp"
                                     android:layout_marginHorizontal="5dp"
-                                    android:spinnerMode="dialog"/>
+                                    android:spinnerMode="dialog" />
                             </LinearLayout>
+
                             <ProgressBar
                                 android:id="@+id/pbCargando"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:visibility="gone"/>
+                                android:visibility="gone" />
+
                             <ImageButton
                                 android:id="@+id/btnRefresh"
                                 android:layout_width="wrap_content"
                                 android:layout_height="match_parent"
-                                android:src="@drawable/ic_refresh"
-                                android:scaleX="1.5"
-                                android:scaleY="1.5"
+                                android:layout_gravity="center_vertical"
                                 android:layout_marginLeft="10dp"
                                 android:background="@null"
-                                android:layout_gravity="center_vertical"/>
+                                android:scaleX="1.5"
+                                android:scaleY="1.5"
+                                android:src="@drawable/ic_refresh" />
                         </LinearLayout>
 
                         <LinearLayout
@@ -150,65 +160,72 @@
                             android:orientation="horizontal"
                             android:padding="3dp"
                             android:visibility="gone">
+
                             <LinearLayout
                                 android:layout_width="0dp"
-                                android:layout_weight="2"
                                 android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:background="@color/colorGrayLight">
+                                android:layout_weight="2"
+                                android:background="@color/colorGrayLight"
+                                android:orientation="vertical">
+
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_gravity="right"
                                     android:text="ENVIA: "
-                                    android:textSize="12sp"
                                     android:textColor="@android:color/black"
-                                    android:layout_gravity="right"
-                                    android:textStyle="bold"/>
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:layout_gravity="right"
                                     android:text="DOC. TRANS.: "
-                                    android:textSize="12sp"
                                     android:textColor="@android:color/black"
-                                    android:layout_gravity="right"
-                                    android:textStyle="bold"/>
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="DESTINO: "
-                                    android:textSize="12sp"
-                                    android:textColor="@android:color/black"
                                     android:layout_gravity="right"
-                                    android:textStyle="bold"/>
+                                    android:text="DESTINO: "
+                                    android:textColor="@android:color/black"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
                             </LinearLayout>
 
                             <LinearLayout
                                 android:layout_width="0dp"
-                                android:layout_weight="5"
                                 android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:layout_marginHorizontal="5dp">
+                                android:layout_marginHorizontal="5dp"
+                                android:layout_weight="5"
+                                android:orientation="vertical">
+
                                 <TextView
                                     android:id="@+id/lblEnvia"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:text="ENVIA:"
-                                    android:textSize="12sp"
-                                    android:textColor="@android:color/black"/>
+                                    android:textColor="@android:color/black"
+                                    android:textSize="12sp" />
+
                                 <TextView
                                     android:id="@+id/lblDocTransferencia"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:text="DOC. TRANS.:"
-                                    android:textSize="12sp"
-                                    android:textColor="@android:color/black"/>
+                                    android:textColor="@android:color/black"
+                                    android:textSize="12sp" />
+
                                 <TextView
                                     android:id="@+id/lblRecibe"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:text="DESTINO:"
-                                    android:textSize="12sp"
-                                    android:textColor="@android:color/black"/>
+                                    android:textColor="@android:color/black"
+                                    android:textSize="12sp" />
                             </LinearLayout>
                         </LinearLayout>
                     </LinearLayout>
@@ -218,53 +235,55 @@
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:cardCornerRadius="10dp"
-                    app:cardElevation="5dp"
+                    android:layout_marginHorizontal="5dp"
                     android:layout_marginVertical="10dp"
-                    android:layout_marginHorizontal="5dp">
+                    app:cardCornerRadius="10dp"
+                    app:cardElevation="5dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:padding="5dp">
+
                         <TextView
                             android:id="@+id/lblProducto"
+                            style="@style/EstiloText_Black"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="PRODUCTOS"
-                            style="@style/EstiloText_Black"
+                            android:layout_marginBottom="10dp"
+                            android:clickable="true"
                             android:drawableRight="@drawable/ic_row_down"
                             android:gravity="center_vertical"
-                            android:clickable="true"
                             android:paddingLeft="10dp"
-                            android:layout_marginBottom="10dp"/>
+                            android:text="PRODUCTOS" />
 
                         <LinearLayout
                             android:id="@+id/lyProductos"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical">
+
                             <Button
                                 android:id="@+id/btnBuscarProducto"
                                 android:layout_width="200dp"
                                 android:layout_height="35dp"
-                                android:text="BUSCAR PRODUCTO"
-                                android:drawableRight="@drawable/ic_search"
-                                android:paddingRight="10dp"
-                                android:background="@drawable/border2"
-                                android:focusedByDefault="true"
-                                android:layout_marginLeft="3dp"
                                 android:layout_gravity="end"
+                                android:layout_marginLeft="3dp"
+                                android:layout_marginBottom="5dp"
+                                android:background="@drawable/border2"
+                                android:drawableRight="@drawable/ic_search"
                                 android:elevation="5dp"
-                                android:layout_marginBottom="5dp"/>
+                                android:focusedByDefault="true"
+                                android:paddingRight="10dp"
+                                android:text="BUSCAR PRODUCTO" />
 
                             <androidx.recyclerview.widget.RecyclerView
                                 android:id="@+id/rvDetalleProductos"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:orientation="vertical"
-                                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+                                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
                         </LinearLayout>
                     </LinearLayout>
 
@@ -277,39 +296,42 @@
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardCornerRadius="10dp"
-        app:cardElevation="5dp"
-        android:layout_marginTop="10dp"
+        android:layout_gravity="bottom"
         android:layout_marginHorizontal="5dp"
+        android:layout_marginTop="10dp"
         android:layout_marginBottom="5dp"
-        android:layout_gravity="bottom">
+        app:cardCornerRadius="10dp"
+        app:cardElevation="5dp">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="5dp">
+
             <TextView
                 android:id="@+id/lblObservacion"
+                style="@style/EstiloText_Black3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:drawableRight="@drawable/ic_row_up"
                 android:text="OBSERVACIÓN"
-                android:textAlignment="viewStart"
-                style="@style/EstiloText_Black3"
-                android:drawableRight="@drawable/ic_row_up"/>
+                android:textAlignment="viewStart" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColorHint="@color/colorPrimaryDark">
+
                 <EditText
                     android:id="@+id/tvObservacion"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:lines="2"
-                    android:textSize="16sp"
-                    android:textColor="@color/colorGray"
                     android:hint="Observación"
-                    android:visibility="gone"/>
+                    android:lines="2"
+                    android:textColor="@color/colorGray"
+                    android:textSize="16sp"
+                    android:visibility="gone" />
             </com.google.android.material.textfield.TextInputLayout>
 
         </LinearLayout>

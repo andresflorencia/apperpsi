@@ -26,10 +26,11 @@ public class Persona {
         this.Fono = "";
     }
 
-    public String Codigo() {return String.valueOf(this.IdPersona); }
+    public String Codigo() {
+        return String.valueOf(this.IdPersona);
+    }
 
-    public boolean Guardar()
-    {
+    public boolean Guardar() {
         try {
             this.sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
             this.sqLiteDatabase.execSQL("INSERT OR REPLACE INTO " +
@@ -37,13 +38,12 @@ public class Persona {
                     "values(?, ?, ?)", new String[]{String.valueOf(this.IdPersona), this.RazonSocial, this.Fono});
             this.sqLiteDatabase.close();
             return true;
-        } catch (SQLException ex){
+        } catch (SQLException ex) {
             return false;
         }
     }
 
-    static public Persona get(int Codigo)
-    {
+    static public Persona get(int Codigo) {
         Persona Item = null;
         sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
         Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM persona WHERE idpersona = " + Codigo, null);
@@ -55,8 +55,7 @@ public class Persona {
         return Item;
     }
 
-    public  static Persona AsignaDatos(Cursor cursor)
-    {
+    public static Persona AsignaDatos(Cursor cursor) {
         Persona Item = null;
         Item = new Persona();
         Item.IdPersona = cursor.getInt(0);
@@ -65,8 +64,7 @@ public class Persona {
         return Item;
     }
 
-    static public List<Persona> getAll()
-    {
+    static public List<Persona> getAll() {
         List<Persona> Items = new ArrayList<Persona>();
         Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM persona", null);
         Persona Item;
@@ -74,7 +72,7 @@ public class Persona {
             do {
                 Item = AsignaDatos(cursor);
                 if (Item != null) Items.add(Item);
-            } while(cursor.moveToNext());
+            } while (cursor.moveToNext());
         }
         cursor.close();
         return Items;

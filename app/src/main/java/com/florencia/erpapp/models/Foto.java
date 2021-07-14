@@ -24,14 +24,14 @@ public class Foto {
     public static SQLiteDatabase sqLiteDatabase;
     public static final String TAG = "TAG_FOTO";
 
-    public Foto(){
+    public Foto() {
         this.idfoto = 0;
         this.personaid = 0;
         this.documentoid = 0;
         this.name = "";
         this.path = "";
         this.tipo = "";
-        this.image_base="";
+        this.image_base = "";
     }
 
     public static boolean removeFotos(Integer idpersona) {
@@ -41,7 +41,7 @@ public class Foto {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
             sqLiteDatabase.execSQL("DELETE FROM foto " + where, params);
             sqLiteDatabase.close();
-            Log.d(TAG, "fotos ELIMINADAS personaid: " + idpersona );
+            Log.d(TAG, "fotos ELIMINADAS personaid: " + idpersona);
             return true;
         } catch (Exception ec) {
             ec.printStackTrace();
@@ -52,12 +52,12 @@ public class Foto {
 
     public static boolean removeFotos(Integer idpersona, Integer iddocumento, String tipo) {
         try {
-            String [] params = new String[]{idpersona.toString(),iddocumento.toString(), tipo};
+            String[] params = new String[]{idpersona.toString(), iddocumento.toString(), tipo};
             String where = "WHERE personaid = ? and documentoid = ? and tipo = ?";
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
             sqLiteDatabase.execSQL("DELETE FROM foto " + where, params);
             sqLiteDatabase.close();
-            Log.d(TAG, "fotos ELIMINADAS personaid: " + idpersona + " - documentoid: " + iddocumento+ " - tipo: " + tipo);
+            Log.d(TAG, "fotos ELIMINADAS personaid: " + idpersona + " - documentoid: " + iddocumento + " - tipo: " + tipo);
             return true;
         } catch (Exception ec) {
             ec.printStackTrace();
@@ -70,28 +70,28 @@ public class Foto {
         try {
             removeFotos(idpersona, iddocumento, tipo);
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
-            for (Foto foto:fotos) {
+            for (Foto foto : fotos) {
                 foto.personaid = idpersona;
                 foto.documentoid = iddocumento;
                 sqLiteDatabase.execSQL("INSERT OR REPLACE INTO " +
-                                "foto(idfoto, personaid, documentoid, name, path, tipo) "+
+                                "foto(idfoto, personaid, documentoid, name, path, tipo) " +
                                 "values(?, ?, ?, ?, ?, ?)",
-                        new String[]{foto.idfoto==0?null: foto.idfoto.toString(), foto.personaid.toString(), foto.documentoid.toString(),
+                        new String[]{foto.idfoto == 0 ? null : foto.idfoto.toString(), foto.personaid.toString(), foto.documentoid.toString(),
                                 foto.name, foto.path, foto.tipo});
-                if (foto.idfoto == 0)foto.idfoto = SQLite.sqlDB.getLastId();
+                if (foto.idfoto == 0) foto.idfoto = SQLite.sqlDB.getLastId();
             }
             sqLiteDatabase.close();
-            Log.d(TAG,"SAVE LISTA DE FOTOS OK");
+            Log.d(TAG, "SAVE LISTA DE FOTOS OK");
             return true;
-        } catch (SQLException ex){
-            Log.d(TAG,"SaveList(): " +ex.getMessage());
+        } catch (SQLException ex) {
+            Log.d(TAG, "SaveList(): " + ex.getMessage());
             return false;
         }
     }
 
-    public static List<Foto> getLista(Integer idpersona, Integer iddocumento, String tipo){
+    public static List<Foto> getLista(Integer idpersona, Integer iddocumento, String tipo) {
         List<Foto> retorno = new ArrayList<>();
-        try{
+        try {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
             Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM foto WHERE personaid = ? AND documentoid = ? and tipo = ?",
                     new String[]{idpersona.toString(), iddocumento.toString(), tipo});
@@ -100,11 +100,11 @@ public class Foto {
                 do {
                     foto = Foto.AsignaDatos(cursor);
                     if (foto != null) retorno.add(foto);
-                }while (cursor.moveToNext());
+                } while (cursor.moveToNext());
             }
             cursor.close();
             sqLiteDatabase.close();
-        }catch (SQLiteException e){
+        } catch (SQLiteException e) {
             Log.d(TAG, "getLista(): " + e.getMessage());
         }
         return retorno;

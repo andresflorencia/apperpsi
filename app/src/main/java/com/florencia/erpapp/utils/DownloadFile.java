@@ -24,9 +24,9 @@ public class DownloadFile extends AsyncTask<String, Void, Void> {
         folder.mkdir();
         File pdfFile = new File(folder, fileName);
 
-        try{
+        try {
             pdfFile.createNewFile();
-        }catch (IOException e){
+        } catch (IOException e) {
             Log.d("TAG", e.getMessage());
             e.printStackTrace();
         }

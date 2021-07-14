@@ -40,14 +40,14 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ClienteFragment extends Fragment implements SearchView.OnQueryTextListener{
+public class ClienteFragment extends Fragment implements SearchView.OnQueryTextListener {
 
     private static String TAG = "TAGCLIENTE_FRAGMENT";
     View view;
     Toolbar toolbar;
     ImageView imgFondo;
     RecyclerView rvClientes;
-    List<Cliente> lstClientes= new ArrayList<>();
+    List<Cliente> lstClientes = new ArrayList<>();
     ClienteAdapter clienteAdapter;
     SearchView svBusqueda;
     LinearLayout lyContainer;
@@ -55,10 +55,12 @@ public class ClienteFragment extends Fragment implements SearchView.OnQueryTextL
     private SwipeRefreshLayout swipeRefreshClientes;
     public static final int CLIENTE_FRAGMENT = 1;
     String _fecha = "";
+
     public ClienteFragment() {
         // Required empty public constructor
     }
-    public ClienteFragment(String fecha){
+
+    public ClienteFragment(String fecha) {
         _fecha = fecha;
     }
 
@@ -84,61 +86,61 @@ public class ClienteFragment extends Fragment implements SearchView.OnQueryTextL
             //Inicio Refrescar el contenido del RecyclerView
             swipeRefreshClientes.setColorSchemeResources(R.color.colorend_splash, R.color.colorAccent, R.color.colorMoradito);
             swipeRefreshClientes.setOnRefreshListener(
-                () -> {
-                    try {
-                        CargarDatos(true);
-                    } catch (Exception e) {
-                        Log.d(TAG, "SwipeRefresh(): " + e.getMessage());
-                    }
-                });
+                    () -> {
+                        try {
+                            CargarDatos(true);
+                        } catch (Exception e) {
+                            Log.d(TAG, "SwipeRefresh(): " + e.getMessage());
+                        }
+                    });
             //Fin Refrescar el contenido del RecyclerView
 
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, "onCreate(): " + e.getMessage());
         }
         return view;
     }
 
-    public void CargarDatos( boolean isSwipe){
+    public void CargarDatos(boolean isSwipe) {
         try {
             Thread th = new Thread() {
                 @Override
                 public void run() {
                     getActivity().runOnUiThread(() -> {
-                            try {
-                                lstClientes = Cliente.getClientes(SQLite.usuario.IdUsuario,_fecha);
-                                if (lstClientes == null || lstClientes.size() == 0) {
-                                    imgFondo.setVisibility(View.VISIBLE);
-                                    lyContainer.setVisibility(View.GONE);
-                                } else {
-                                    imgFondo.setVisibility(View.GONE);
-                                    lyContainer.setVisibility(View.VISIBLE);
-                                    clienteAdapter = new ClienteAdapter(getContext(), lstClientes);
-                                    rvClientes.setAdapter(clienteAdapter);
+                        try {
+                            lstClientes = Cliente.getClientes(SQLite.usuario.IdUsuario, _fecha);
+                            if (lstClientes == null || lstClientes.size() == 0) {
+                                imgFondo.setVisibility(View.VISIBLE);
+                                lyContainer.setVisibility(View.GONE);
+                            } else {
+                                imgFondo.setVisibility(View.GONE);
+                                lyContainer.setVisibility(View.VISIBLE);
+                                clienteAdapter = new ClienteAdapter(getContext(), lstClientes);
+                                rvClientes.setAdapter(clienteAdapter);
 
-                                    String bus = svBusqueda.getQuery().toString();
-                                    svBusqueda.setQuery("", true);
-                                    if (!bus.equals(""))
-                                        svBusqueda.setQuery(bus, true);
-                                }
-                                if (isSwipe)
-                                    ClienteFragment.this.swipeRefreshClientes.setRefreshing(false);
-                            }catch (Exception e){
-                                Log.d(TAG, "CargaDatos(): " + e.getMessage());
+                                String bus = svBusqueda.getQuery().toString();
+                                svBusqueda.setQuery("", true);
+                                if (!bus.equals(""))
+                                    svBusqueda.setQuery(bus, true);
                             }
-                        });
+                            if (isSwipe)
+                                ClienteFragment.this.swipeRefreshClientes.setRefreshing(false);
+                        } catch (Exception e) {
+                            Log.d(TAG, "CargaDatos(): " + e.getMessage());
+                        }
+                    });
                 }
             };
             th.start();
-        }catch (Exception e){
-            Log.d(TAG,e.getMessage());
+        } catch (Exception e) {
+            Log.d(TAG, e.getMessage());
         }
     }
 
     @Override
     public void onResume() {
         Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
-        String titulo="Clientes" ;
+        String titulo = "Clientes";
         toolbar.setTitle(titulo);
         toolbar.setTitleTextColor(Color.WHITE);
         CargarDatos(false);
@@ -147,7 +149,7 @@ public class ClienteFragment extends Fragment implements SearchView.OnQueryTextL
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_cliente,menu);
+        inflater.inflate(R.menu.menu_cliente, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 

@@ -29,16 +29,16 @@ import com.florencia.erpapp.services.SQLite;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ClienteBusquedaActivity extends AppCompatActivity implements SearchView.OnQueryTextListener  {
+public class ClienteBusquedaActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
     ImageView imgFondo;
     RecyclerView rvCliente;
-    List<Cliente> listClientes= new ArrayList<>();
+    List<Cliente> listClientes = new ArrayList<>();
     ClienteBusquedaAdapter clienteAdapter;
     SearchView svBusqueda;
     LinearLayout lyContainer;
     ProgressDialog pgCargando;
-    String tipobusqueda="";
+    String tipobusqueda = "";
     public static final int REQUEST_NEW_CLIENTE = 2;
     private static String TAG = "TAGCLIENTE_BUSQUEDA_ACT";
 
@@ -64,15 +64,15 @@ public class ClienteBusquedaActivity extends AppCompatActivity implements Search
 
         CargarDatos();
 
-        if(getIntent().getExtras()!=null){
-            svBusqueda.setQuery(getIntent().getExtras().getString("busqueda",""),true);
-            tipobusqueda = getIntent().getExtras().getString("tipobusqueda","");
-            if(clienteAdapter!=null)
+        if (getIntent().getExtras() != null) {
+            svBusqueda.setQuery(getIntent().getExtras().getString("busqueda", ""), true);
+            tipobusqueda = getIntent().getExtras().getString("tipobusqueda", "");
+            if (clienteAdapter != null)
                 clienteAdapter.tipobusqueda = tipobusqueda;
         }
     }
 
-    private void CargarDatos(){
+    private void CargarDatos() {
         try {
             listClientes = Cliente.getClientes(SQLite.usuario.IdUsuario, "");
             if (listClientes == null || listClientes.size() == 0) {
@@ -84,8 +84,8 @@ public class ClienteBusquedaActivity extends AppCompatActivity implements Search
                 clienteAdapter = new ClienteBusquedaAdapter(ClienteBusquedaActivity.this, listClientes, tipobusqueda);
                 rvCliente.setAdapter(clienteAdapter);
             }
-        }catch (Exception e){
-            Log.d(TAG,e.getMessage());
+        } catch (Exception e) {
+            Log.d(TAG, e.getMessage());
         }
     }
 
@@ -102,7 +102,7 @@ public class ClienteBusquedaActivity extends AppCompatActivity implements Search
         switch (item.getItemId()) {
             case R.id.option_addclient:
                 i = new Intent(this, ClienteActivity.class);
-                i.putExtra("nuevo_cliente",true);
+                i.putExtra("nuevo_cliente", true);
                 startActivityForResult(i, REQUEST_NEW_CLIENTE);
                 overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
                 break;
@@ -113,10 +113,10 @@ public class ClienteBusquedaActivity extends AppCompatActivity implements Search
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == RESULT_OK){
-            switch (requestCode){
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
                 case REQUEST_NEW_CLIENTE:
-                    setResult(Activity.RESULT_OK,data);
+                    setResult(Activity.RESULT_OK, data);
                     finish();
                     break;
             }
@@ -126,7 +126,7 @@ public class ClienteBusquedaActivity extends AppCompatActivity implements Search
     @Override
     public void onResume() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.appbar);
-        String titulo="Búsqueda de cliente" ;
+        String titulo = "Búsqueda de cliente";
         toolbar.setTitle(titulo);
         toolbar.setTitleTextColor(Color.WHITE);
         toolbar.setBackgroundColor(getResources().getColor(R.color.colorGreenLight));
@@ -140,7 +140,7 @@ public class ClienteBusquedaActivity extends AppCompatActivity implements Search
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        if(clienteAdapter!=null)
+        if (clienteAdapter != null)
             clienteAdapter.filter(newText);
         return false;
     }

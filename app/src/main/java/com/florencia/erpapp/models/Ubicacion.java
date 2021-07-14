@@ -19,7 +19,7 @@ public class Ubicacion {
     public static SQLiteDatabase sqLiteDatabase;
     public static String TAG = "TAGUBICACION";
 
-    public Ubicacion(){
+    public Ubicacion() {
         this.idubicacion = 0;
         this.usuarioid = 0;
         this.estado = 0;
@@ -33,13 +33,13 @@ public class Ubicacion {
         try {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
             sqLiteDatabase.execSQL("INSERT OR REPLACE INTO " +
-                    "ubicacion(usuarioid, lat, lon, estado, fechaapp, rucempresa) " +
-                    "values(?, ?, ?, ?, ?, ?)",
+                            "ubicacion(usuarioid, lat, lon, estado, fechaapp, rucempresa) " +
+                            "values(?, ?, ?, ?, ?, ?)",
                     new String[]{usuarioid.toString(), lat.toString(), lon.toString(), "0",
                             Utils.getDateFormat("yyyy-MM-dd HH:mm"), rucempresa});
             sqLiteDatabase.close();
-            Log.d("TAG", " User: " + usuarioid +". Se agregó la posicion -> Lat: "
-                    + lat + " - Lon: "+ lon + " RUC: " + rucempresa);
+            Log.d("TAG", " User: " + usuarioid + ". Se agregó la posicion -> Lat: "
+                    + lat + " - Lon: " + lon + " RUC: " + rucempresa);
         } catch (Exception ec) {
             ec.printStackTrace();
             Log.d(TAG, ec.getMessage());
@@ -55,8 +55,8 @@ public class Ubicacion {
                     new String[]{usuarioid.toString(), lat.toString(), lon.toString(), "0",
                             Utils.getDateFormat("yyyy-MM-dd HH:mm"), rucempresa});
             sqLiteDatabase.close();
-            Log.d("TAG", " User: " + usuarioid +". Se agregó la posicion -> Lat: "
-                    + lat + " - Lon: "+ lon + " RUC: " + rucempresa);
+            Log.d("TAG", " User: " + usuarioid + ". Se agregó la posicion -> Lat: "
+                    + lat + " - Lon: " + lon + " RUC: " + rucempresa);
         } catch (Exception ec) {
             ec.printStackTrace();
             Log.d(TAG, ec.getMessage());
@@ -67,7 +67,7 @@ public class Ubicacion {
         ArrayList<Ubicacion> items = null;
         try {
             sqLiteDatabase = SQLite.sqlDB.getReadableDatabase();
-            Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM ubicacion WHERE usuarioid = ? AND estado = 0 ORDER BY idubicacion", new String[] {usuarioid.toString()});
+            Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM ubicacion WHERE usuarioid = ? AND estado = 0 ORDER BY idubicacion", new String[]{usuarioid.toString()});
             if (cursor.moveToFirst()) {
                 items = new ArrayList<>();
                 do {
@@ -80,7 +80,7 @@ public class Ubicacion {
                     item.fechaapp = cursor.getString(5);
                     item.rucempresa = cursor.getString(6);
                     items.add(item);
-                }while (cursor.moveToNext());
+                } while (cursor.moveToNext());
             }
             sqLiteDatabase.close();
         } catch (Exception ec) {
@@ -93,11 +93,11 @@ public class Ubicacion {
     public static boolean Update(Integer idubicacion, ContentValues values) {
         try {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
-            sqLiteDatabase.update("ubicacion",values, "idubicacion = ?",new String[]{idubicacion.toString()});
+            sqLiteDatabase.update("ubicacion", values, "idubicacion = ?", new String[]{idubicacion.toString()});
             sqLiteDatabase.close();
-            Log.d(TAG,"UPDATE UBICACION OK");
+            Log.d(TAG, "UPDATE UBICACION OK");
             return true;
-        } catch (SQLException ex){
+        } catch (SQLException ex) {
             Log.d(TAG, "Update(): " + ex.getMessage());
             return false;
         }

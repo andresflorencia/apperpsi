@@ -24,7 +24,7 @@ public class Regla {
     public static SQLiteDatabase sqLiteDatabase;
     public static String TAG = "TAGREGLA";
 
-    public Regla(){
+    public Regla() {
         this.idproductoregla = 0;
         this.productoid = 0;
         this.establecimientoid = 0;
@@ -41,25 +41,25 @@ public class Regla {
             this.sqLiteDatabase.execSQL("INSERT OR REPLACE INTO " +
                     "reglaprecio(idproductoregla, productoid, establecimientoid, cantidad, numerolote, fechamaxima, precio, longdate) " +
                     "values(?, ?, ?, ?, ?, ?, ?, ?)", new String[]{this.idproductoregla.toString(), this.productoid.toString(), this.establecimientoid.toString(),
-                    this.cantidad.toString(),this.numerolote, this.fechamaxima, this.precio.toString(), String.valueOf(Utils.longDate(this.fechamaxima))});
+                    this.cantidad.toString(), this.numerolote, this.fechamaxima, this.precio.toString(), String.valueOf(Utils.longDate(this.fechamaxima))});
             this.sqLiteDatabase.close();
-            Log.d(TAG,"SAVE REGLA OK");
+            Log.d(TAG, "SAVE REGLA OK");
             return true;
-        } catch (SQLException ex){
+        } catch (SQLException ex) {
             Log.d(TAG, ex.getMessage());
             return false;
         }
     }
 
-    public static boolean InsertMultiple(Integer idproducto, Integer establecimientoid, List<Regla> reglas){
+    public static boolean InsertMultiple(Integer idproducto, Integer establecimientoid, List<Regla> reglas) {
         try {
             ContentValues values;
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
-            sqLiteDatabase.delete("reglaprecio","productoid = ?", new String[]{idproducto.toString()});
-            for(Regla regla: reglas) {
-                sqLiteDatabase.delete("reglaprecio","idproductoregla = ?", new String[]{regla.idproductoregla.toString()});
+            sqLiteDatabase.delete("reglaprecio", "productoid = ?", new String[]{idproducto.toString()});
+            for (Regla regla : reglas) {
+                sqLiteDatabase.delete("reglaprecio", "idproductoregla = ?", new String[]{regla.idproductoregla.toString()});
                 regla.longdate = Utils.longDate(regla.fechamaxima);
-                values= new ContentValues();
+                values = new ContentValues();
                 values.put("idproductoregla", regla.idproductoregla);
                 values.put("productoid", regla.productoid);
                 values.put("establecimientoid", regla.establecimientoid);
@@ -73,7 +73,7 @@ public class Regla {
             sqLiteDatabase.close();
             Log.d(TAG, "INSERT REGLAS OK");
             return true;
-        }catch (SQLiteException e){
+        } catch (SQLiteException e) {
             Log.d(TAG, e.getMessage());
             return false;
         }
@@ -91,13 +91,14 @@ public class Regla {
             Item.fechamaxima = cursor.getString(5);
             Item.precio = cursor.getDouble(6);
             Item.longdate = cursor.getLong(7);
-        }catch(Exception e){
+        } catch (Exception e) {
             Log.d(TAG, "AsignaDatos(): " + e.getMessage());
-        } finally { }
+        } finally {
+        }
         return Item;
     }
 
-    public static ArrayList<Regla> getAll(Integer idproducto, Integer establecimientoid){
+    public static ArrayList<Regla> getAll(Integer idproducto, Integer establecimientoid) {
         Long lToday = Utils.longDate(Utils.getDateFormat("yyyy-MM-dd"));
         ArrayList<Regla> Items = new ArrayList<>();
         sqLiteDatabase = SQLite.sqlDB.getReadableDatabase();
@@ -108,14 +109,14 @@ public class Regla {
         if (cursor.moveToFirst()) {
             do {
                 Item = AsignaDatos(cursor);
-                if (Item!=null) Items.add(Item);
-            } while(cursor.moveToNext());
+                if (Item != null) Items.add(Item);
+            } while (cursor.moveToNext());
         }
         sqLiteDatabase.close();
         return Items;
     }
 
-    public static Regla get(Integer id){
+    public static Regla get(Integer id) {
         sqLiteDatabase = SQLite.sqlDB.getReadableDatabase();
         Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM reglaprecio WHERE idproductoregla = ?",
                 new String[]{id.toString()});
@@ -126,14 +127,14 @@ public class Regla {
         return Item;
     }
 
-    public static boolean Delete(String [] where) {
+    public static boolean Delete(String[] where) {
         try {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
-            sqLiteDatabase.delete("reglaprecio", "productoid = ? and establecimientoid = ?",where);
+            sqLiteDatabase.delete("reglaprecio", "productoid = ? and establecimientoid = ?", where);
             sqLiteDatabase.close();
-            Log.d(TAG,"DELETE REGLAS OK");
+            Log.d(TAG, "DELETE REGLAS OK");
             return true;
-        } catch (SQLException ex){
+        } catch (SQLException ex) {
             Log.d(TAG, ex.getMessage());
             return false;
         }
@@ -142,7 +143,7 @@ public class Regla {
     @NonNull
     @Override
     public String toString() {
-        return  " Pro: "+ this.productoid +
+        return " Pro: " + this.productoid +
                 " - E: " + this.establecimientoid +
                 " - C: " + this.cantidad +
                 " - P: " + this.precio +

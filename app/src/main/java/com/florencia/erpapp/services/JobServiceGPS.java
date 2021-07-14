@@ -18,10 +18,11 @@ public class JobServiceGPS extends JobService {
 
     private boolean jobCancelled = false;
     SharedPreferences sPreferences;
+
     @Override
     public boolean onStartJob(JobParameters params) {
         Log.d("TAG", "onStartJob");
-        tomarPosicion( params);
+        tomarPosicion(params);
         return true;
     }
 
@@ -50,7 +51,7 @@ public class JobServiceGPS extends JobService {
                             Context co = getApplication().getApplicationContext();
                             GPSTracker gpsTracker = new GPSTracker(co);
                             Location miLocation = gpsTracker.getLastKnownLocation();
-                            SQLite.sqlDB = new SQLite(getApplication().getApplicationContext(),true);
+                            SQLite.sqlDB = new SQLite(getApplication().getApplicationContext(), true);
                             if (miLocation != null) {
                                 Ubicacion.Save(idUser, rucempresa, miLocation.getLatitude(), miLocation.getLongitude());
                                 //Log.d("TAG", "Lat: " + miLocation.getLatitude() + " - Lon: " + miLocation.getLongitude());
@@ -64,12 +65,12 @@ public class JobServiceGPS extends JobService {
                     jobFinished(params, true);
                 }
             }).start();
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d("TAG", e.getMessage());
         }
     }
 
-    private boolean permitirJob(){
+    private boolean permitirJob() {
         boolean retorno = false;
         try {
             //Lo primero que tienes que hacer es establecer el formato que tiene tu fecha para que puedas obtener un objeto de tipo Date el cual es el que se utiliza para obtener la diferencia.
@@ -91,9 +92,9 @@ public class JobServiceGPS extends JobService {
             retorno = (millNow >= millInicio && millNow <= millFinal);
             //Log.d("TAG",retorno?"SI ESTÀ EN EL RANGO DE HORAS": "NO ESTÀ EN EL RANGO DE HORAS");
             //Toast.makeText(getApplication().getApplicationContext(), retorno?"Si está en el rango": "No está en el rango",Toast.LENGTH_LONG).show();
-        }catch (Exception e){
+        } catch (Exception e) {
             retorno = false;
-            Log.d("TAG",e.getMessage());
+            Log.d("TAG", e.getMessage());
         }
         return retorno;
     }

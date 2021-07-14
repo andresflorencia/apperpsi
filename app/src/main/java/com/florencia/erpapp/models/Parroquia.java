@@ -15,18 +15,17 @@ public class Parroquia {
     public String nombreparroquia;
     public Integer cantonid;
 
-
     public static SQLiteDatabase sqLiteDatabase;
     public static final String TAG = "TAGPROVINCIA";
 
-    public Parroquia(){
+    public Parroquia() {
         this.idparroquia = 0;
         this.nombreparroquia = "";
         this.cantonid = 0;
     }
 
     public static Parroquia get(Integer codigo) {
-        Parroquia parroquia=null;
+        Parroquia parroquia = null;
         try {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
             Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM parroquia where idparroquia= ?", new String[]{codigo.toString()});
@@ -55,7 +54,7 @@ public class Parroquia {
                 do {
                     parroquia = Parroquia.AsignaDatos(cursor);
                     if (parroquia != null) lista.add(parroquia);
-                }while (cursor.moveToNext());
+                } while (cursor.moveToNext());
             }
             cursor.close();
             sqLiteDatabase.close();
@@ -69,14 +68,14 @@ public class Parroquia {
     public static boolean SaveLista(List<Parroquia> parroquias) {
         try {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
-            for (Parroquia item:parroquias) {
+            for (Parroquia item : parroquias) {
                 sqLiteDatabase.execSQL("INSERT OR REPLACE INTO " +
                                 "parroquia(idparroquia, nombreparroquia, cantonid)" +
                                 "values(?, ?, ?)",
                         new String[]{item.idparroquia.toString(), item.nombreparroquia, item.cantonid.toString()});
             }
             sqLiteDatabase.close();
-            Log.d(TAG,"Guardó lista parroquias");
+            Log.d(TAG, "Guardó lista parroquias");
             return true;
         } catch (Exception ex) {
             ex.printStackTrace();

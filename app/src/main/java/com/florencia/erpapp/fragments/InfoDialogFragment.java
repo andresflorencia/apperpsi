@@ -31,6 +31,7 @@ public class InfoDialogFragment extends AppCompatDialogFragment {
     private ProgressBar pbCargando;
     private ImageButton btnCerrar;
     Cliente cliente = new Cliente();
+
     public InfoDialogFragment() {
         // Required empty public constructor
     }
@@ -39,61 +40,61 @@ public class InfoDialogFragment extends AppCompatDialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        view= inflater.inflate(R.layout.fragment_info_dialog, container, false);
+        view = inflater.inflate(R.layout.fragment_info_dialog, container, false);
 
-        txtNombre = (TextView)view.findViewById(R.id.txtNombre);
-        txtNombreComercial = (TextView)view.findViewById(R.id.txtNombreComercial);
-        txtNip = (TextView)view.findViewById(R.id.txtNIP);
-        txtDireccion = (TextView)view.findViewById(R.id.txtDireccion);
-        txtContacto = (TextView)view.findViewById(R.id.txtContacto);
+        txtNombre = (TextView) view.findViewById(R.id.txtNombre);
+        txtNombreComercial = (TextView) view.findViewById(R.id.txtNombreComercial);
+        txtNip = (TextView) view.findViewById(R.id.txtNIP);
+        txtDireccion = (TextView) view.findViewById(R.id.txtDireccion);
+        txtContacto = (TextView) view.findViewById(R.id.txtContacto);
         txtCorreo = (TextView) view.findViewById(R.id.txtCorreo);
         txtCategoria = view.findViewById(R.id.txtCategoria);
         pbCargando = view.findViewById(R.id.pbCargando);
         btnCerrar = view.findViewById(R.id.btnCerrar);
 
-        if(!getArguments().isEmpty()) {
-            int id = getArguments().getInt("idcliente",0);
-            if(id>0)
+        if (!getArguments().isEmpty()) {
+            int id = getArguments().getInt("idcliente", 0);
+            if (id > 0)
                 BuscarDatos(id);
 
         }
 
         btnCerrar.setOnClickListener(v -> getDialog().dismiss());
 
-        if(getDialog().getWindow()!=null)
+        if (getDialog().getWindow() != null)
             getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(0));
-        return  view;
+        return view;
     }
 
     private void BuscarDatos(int id) {
-        try{
-            Thread th = new Thread(){
+        try {
+            Thread th = new Thread() {
                 @Override
-                public void run(){
+                public void run() {
                     pbCargando.setVisibility(View.VISIBLE);
                     cliente = Cliente.get(id);
                     getActivity().runOnUiThread(() -> {
-                            if(cliente != null){
-                                txtNombre.setText(cliente.razonsocial);
-                                txtNombreComercial.setText(cliente.nombrecomercial.equals("")?"N/A":cliente.nombrecomercial);
-                                txtNip.setText(cliente.nip);
-                                txtCorreo.setText(cliente.email.equals("")?"N/A":cliente.email);
-                                txtDireccion.setText(cliente.direccion.equals("")?"N/A":cliente.direccion);
-                                txtContacto.setText(cliente.fono1.equals("") && cliente.fono2.equals("")?"N/A":cliente.fono1.concat(" - ").concat(cliente.fono2));
-                                txtCategoria.setText(
-                                        (cliente.nombrecategoria.equals("")?
-                                                "Sin categoría":
-                                                "Categoría: ".concat(cliente.nombrecategoria))
-                                        .concat("\n\nMonto Crédito: " + Utils.FormatoMoneda(cliente.montocredito,2))
-                                        .concat("\nDeuda Total: " + Utils.FormatoMoneda(cliente.deudatotal,2))
-                                        .concat("\nMonto Disponible: " + Utils.FormatoMoneda(cliente.montocredito - cliente.deudatotal,2)));
-                            }
-                            pbCargando.setVisibility(View.GONE);
-                        });
+                        if (cliente != null) {
+                            txtNombre.setText(cliente.razonsocial);
+                            txtNombreComercial.setText(cliente.nombrecomercial.equals("") ? "N/A" : cliente.nombrecomercial);
+                            txtNip.setText(cliente.nip);
+                            txtCorreo.setText(cliente.email.equals("") ? "N/A" : cliente.email);
+                            txtDireccion.setText(cliente.direccion.equals("") ? "N/A" : cliente.direccion);
+                            txtContacto.setText(cliente.fono1.equals("") && cliente.fono2.equals("") ? "N/A" : cliente.fono1.concat(" - ").concat(cliente.fono2));
+                            txtCategoria.setText(
+                                    (cliente.nombrecategoria.equals("") ?
+                                            "Sin categoría" :
+                                            "Categoría: ".concat(cliente.nombrecategoria))
+                                            .concat("\n\nMonto Crédito: " + Utils.FormatoMoneda(cliente.montocredito, 2))
+                                            .concat("\nDeuda Total: " + Utils.FormatoMoneda(cliente.deudatotal, 2))
+                                            .concat("\nMonto Disponible: " + Utils.FormatoMoneda(cliente.montocredito - cliente.deudatotal, 2)));
+                        }
+                        pbCargando.setVisibility(View.GONE);
+                    });
                 }
             };
             th.start();
-        }catch (Exception e){
+        } catch (Exception e) {
             pbCargando.setVisibility(View.GONE);
             Log.d(TAG, e.getMessage());
         }

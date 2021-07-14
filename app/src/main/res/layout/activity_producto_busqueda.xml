@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,10 +7,10 @@
     android:fitsSystemWindows="true"
     tools:context=".activities.ProductoBusquedaActivity">
 
-    <com.google.android.material.appbar.AppBarLayout
+    <com.google.android.material.appbar.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        xmlns:android="http://schemas.android.com/apk/res/android">
+        android:layout_height="wrap_content">
+
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/appbar"
             android:layout_width="match_parent"
@@ -26,58 +25,64 @@
         android:layout_gravity="center"
         android:orientation="vertical"
         android:visibility="visible">
+
         <ProgressBar
             android:id="@+id/pbCargando"
             android:layout_width="50dp"
             android:layout_height="50dp"
+            android:layout_gravity="center"
             android:elevation="20dp"
             android:indeterminate="true"
-            android:visibility="visible"
-            android:layout_gravity="center"/>
+            android:visibility="visible" />
+
         <TextView
             android:id="@+id/lblMessage"
+            style="@style/TextAppearance.AppCompat.Headline"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Cargando productos"
             android:layout_gravity="center"
-            android:textAlignment="center"
-            style="@style/TextAppearance.AppCompat.Headline"/>
+            android:text="Cargando productos"
+            android:textAlignment="center" />
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/lyContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="55dp"
         android:orientation="vertical"
-        android:visibility="visible"
-        android:layout_marginTop="55dp">
+        android:visibility="visible">
+
         <androidx.appcompat.widget.SearchView
             android:id="@+id/svBusqueda"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:queryHint="Filtrar"
-            app:iconifiedByDefault="false"
+            android:layout_margin="5dp"
             android:background="@drawable/border1"
-            android:layout_margin="5dp"/>
+            app:iconifiedByDefault="false"
+            app:queryHint="Filtrar" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvCategorias"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
             android:orientation="horizontal"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            android:layout_marginBottom="5dp"/>
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvProductos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
     </LinearLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom">
+
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/btnConfirmar"
             android:layout_width="wrap_content"
@@ -85,29 +90,30 @@
             android:layout_gravity="end|bottom"
             android:layout_margin="5dp"
             android:src="@drawable/ic_check_white"
-            app:elevation="10dp"
-            app:showMotionSpec="@anim/alpha"
             android:visibility="gone"
+            app:elevation="10dp"
             app:fabSize="normal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:showMotionSpec="@anim/alpha" />
+
         <TextView
             android:id="@+id/txtCounter"
-            android:visibility="gone"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:text="1"
-            android:textSize="11sp"
-            android:gravity="center"
-            android:elevation="10dp"
-            android:textColor="@color/colorWhite"
-            android:background="@drawable/bg_round_red"
-            android:padding="2dp"
             android:layout_marginTop="2dp"
             android:layout_marginRight="2dp"
-            app:layout_constraintTop_toTopOf="@id/btnConfirmar"
-            app:layout_constraintEnd_toEndOf="@id/btnConfirmar"/>
+            android:background="@drawable/bg_round_red"
+            android:elevation="10dp"
+            android:gravity="center"
+            android:padding="2dp"
+            android:text="1"
+            android:textColor="@color/colorWhite"
+            android:textSize="11sp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@id/btnConfirmar"
+            app:layout_constraintTop_toTopOf="@id/btnConfirmar" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

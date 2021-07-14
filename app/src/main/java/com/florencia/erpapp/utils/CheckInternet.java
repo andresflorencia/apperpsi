@@ -10,21 +10,27 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
 
-public class CheckInternet extends AsyncTask<String,String,String> {
+public class CheckInternet extends AsyncTask<String, String, String> {
     onlinelistener listener;
-    private boolean corriendo=true;
-    public interface onlinelistener{
+    private boolean corriendo = true;
+
+    public interface onlinelistener {
         void isConnect(boolean connect);
     }
-    public void setListener(onlinelistener listener)
-    {this.listener=listener;}
-    public void stop(){corriendo=false;}
+
+    public void setListener(onlinelistener listener) {
+        this.listener = listener;
+    }
+
+    public void stop() {
+        corriendo = false;
+    }
+
     @Override
     protected String doInBackground(String... strings) {
 
-        while(corriendo)
-        { //System.out.println("Hilo internetbucle");
-            if(isOnline())
+        while (corriendo) { //System.out.println("Hilo internetbucle");
+            if (isOnline())
                 publishProgress("true");
             else publishProgress("false");
         }
@@ -39,7 +45,7 @@ public class CheckInternet extends AsyncTask<String,String,String> {
 
     @Override
     protected void onProgressUpdate(String... values) {
-        if(values[0].equalsIgnoreCase("true"))
+        if (values[0].equalsIgnoreCase("true"))
             listener.isConnect(true);
         else
             listener.isConnect(false);
@@ -67,11 +73,12 @@ public class CheckInternet extends AsyncTask<String,String,String> {
         try {
             ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo networkInfo = cm.getActiveNetworkInfo();
-            if (networkInfo != null && networkInfo.isConnected() && networkInfo.isAvailable())
-            {   System.out.println("Conexion de Red Activa");
-                return true;}
-        }catch (Exception e)
-        {   System.out.println("Conexion de Red No activa");
+            if (networkInfo != null && networkInfo.isConnected() && networkInfo.isAvailable()) {
+                System.out.println("Conexion de Red Activa");
+                return true;
+            }
+        } catch (Exception e) {
+            System.out.println("Conexion de Red No activa");
             e.printStackTrace();
         }
         return false;

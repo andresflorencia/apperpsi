@@ -20,19 +20,20 @@ public class Utilidades {
             if (actionBar == null) return;
             actionBar.setIcon(R.mipmap.ic_launcher);
             actionBar.setDisplayShowHomeEnabled(true);
-        } finally { }
+        } finally {
+        }
     }
 
     static public void ActionBarFormat(ActionBar actionBar, String SubTitle) {
         ActionBarFormat(actionBar);
-        try
-        {
+        try {
             actionBar.setSubtitle(SubTitle);
-        }finally {
+        } finally {
 
         }
     }
-    static public void createdb(Context context){
+
+    static public void createdb(Context context) {
         SQLite.sqlDB.SQLEstructura(context.getString(R.string.dbUsuario));
         SQLite.sqlDB.SQLEstructura(context.getString(R.string.dbSucursal));
         SQLite.sqlDB.SQLEstructura(context.getString(R.string.dbSecuencial));
@@ -57,13 +58,14 @@ public class Utilidades {
         SQLite.sqlDB.SQLEstructura(context.getString(R.string.dbFotos));
         SQLite.sqlDB.SQLEstructura(context.getString(R.string.dbIngreso));
         SQLite.sqlDB.SQLEstructura(context.getString(R.string.dbDetalleIngreso));
+        SQLite.sqlDB.SQLEstructura(context.getString(R.string.dbVersion));
     }
 
     public static String[] getDateTime() {
         final Calendar c = Calendar.getInstance();
-        String dateTime [] = new String[2];
-        dateTime[0] = c.get(Calendar.DAY_OF_MONTH) +"/"+ c.get(Calendar.MONTH) +"/"+ c.get(Calendar.YEAR);
-        dateTime[1] = c.get(Calendar.HOUR_OF_DAY) +":"+ c.get(Calendar.MINUTE);
+        String dateTime[] = new String[2];
+        dateTime[0] = c.get(Calendar.DAY_OF_MONTH) + "/" + c.get(Calendar.MONTH) + "/" + c.get(Calendar.YEAR);
+        dateTime[1] = c.get(Calendar.HOUR_OF_DAY) + ":" + c.get(Calendar.MINUTE);
         return dateTime;
     }
 

@@ -77,7 +77,7 @@ public class PedidoActivity extends AppCompatActivity {
     public static final List<DetallePedido> productBusqueda = new ArrayList<>();
     public TextView lblTotal, lblSubtotales;
     public LinearLayout lySubtotales;
-    Integer idpedido=0;
+    Integer idpedido = 0;
     ProgressDialog pgCargando;
     Toolbar toolbar;
     ImageButton btViewSubtotales, btnObservacion;
@@ -89,7 +89,7 @@ public class PedidoActivity extends AppCompatActivity {
     BottomSheetDialog btsDialog;
     Button btnPositive, btnNegative;
     View viewSeparator, rootView;
-    String tipoAccion="";
+    String tipoAccion = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,36 +106,36 @@ public class PedidoActivity extends AppCompatActivity {
         crearBottonSheet();
 
         txtCliente.setOnKeyListener(
-            (v, keyCode, event) -> {
-                if((event.getAction() == KeyEvent.ACTION_DOWN) &&
-                        (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                    Intent i = new Intent(v.getContext(),ClienteBusquedaActivity.class);
-                    i.putExtra("busqueda",txtCliente.getText().toString().trim());
-                    i.putExtra("tipobusqueda", "PC");
-                    startActivityForResult(i, REQUEST_CLIENTE);
-                    overridePendingTransition(R.anim.left_in, R.anim.left_out);
-                    return true;
+                (v, keyCode, event) -> {
+                    if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                            (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                        Intent i = new Intent(v.getContext(), ClienteBusquedaActivity.class);
+                        i.putExtra("busqueda", txtCliente.getText().toString().trim());
+                        i.putExtra("tipobusqueda", "PC");
+                        startActivityForResult(i, REQUEST_CLIENTE);
+                        overridePendingTransition(R.anim.left_in, R.anim.left_out);
+                        return true;
+                    }
+                    return false;
                 }
-                return false;
-            }
         );
 
         txtCliente.setOnTouchListener(
-            (v, event) -> {
-                if(event.getAction() == MotionEvent.ACTION_UP) {
-                    if(event.getRawX() >= txtCliente.getRight() - txtCliente.getTotalPaddingRight()) {
-                        txtCliente.setText("");
-                        cliente = new Cliente();
-                        detalleAdapter.categoria = "0";
-                        detalleAdapter.CambiarPrecio("0");
-                        return true;
-                    }else if(event.getRawX() <= txtCliente.getTotalPaddingLeft()
-                            && cliente.idcliente>0 && !cliente.nip.contains("999999999")){
-                        MostrarInfoDialog(cliente.idcliente);
+                (v, event) -> {
+                    if (event.getAction() == MotionEvent.ACTION_UP) {
+                        if (event.getRawX() >= txtCliente.getRight() - txtCliente.getTotalPaddingRight()) {
+                            txtCliente.setText("");
+                            cliente = new Cliente();
+                            detalleAdapter.categoria = "0";
+                            detalleAdapter.CambiarPrecio("0");
+                            return true;
+                        } else if (event.getRawX() <= txtCliente.getTotalPaddingLeft()
+                                && cliente.idcliente > 0 && !cliente.nip.contains("999999999")) {
+                            MostrarInfoDialog(cliente.idcliente);
+                        }
                     }
+                    return false;
                 }
-                return false;
-            }
         );
 
         txtCliente.addTextChangedListener(new TextWatcher() {
@@ -151,12 +151,12 @@ public class PedidoActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                try{
-                    if(s.length()>0 && idpedido == 0)
-                        txtCliente.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_user,0, R.drawable.ic_close,0);
+                try {
+                    if (s.length() > 0 && idpedido == 0)
+                        txtCliente.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_user, 0, R.drawable.ic_close, 0);
                     else
-                        txtCliente.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_user,0, 0,0);
-                }catch (Exception e){
+                        txtCliente.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_user, 0, 0, 0);
+                } catch (Exception e) {
                     Log.d(TAG, e.getMessage());
                 }
             }
@@ -164,8 +164,8 @@ public class PedidoActivity extends AppCompatActivity {
     }
 
     private void crearBottonSheet() {
-        if(btsDialog==null){
-            View view = LayoutInflater.from(this).inflate(R.layout.bottonsheet_message,null);
+        if (btsDialog == null) {
+            View view = LayoutInflater.from(this).inflate(R.layout.bottonsheet_message, null);
             btnPositive = view.findViewById(R.id.btnPositive);
             btnNegative = view.findViewById(R.id.btnNegative);
             lblMessage = view.findViewById(R.id.lblMessage);
@@ -179,7 +179,7 @@ public class PedidoActivity extends AppCompatActivity {
         }
     }
 
-    private void init(){
+    private void init() {
         pgCargando = new ProgressDialog(this);
         pgCargando.setTitle("Cargando comprobante");
         pgCargando.setMessage("Espere un momento...");
@@ -218,79 +218,79 @@ public class PedidoActivity extends AppCompatActivity {
         lblProducto.setOnClickListener(onClick);
         btnObservacion.setOnClickListener(onClick);
 
-        if(SQLite.gpsTracker==null)
+        if (SQLite.gpsTracker == null)
             SQLite.gpsTracker = new GPSTracker(this);
         if (!SQLite.gpsTracker.checkGPSEnabled())
             SQLite.gpsTracker.showSettingsAlert(PedidoActivity.this);
 
         btnObservacion.setTag("");
 
-        if(getIntent().getExtras()!=null){
-            int idcliente = getIntent().getExtras().getInt("idcliente",0);
-            if(idcliente>0) {
+        if (getIntent().getExtras() != null) {
+            int idcliente = getIntent().getExtras().getInt("idcliente", 0);
+            if (idcliente > 0) {
                 cliente = Cliente.get(idcliente);
                 pedido.cliente = cliente;
                 txtCliente.setText(cliente.razonsocial);
             }
-            idpedido = getIntent().getExtras().getInt("idcomprobante",0);
+            idpedido = getIntent().getExtras().getInt("idcomprobante", 0);
         }
 
         detalleProductos = new ArrayList<>();
-        detalleAdapter = new DetallePedidoAdapter(this, detalleProductos, cliente.categoria.equals("")?"0":cliente.categoria, idpedido>0);
+        detalleAdapter = new DetallePedidoAdapter(this, detalleProductos, cliente.categoria.equals("") ? "0" : cliente.categoria, idpedido > 0);
         rvDetalle.setAdapter(detalleAdapter);
 
-        if(idpedido>0){
+        if (idpedido > 0) {
             BuscaPedido(idpedido);
         }
     }
 
     private View.OnClickListener onClick = v -> {
-            switch (v.getId()){
-                case R.id.lblTotal:
-                case R.id.lySubtotales:
-                case R.id.btViewSubtotales:
-                    Utils.EfectoLayout(lySubtotales);
-                    break;
-                case R.id.btnBuscarProducto:
-                    Intent i = new Intent(v.getContext(),ProductoBusquedaActivity.class);
-                    i.putExtra("tipobusqueda", "PC");
-                    startActivityForResult(i, REQUEST_BUSQUEDA);
-                    overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
-                    break;
-                case R.id.btnFechaDocumento:
-                    showDatePickerDialog(v);
-                    break;
-                case R.id.btnPositive:
-                    if(tipoAccion.equals("ERROR")) {
-                        btnNegative.setVisibility(View.VISIBLE);
-                        viewSeparator.setVisibility(View.VISIBLE);
-                        lblTitle.setVisibility(View.VISIBLE);
-                        btsDialog.dismiss();
-                    }else if(tipoAccion.equals("GUARDAR")) {
-                        btnNegative.setVisibility(View.GONE);
-                        viewSeparator.setVisibility(View.GONE);
-                        lblTitle.setText("");
-                        lblTitle.setVisibility(View.GONE);
-                        btsDialog.dismiss();
-                        GuardarDatos();
-                    }
-                    break;
-                case R.id.btnNegative:
+        switch (v.getId()) {
+            case R.id.lblTotal:
+            case R.id.lySubtotales:
+            case R.id.btViewSubtotales:
+                Utils.EfectoLayout(lySubtotales);
+                break;
+            case R.id.btnBuscarProducto:
+                Intent i = new Intent(v.getContext(), ProductoBusquedaActivity.class);
+                i.putExtra("tipobusqueda", "PC");
+                startActivityForResult(i, REQUEST_BUSQUEDA);
+                overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
+                break;
+            case R.id.btnFechaDocumento:
+                showDatePickerDialog(v);
+                break;
+            case R.id.btnPositive:
+                if (tipoAccion.equals("ERROR")) {
+                    btnNegative.setVisibility(View.VISIBLE);
+                    viewSeparator.setVisibility(View.VISIBLE);
+                    lblTitle.setVisibility(View.VISIBLE);
                     btsDialog.dismiss();
-                    break;
-                case R.id.lblCliente:
-                    Utils.EfectoLayout(lyCliente, lblCliente);
-                    break;
-                case R.id.lblProducto:
-                    Utils.EfectoLayout(lyProductos, lblProducto);
-                    break;
-                case R.id.btnObservacion:
-                    IngresaObservacion(btnObservacion.getTag().toString());
-                    break;
-            }
-        };
+                } else if (tipoAccion.equals("GUARDAR")) {
+                    btnNegative.setVisibility(View.GONE);
+                    viewSeparator.setVisibility(View.GONE);
+                    lblTitle.setText("");
+                    lblTitle.setVisibility(View.GONE);
+                    btsDialog.dismiss();
+                    GuardarDatos();
+                }
+                break;
+            case R.id.btnNegative:
+                btsDialog.dismiss();
+                break;
+            case R.id.lblCliente:
+                Utils.EfectoLayout(lyCliente, lblCliente);
+                break;
+            case R.id.lblProducto:
+                Utils.EfectoLayout(lyProductos, lblProducto);
+                break;
+            case R.id.btnObservacion:
+                IngresaObservacion(btnObservacion.getTag().toString());
+                break;
+        }
+    };
 
-    void IngresaObservacion(String observacion){
+    void IngresaObservacion(String observacion) {
         try {
 
             EditText txtObservacion;
@@ -301,10 +301,11 @@ public class PedidoActivity extends AppCompatActivity {
                     (ConstraintLayout) findViewById(R.id.lyDialogContainer));
             builder.setView(view);
             txtObservacion = view.findViewById(R.id.txtObservacion);
-            btnOk = (Button)view.findViewById(R.id.btnConfirm);
-            ((Button)view.findViewById(R.id.btnCancel)).setText("Cancelar");
+            btnOk = (Button) view.findViewById(R.id.btnConfirm);
+            ((Button) view.findViewById(R.id.btnCancel)).setText("Cancelar");
             btnOk.setText("Confirmar");
-            txtObservacion.setText(observacion); txtObservacion.setSelectAllOnFocus(true);
+            txtObservacion.setText(observacion);
+            txtObservacion.setSelectAllOnFocus(true);
 
             txtObservacion.setEnabled(idpedido == 0);
 
@@ -318,10 +319,10 @@ public class PedidoActivity extends AppCompatActivity {
 
             view.findViewById(R.id.btnCancel).setOnClickListener(v -> alertDialog.dismiss());
 
-            if(alertDialog.getWindow()!=null)
+            if (alertDialog.getWindow() != null)
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
             alertDialog.show();
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, e.getMessage());
         }
 
@@ -330,27 +331,27 @@ public class PedidoActivity extends AppCompatActivity {
     public void showDatePickerDialog(View v) {
         Locale l = new Locale("ES-es");
         calendar = Calendar.getInstance(l);
-        int day=calendar.get(Calendar.DAY_OF_MONTH);
-        int month=calendar.get(Calendar.MONTH);
-        int year=calendar.get(Calendar.YEAR);
-        String[] fecha= btnFecha.getTag().toString().split("-");
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        int month = calendar.get(Calendar.MONTH);
+        int year = calendar.get(Calendar.YEAR);
+        String[] fecha = btnFecha.getTag().toString().split("-");
         day = Integer.valueOf(fecha[2]);
-        month = Integer.valueOf(fecha[1])-1;
+        month = Integer.valueOf(fecha[1]) - 1;
         year = Integer.valueOf(fecha[0]);
         dtpDialog = new DatePickerDialog(v.getContext(),
-            (vi, y, m, d) -> {
-                String dia = (d>=0 && d<10?"0"+(d):String.valueOf(d));
-                String mes = (m>=0 && m<9?"0"+(m+1):String.valueOf(m+1));
+                (vi, y, m, d) -> {
+                    String dia = (d >= 0 && d < 10 ? "0" + (d) : String.valueOf(d));
+                    String mes = (m >= 0 && m < 9 ? "0" + (m + 1) : String.valueOf(m + 1));
 
-                String mitextoU = y + "-" + mes + "-" + dia;
-                btnFecha.setTag(mitextoU);
-                btnFecha.setText(dia + "-" + Utils.getMes(m, true) + "-" + y);
-            }
-        ,year,month,day);
+                    String mitextoU = y + "-" + mes + "-" + dia;
+                    btnFecha.setTag(mitextoU);
+                    btnFecha.setText(dia + "-" + Utils.getMes(m, true) + "-" + y);
+                }
+                , year, month, day);
         dtpDialog.show();
     }
 
-    private void MostrarInfoDialog(Integer idcliente){
+    private void MostrarInfoDialog(Integer idcliente) {
         DialogFragment dialogFragment = new InfoDialogFragment();
         Bundle bundle = new Bundle();
         bundle.putInt("idcliente", idcliente);
@@ -372,46 +373,46 @@ public class PedidoActivity extends AppCompatActivity {
                     pedido = new Pedido();
                     pedido = Pedido.get(idpedido);
                     runOnUiThread(() -> {
-                            if (pedido != null) {
-                                toolbar.setTitle(pedido.secuencialpedido);
-                                toolbar.setSubtitle("Registro: " + pedido.fechacelular);
-                                txtCliente.setText(pedido.cliente.razonsocial);
-                                EstablecerFecha(pedido.fechapedido);
-                                btnFecha.setEnabled(false);
-                                detalleAdapter.visualizacion = true;
-                                detalleProductos.clear();
-                                detalleProductos.addAll(pedido.detalle);
-                                detalleAdapter.detallePedido.clear();
-                                detalleAdapter.detallePedido.addAll(pedido.detalle);
-                                detalleAdapter.CalcularTotal();
-                                pedido.getTotal();
-                                detalleAdapter.notifyDataSetChanged();
-                                setSubtotales(pedido.total, pedido.subtotal, pedido.subtotaliva);
-                                btnObservacion.setTag(pedido.observacion);
-                            } else {
-                                //Utils.showMessage(PedidoActivity.this, "Ocurrió un error al obtener los datos para este comprobante.");
-                                Banner.make(rootView,PedidoActivity.this, Banner.ERROR,"Ocurrió un error al obtener los datos para este pedido.", Banner.BOTTOM, 3000).show();
-                            }
-                            pgCargando.dismiss();
-                        });
+                        if (pedido != null) {
+                            toolbar.setTitle(pedido.secuencialpedido);
+                            toolbar.setSubtitle("Registro: " + pedido.fechacelular);
+                            txtCliente.setText(pedido.cliente.razonsocial);
+                            EstablecerFecha(pedido.fechapedido);
+                            btnFecha.setEnabled(false);
+                            detalleAdapter.visualizacion = true;
+                            detalleProductos.clear();
+                            detalleProductos.addAll(pedido.detalle);
+                            detalleAdapter.detallePedido.clear();
+                            detalleAdapter.detallePedido.addAll(pedido.detalle);
+                            detalleAdapter.CalcularTotal();
+                            pedido.getTotal();
+                            detalleAdapter.notifyDataSetChanged();
+                            setSubtotales(pedido.total, pedido.subtotal, pedido.subtotaliva);
+                            btnObservacion.setTag(pedido.observacion);
+                        } else {
+                            //Utils.showMessage(PedidoActivity.this, "Ocurrió un error al obtener los datos para este comprobante.");
+                            Banner.make(rootView, PedidoActivity.this, Banner.ERROR, "Ocurrió un error al obtener los datos para este pedido.", Banner.BOTTOM, 3000).show();
+                        }
+                        pgCargando.dismiss();
+                    });
                 }
             };
             th.start();
-        }catch (Exception e){
+        } catch (Exception e) {
             pgCargando.dismiss();
             Log.d(TAG, e.getMessage());
         }
 
     }
 
-    public void showError(String message){
+    public void showError(String message) {
         crearBottonSheet();
         lblMessage.setText(message);
         btnNegative.setVisibility(View.GONE);
         viewSeparator.setVisibility(View.GONE);
         lblTitle.setVisibility(View.GONE);
         tipoAccion = "ERROR";
-        if(btsDialog.getWindow()!=null)
+        if (btsDialog.getWindow() != null)
             btsDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
         btsDialog.show();
     }
@@ -422,9 +423,9 @@ public class PedidoActivity extends AppCompatActivity {
         inflater.inflate(R.menu.menu_save, menu);
         menu.findItem(R.id.option_newclient).setVisible(false);
         menu.findItem(R.id.option_reimprimir).setVisible(false);
-        if(idpedido==0) {
+        if (idpedido == 0) {
             //menu.findItem(R.id.option_reimprimir).setVisible(false);
-        }else{
+        } else {
             menu.findItem(R.id.option_save).setVisible(false);
             menu.findItem(R.id.option_newdocument).setVisible(false);
         }
@@ -433,36 +434,36 @@ public class PedidoActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.option_save:
-                if(!SQLite.usuario.VerificaPermiso(this,Constants.PEDIDO, "escritura")){
+                if (!SQLite.usuario.VerificaPermiso(this, Constants.PEDIDO, "escritura")) {
                     //Utils.showMessage(this,"No tiene permisos para registrar pedidos.");
-                    Banner.make(rootView,PedidoActivity.this,Banner.ERROR,"No tiene permisos para registrar pedidos.", Banner.BOTTOM,3000).show();
+                    Banner.make(rootView, PedidoActivity.this, Banner.ERROR, "No tiene permisos para registrar pedidos.", Banner.BOTTOM, 3000).show();
                     break;
                 }
 
-                if(detalleAdapter.detallePedido.size()==0) {
-                    Banner.make(rootView,PedidoActivity.this,Banner.ERROR,"Agregue productos al pedido...", Banner.BOTTOM,3000).show();
+                if (detalleAdapter.detallePedido.size() == 0) {
+                    Banner.make(rootView, PedidoActivity.this, Banner.ERROR, "Agregue productos al pedido...", Banner.BOTTOM, 3000).show();
                     break;
                 }
                 AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogTheme);
                 View view = LayoutInflater.from(this).inflate(R.layout.layout_confirmation_dialog,
                         (ConstraintLayout) findViewById(R.id.lyDialogContainer));
                 builder.setView(view);
-                ((TextView)view.findViewById(R.id.lblTitle)).setText("Guardar pedido");
-                ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Está seguro que desea guardar este pedido?");
-                ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_save);
-                ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
-                ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
+                ((TextView) view.findViewById(R.id.lblTitle)).setText("Guardar pedido");
+                ((TextView) view.findViewById(R.id.lblMessage)).setText("¿Está seguro que desea guardar este pedido?");
+                ((ImageView) view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_save);
+                ((Button) view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
+                ((Button) view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
                 final AlertDialog alertDialog = builder.create();
                 view.findViewById(R.id.btnConfirm).setOnClickListener(v -> {
-                        GuardarDatos();
-                        alertDialog.dismiss();
-                    });
+                    GuardarDatos();
+                    alertDialog.dismiss();
+                });
 
                 view.findViewById(R.id.btnCancel).setOnClickListener(v -> alertDialog.dismiss());
 
-                if(alertDialog.getWindow()!=null)
+                if (alertDialog.getWindow() != null)
                     alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
                 alertDialog.show();
                 break;
@@ -486,7 +487,7 @@ public class PedidoActivity extends AppCompatActivity {
                 break;
             case R.id.option_listdocument:
                 Intent i = new Intent(this, ListaComprobantesActivity.class);
-                i.putExtra("tipobusqueda","PC");
+                i.putExtra("tipobusqueda", "PC");
                 startActivityForResult(i, REQUEST_BUSQUEDA_PEDIDO);
                 overridePendingTransition(R.anim.left_in, R.anim.left_out);
                 break;
@@ -495,8 +496,8 @@ public class PedidoActivity extends AppCompatActivity {
     }
 
     private void GuardarDatos() {
-        try{
-            if(!ValidaDatos()) return;
+        try {
+            if (!ValidaDatos()) return;
 
             pedido.detalle.clear();
             pedido.detalle.addAll(detalleAdapter.detallePedido);
@@ -509,11 +510,11 @@ public class PedidoActivity extends AppCompatActivity {
             pedido.getCodigoTransaccion();
             pedido.estado = 1;
             pedido.nip = cliente.nip;
-            pedido.porcentajeiva = pedido.subtotaliva > 0?12d:0d;
+            pedido.porcentajeiva = pedido.subtotaliva > 0 ? 12d : 0d;
             pedido.fechacelular = Utils.getDateFormat("yyyy-MM-dd HH:mm:ss");
-            pedido.fechapedido = btnFecha.getTag().toString().trim().equals("")?Utils.getDateFormat("yyyy-MM-dd"):btnFecha.getTag().toString().trim();
+            pedido.fechapedido = btnFecha.getTag().toString().trim().equals("") ? Utils.getDateFormat("yyyy-MM-dd") : btnFecha.getTag().toString().trim();
             pedido.usuarioid = SQLite.usuario.IdUsuario;
-            pedido.categoria = cliente.categoria.equals("")?"0":cliente.categoria;
+            pedido.categoria = cliente.categoria.equals("") ? "0" : cliente.categoria;
             pedido.parroquiaid = SQLite.usuario.ParroquiaID;
             pedido.longdate = Utils.longDate(Utils.getDateFormat("yyyy-MM-dd"));
             pedido.observacion = btnObservacion.getTag().toString();
@@ -549,16 +550,16 @@ public class PedidoActivity extends AppCompatActivity {
                 builder.show();*/
                 LimpiarDatos();
                 //Utils.showMessage(this, Constants.MSG_DATOS_GUARDADOS);
-                Banner.make(rootView,PedidoActivity.this,Banner.SUCCESS,Constants.MSG_DATOS_GUARDADOS,Banner.BOTTOM,3000).show();
-            }else
-                Banner.make(rootView,PedidoActivity.this,Banner.ERROR,Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM,3000).show();
-        }catch (Exception e){
+                Banner.make(rootView, PedidoActivity.this, Banner.SUCCESS, Constants.MSG_DATOS_GUARDADOS, Banner.BOTTOM, 3000).show();
+            } else
+                Banner.make(rootView, PedidoActivity.this, Banner.ERROR, Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM, 3000).show();
+        } catch (Exception e) {
             Log.d(TAG, e.getMessage());
         }
     }
 
     private void LimpiarDatos() {
-        try{
+        try {
             toolbar.setTitle("Nuevo pedido");
             toolbar.setSubtitle("");
             toolbar.setSubtitle("");
@@ -577,64 +578,64 @@ public class PedidoActivity extends AppCompatActivity {
             btnObservacion.setTag("");
             EstablecerFecha("");
             btnFecha.setEnabled(true);
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, "LimpiarDatos(): " + e.getMessage());
         }
     }
 
     private void EstablecerFecha(String fecha) {
-        if(fecha.equals(""))
+        if (fecha.equals(""))
             fecha = Utils.getDateFormat("yyyy-MM-dd");
         btnFecha.setTag(fecha);
         btnFecha.setText(Utils.fechaMes(fecha));
     }
 
-    private boolean ValidaDatos() throws Exception{
+    private boolean ValidaDatos() throws Exception {
         pedido.detalle.clear();
         pedido.detalle.addAll(detalleAdapter.detallePedido);
         pedido.getTotal();
 
-        if(cliente == null || cliente.nip.equals("")){
+        if (cliente == null || cliente.nip.equals("")) {
             //Utils.showMessage(this, "Debe especificar un cliente.");
-            Banner.make(rootView,PedidoActivity.this,Banner.ERROR,"Debe especificar un cliente.", Banner.BOTTOM,3000).show();
+            Banner.make(rootView, PedidoActivity.this, Banner.ERROR, "Debe especificar un cliente.", Banner.BOTTOM, 3000).show();
             return false;
         }
-        if( SQLite.usuario.sucursal == null){
+        if (SQLite.usuario.sucursal == null) {
             //Utils.showMessage(this, "Datos incompletos de la Sucursal para emitir facturas.");
-            Banner.make(rootView,PedidoActivity.this,Banner.ERROR,"Datos incompletos de la Sucursal para emitir facturas.", Banner.BOTTOM,3000).show();
+            Banner.make(rootView, PedidoActivity.this, Banner.ERROR, "Datos incompletos de la Sucursal para emitir facturas.", Banner.BOTTOM, 3000).show();
             return false;
-        }else if(SQLite.usuario.sucursal.CodigoEstablecimiento.equals("") || SQLite.usuario.sucursal.PuntoEmision.equals("")) {
+        } else if (SQLite.usuario.sucursal.CodigoEstablecimiento.equals("") || SQLite.usuario.sucursal.PuntoEmision.equals("")) {
             //Utils.showMessage(this, "Datos incompletos de la Sucursal para emitir facturas.");
-            Banner.make(rootView,PedidoActivity.this,Banner.ERROR,"Datos incompletos de la Sucursal para emitir facturas.", Banner.BOTTOM,3000).show();
+            Banner.make(rootView, PedidoActivity.this, Banner.ERROR, "Datos incompletos de la Sucursal para emitir facturas.", Banner.BOTTOM, 3000).show();
             return false;
         }
-        if(pedido.detalle.size()==0){
-            Banner.make(rootView,PedidoActivity.this,Banner.ERROR,"Especifique un detalle para el pedido", Banner.BOTTOM,3000).show();
+        if (pedido.detalle.size() == 0) {
+            Banner.make(rootView, PedidoActivity.this, Banner.ERROR, "Especifique un detalle para el pedido", Banner.BOTTOM, 3000).show();
             return false;
-        }else{
-            for (DetallePedido det:pedido.detalle){
-                if(det.cantidad<=0){
-                    Banner.make(rootView,PedidoActivity.this,Banner.ERROR,"Ingrese una cantidad mayor a 0 para " + det.producto.nombreproducto , Banner.BOTTOM, 3500).show();
+        } else {
+            for (DetallePedido det : pedido.detalle) {
+                if (det.cantidad <= 0) {
+                    Banner.make(rootView, PedidoActivity.this, Banner.ERROR, "Ingrese una cantidad mayor a 0 para " + det.producto.nombreproducto, Banner.BOTTOM, 3500).show();
                     return false;
                 }
             }
         }
-        if(pedido.total == 0){
+        if (pedido.total == 0) {
             //Utils.showMessage(this, "El total del pedido debe ser mayor que $0.");
-            Banner.make(rootView,PedidoActivity.this,Banner.ERROR,"El total del pedido debe ser mayor que $0.", Banner.BOTTOM,3000).show();
+            Banner.make(rootView, PedidoActivity.this, Banner.ERROR, "El total del pedido debe ser mayor que $0.", Banner.BOTTOM, 3000).show();
             return false;
         }
 
-        if(cliente.nip.contains("99999999")){
+        if (cliente.nip.contains("99999999")) {
             //Utils.showMessage(this, "No está permitido el registro de pedido a CONSUMIDOR FINAL");
-            Banner.make(rootView,PedidoActivity.this,Banner.ERROR,"No está permitido el registro de pedido a CONSUMIDOR FINAL", Banner.BOTTOM, 3000).show();
+            Banner.make(rootView, PedidoActivity.this, Banner.ERROR, "No está permitido el registro de pedido a CONSUMIDOR FINAL", Banner.BOTTOM, 3000).show();
             return false;
         }
 
         return true;
     }
-    
-    private boolean imprimirFactura(String strTipo, boolean reimpresion){
+
+    private boolean imprimirFactura(String strTipo, boolean reimpresion) {
         Printer printer = new Printer(this);
         boolean fImp = true;
         try {
@@ -662,21 +663,21 @@ public class PedidoActivity extends AppCompatActivity {
                         for (DetallePedido midetalle : pedido.detalle) {
                             Printer.Data[] Datos = new Printer.Data[]{
                                     new Printer.Data(6, midetalle.cantidad.toString(), 0),
-                                    new Printer.Data(15, (midetalle.producto.porcentajeiva>0?"** ":"")+ midetalle.producto.nombreproducto, 0),
-                                    new Printer.Data(8, Utils.FormatoMoneda(midetalle.precio,2), 1),
-                                    new Printer.Data(11, Utils.FormatoMoneda(midetalle.Subtotal(),2), 1),
+                                    new Printer.Data(15, (midetalle.producto.porcentajeiva > 0 ? "** " : "") + midetalle.producto.nombreproducto, 0),
+                                    new Printer.Data(8, Utils.FormatoMoneda(midetalle.precio, 2), 1),
+                                    new Printer.Data(11, Utils.FormatoMoneda(midetalle.Subtotal(), 2), 1),
                             };
                             printer.printArray(Datos, 0, 0);
                         }
                         printer.printCustom("------------------------------------------", 0, 1);
-                        printer.printCustom("SUB TOTAL 0%: " + Utils.FormatoMoneda(pedido.subtotal,2), 0, 2);
-                        printer.printCustom("SUB TOTAL 12%: " + Utils.FormatoMoneda(pedido.subtotaliva,2), 0, 2);
-                        printer.printCustom("IVA 12%: " + Utils.FormatoMoneda((pedido.total - pedido.subtotal - pedido.subtotaliva),2), 0, 2);
-                        printer.printCustom("TOTAL: " + Utils.FormatoMoneda(pedido.total,2), 0, 2);
+                        printer.printCustom("SUB TOTAL 0%: " + Utils.FormatoMoneda(pedido.subtotal, 2), 0, 2);
+                        printer.printCustom("SUB TOTAL 12%: " + Utils.FormatoMoneda(pedido.subtotaliva, 2), 0, 2);
+                        printer.printCustom("IVA 12%: " + Utils.FormatoMoneda((pedido.total - pedido.subtotal - pedido.subtotaliva), 2), 0, 2);
+                        printer.printCustom("TOTAL: " + Utils.FormatoMoneda(pedido.total, 2), 0, 2);
                         printer.printCustom("", 1, 1);
                         //printer.printText(printer.leftRightAlign("Fecha: " + dateTime[0], dateTime[1]));
-                        printer.printCustom("Usuario: " + SQLite.usuario.Usuario,0,0);
-                        printer.printCustom("Fecha impresión: " + Utils.getDateFormat("yyyy-MM-dd HH:mm:ss"),0,0);
+                        printer.printCustom("Usuario: " + SQLite.usuario.Usuario, 0, 0);
+                        printer.printCustom("Fecha impresión: " + Utils.getDateFormat("yyyy-MM-dd HH:mm:ss"), 0, 0);
                         //tarea.Fecha = dateTime[0] + " " + dateTime[1];
                         printer.printNewLine();
                         printer.printCustom(strTipo, 0, 1);
@@ -684,7 +685,7 @@ public class PedidoActivity extends AppCompatActivity {
                         printer.printNewLine();
                         printer.printNewLine();
                         printer.flush();
-                        if(!reimpresion)
+                        if (!reimpresion)
                             this.LimpiarDatos();
                     } catch (IOException e) {
                         fImp = false;
@@ -694,7 +695,7 @@ public class PedidoActivity extends AppCompatActivity {
                 }
 
             } else fImp = false;
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, e.getMessage());
             fImp = false;
         }
@@ -708,31 +709,31 @@ public class PedidoActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case REQUEST_BUSQUEDA:
-                    detalleAdapter.visualizacion=false;
-                    for(DetallePedido miP:productBusqueda) {
+                    detalleAdapter.visualizacion = false;
+                    for (DetallePedido miP : productBusqueda) {
                         boolean agregar = true;
-                        for(DetallePedido miD:detalleAdapter.detallePedido){
-                            if(miP.producto.idproducto.equals(miD.producto.idproducto)) {
+                        for (DetallePedido miD : detalleAdapter.detallePedido) {
+                            if (miP.producto.idproducto.equals(miD.producto.idproducto)) {
                                 miD.cantidad += miP.cantidad;
                                 agregar = false;
                                 break;
                             }
                         }
-                        if(agregar)
+                        if (agregar)
                             detalleAdapter.detallePedido.add(miP);
                     }
                     pedido.detalle.clear();
                     pedido.detalle.addAll(detalleAdapter.detallePedido);
                     pedido.getTotal();
                     this.setSubtotales(pedido.total, pedido.subtotal, pedido.subtotaliva);
-                    detalleAdapter.CambiarPrecio(cliente.categoria.equals("")?"0":cliente.categoria);
+                    detalleAdapter.CambiarPrecio(cliente.categoria.equals("") ? "0" : cliente.categoria);
                     detalleAdapter.CalcularTotal();
                     detalleAdapter.notifyDataSetChanged();
-                    Log.d(TAG,String.valueOf(detalleAdapter.detallePedido.size()));
+                    Log.d(TAG, String.valueOf(detalleAdapter.detallePedido.size()));
                     break;
                 case REQUEST_CLIENTE:
-                    Integer idcliente = data.getExtras().getInt("idcliente",0);
-                    if(idcliente>0){
+                    Integer idcliente = data.getExtras().getInt("idcliente", 0);
+                    if (idcliente > 0) {
                         cliente = Cliente.get(idcliente);
                         pedido.cliente = cliente;
                         txtCliente.setText(cliente.razonsocial);
@@ -741,21 +742,21 @@ public class PedidoActivity extends AppCompatActivity {
                     }
                     break;
                 case DeviceList.REQUEST_CONNECT_BT:
-                    try{
+                    try {
                         btsocket = DeviceList.getSocket();
-                        if(btsocket!=null) {
-                            Utils.showMessageShort(this,"Imprimiendo comprobante");
-                            imprimirFactura(idpedido==0?"* ORIGINALCLIENTE *": "* REIMPRESIÓN DE PEDIDO *",
-                                    idpedido>0);
+                        if (btsocket != null) {
+                            Utils.showMessageShort(this, "Imprimiendo comprobante");
+                            imprimirFactura(idpedido == 0 ? "* ORIGINALCLIENTE *" : "* REIMPRESIÓN DE PEDIDO *",
+                                    idpedido > 0);
                             Log.d(TAG, "IMPRESORA SELECCIONADA");
                         }
-                    }catch (Exception e){
-                        Log.d(TAG,e.getMessage());
+                    } catch (Exception e) {
+                        Log.d(TAG, e.getMessage());
                     }
                     break;
                 case REQUEST_BUSQUEDA_PEDIDO:
-                    idpedido = data.getExtras().getInt("idcomprobante",0);
-                    if(idpedido>0) {
+                    idpedido = data.getExtras().getInt("idcomprobante", 0);
+                    if (idpedido > 0) {
                         BuscaPedido(idpedido);
                         //toolbar.getMenu().findItem(R.id.option_reimprimir).setVisible(true);
                         toolbar.getMenu().findItem(R.id.option_save).setVisible(false);
@@ -766,9 +767,9 @@ public class PedidoActivity extends AppCompatActivity {
     }
 
     public void setSubtotales(Double total, Double subtotal, Double subtotaliva) {
-        lblSubtotales.setText("Subtotal 0%:    " + Utils.FormatoMoneda(subtotal,2) +
-                "\nSubtotal 12%:    " + Utils.FormatoMoneda(subtotaliva ,2) +
-                "\nIVA 12%:    " + Utils.FormatoMoneda((total - subtotaliva - subtotal),2));
+        lblSubtotales.setText("Subtotal 0%:    " + Utils.FormatoMoneda(subtotal, 2) +
+                "\nSubtotal 12%:    " + Utils.FormatoMoneda(subtotaliva, 2) +
+                "\nIVA 12%:    " + Utils.FormatoMoneda((total - subtotaliva - subtotal), 2));
     }
 
     @Override
@@ -784,16 +785,16 @@ public class PedidoActivity extends AppCompatActivity {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if(keyCode == KeyEvent.KEYCODE_BACK){
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogTheme);
             View view = LayoutInflater.from(this).inflate(R.layout.layout_confirmation_dialog,
                     (ConstraintLayout) findViewById(R.id.lyDialogContainer));
             builder.setView(view);
-            ((TextView)view.findViewById(R.id.lblTitle)).setText("Cerrar");
-            ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Desea salir de la ventana de pedido?");
-            ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_check_white);
-            ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
-            ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
+            ((TextView) view.findViewById(R.id.lblTitle)).setText("Cerrar");
+            ((TextView) view.findViewById(R.id.lblMessage)).setText("¿Desea salir de la ventana de pedido?");
+            ((ImageView) view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_check_white);
+            ((Button) view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
+            ((Button) view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
             final AlertDialog alertDialog = builder.create();
             view.findViewById(R.id.btnConfirm).setOnClickListener(v -> {
                 onBackPressed();
@@ -802,7 +803,7 @@ public class PedidoActivity extends AppCompatActivity {
 
             view.findViewById(R.id.btnCancel).setOnClickListener(v -> alertDialog.dismiss());
 
-            if(alertDialog.getWindow()!=null)
+            if (alertDialog.getWindow() != null)
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
             alertDialog.show();
             return true;

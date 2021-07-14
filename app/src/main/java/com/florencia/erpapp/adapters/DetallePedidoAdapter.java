@@ -30,7 +30,7 @@ import com.shasin.notificationbanner.Banner;
 
 import java.util.List;
 
-public class DetallePedidoAdapter extends RecyclerView.Adapter<DetallePedidoAdapter.ProductoViewHolder>{
+public class DetallePedidoAdapter extends RecyclerView.Adapter<DetallePedidoAdapter.ProductoViewHolder> {
 
     private static String TAG = "TAGDETALLEPEDIDO_ADAPTER";
     public List<DetallePedido> detallePedido;
@@ -42,7 +42,7 @@ public class DetallePedidoAdapter extends RecyclerView.Adapter<DetallePedidoAdap
     public DetallePedidoAdapter(PedidoActivity activity, List<DetallePedido> detallePedido, String categoria, boolean visualizacion) {
         this.detallePedido = detallePedido;
         this.activity = activity;
-        this.categoria = categoria.equals("")?"0":categoria;
+        this.categoria = categoria.equals("") ? "0" : categoria;
         this.visualizacion = visualizacion;
         this.rootView = activity.findViewById(android.R.id.content);
     }
@@ -59,51 +59,52 @@ public class DetallePedidoAdapter extends RecyclerView.Adapter<DetallePedidoAdap
     public void onBindViewHolder(@NonNull ProductoViewHolder holder, int position) {
         holder.bindProducto(detallePedido.get(position));
     }
+
     @Override
     public int getItemCount() {
         return detallePedido.size();
     }
 
-    public void CalcularTotal(){
+    public void CalcularTotal() {
         try {
             Double total = 0d;
             Double subtotal = 0d;
             Double subtotaliva = 0d;
-            for (DetallePedido miDetalle:this.detallePedido) {
+            for (DetallePedido miDetalle : this.detallePedido) {
                 total += miDetalle.Subtotaliva();
-                if(miDetalle.producto.porcentajeiva>0)
+                if (miDetalle.producto.porcentajeiva > 0)
                     subtotaliva += miDetalle.Subtotal();
                 else
-                    subtotal+=miDetalle.Subtotal();
+                    subtotal += miDetalle.Subtotal();
             }
-            this.activity.lblTotal.setText("Total: " + Utils.FormatoMoneda(total,2));
+            this.activity.lblTotal.setText("Total: " + Utils.FormatoMoneda(total, 2));
             this.activity.setSubtotales(total, subtotal, subtotaliva);
-        }catch (Exception e){
-            Log.d(TAG,e.getMessage());
+        } catch (Exception e) {
+            Log.d(TAG, e.getMessage());
         }
     }
 
-    public void CambiarPrecio(String categoria){
-        try{
-            if(categoria.equals("") || categoria.equalsIgnoreCase("A"))
+    public void CambiarPrecio(String categoria) {
+        try {
+            if (categoria.equals("") || categoria.equalsIgnoreCase("A"))
                 categoria = "0";
-            for(DetallePedido miDetalle:this.detallePedido){
+            for (DetallePedido miDetalle : this.detallePedido) {
                 //miDetalle.precio = miDetalle.producto.getPrecio(categoria);
                 miDetalle.getPrecio(miDetalle.producto.reglas, miDetalle.producto.precioscategoria,
                         categoria, miDetalle.cantidad, miDetalle.precio);
             }
             notifyDataSetChanged();
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, e.getMessage());
         }
     }
 
-    class ProductoViewHolder extends RecyclerView.ViewHolder{
+    class ProductoViewHolder extends RecyclerView.ViewHolder {
 
         TextView tvNombreProducto, tvPrecio, tvCantidad, tvSubtotal;
         ImageButton btnDelete, btnInfo;
 
-        ProductoViewHolder(@NonNull View itemView){
+        ProductoViewHolder(@NonNull View itemView) {
             super(itemView);
             tvNombreProducto = itemView.findViewById(R.id.tv_NombreProducto);
             tvPrecio = itemView.findViewById(R.id.tvPrecio);
@@ -115,21 +116,21 @@ public class DetallePedidoAdapter extends RecyclerView.Adapter<DetallePedidoAdap
             btnInfo.setVisibility(View.VISIBLE);
         }
 
-        void bindProducto(final DetallePedido detalle){
+        void bindProducto(final DetallePedido detalle) {
 
             try {
-                tvNombreProducto.setText((detalle.producto.porcentajeiva>0?"** ":"")+ detalle.producto.nombreproducto);
-                tvPrecio.setText(Utils.FormatoMoneda(detalle.precio,2));
+                tvNombreProducto.setText((detalle.producto.porcentajeiva > 0 ? "** " : "") + detalle.producto.nombreproducto);
+                tvPrecio.setText(Utils.FormatoMoneda(detalle.precio, 2));
                 tvCantidad.setText(detalle.cantidad.toString());
                 tvCantidad.setInputType(InputType.TYPE_CLASS_PHONE);
-                tvSubtotal.setText(Utils.FormatoMoneda(detalle.Subtotal(),2));
+                tvSubtotal.setText(Utils.FormatoMoneda(detalle.Subtotal(), 2));
                 tvCantidad.setSelectAllOnFocus(true);
 
                 tvCantidad.setEnabled(!visualizacion);
-                if(visualizacion) {
+                if (visualizacion) {
                     btnDelete.setVisibility(View.GONE);
                     btnInfo.setVisibility(View.GONE);
-                }else {
+                } else {
                     btnDelete.setVisibility(View.VISIBLE);
                     btnInfo.setVisibility(View.VISIBLE);
                 }
@@ -137,36 +138,37 @@ public class DetallePedidoAdapter extends RecyclerView.Adapter<DetallePedidoAdap
                 CalcularTotal();
 
                 btnDelete.setOnClickListener(v -> {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(activity, R.style.AlertDialogTheme);
-                        View view = LayoutInflater.from(activity).inflate(R.layout.layout_warning_dialog,
-                                (ConstraintLayout) activity.findViewById(R.id.lyDialogContainer));
-                        builder.setView(view);
-                        ((TextView)view.findViewById(R.id.lblTitle)).setText(detallePedido.get(getAdapterPosition()).producto.nombreproducto);
-                        ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Está seguro que desea eliminar este ítem?");
-                        ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_delete2);
-                        ((Button)view.findViewById(R.id.btnCancel)).setText(activity.getResources().getString(R.string.Cancel));
-                        ((Button)view.findViewById(R.id.btnYes)).setText(activity.getResources().getString(R.string.Confirm));
-                        final AlertDialog alertDialog = builder.create();
-                        view.findViewById(R.id.btnYes).setOnClickListener(vi -> {
-                                detallePedido.remove(getAdapterPosition());
-                                notifyDataSetChanged();
-                                CalcularTotal();
-                                Banner.make(rootView,activity,Banner.INFO,"Ítem eliminado de la lista.",Banner.BOTTOM,2000).show();
-                                alertDialog.dismiss();
-                            });
-
-                        view.findViewById(R.id.btnCancel).setOnClickListener(vi -> alertDialog.dismiss());
-
-                        if(alertDialog.getWindow()!=null)
-                            alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
-                        alertDialog.show();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(activity, R.style.AlertDialogTheme);
+                    View view = LayoutInflater.from(activity).inflate(R.layout.layout_warning_dialog,
+                            (ConstraintLayout) activity.findViewById(R.id.lyDialogContainer));
+                    builder.setView(view);
+                    ((TextView) view.findViewById(R.id.lblTitle)).setText(detallePedido.get(getAdapterPosition()).producto.nombreproducto);
+                    ((TextView) view.findViewById(R.id.lblMessage)).setText("¿Está seguro que desea eliminar este ítem?");
+                    ((ImageView) view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_delete2);
+                    ((Button) view.findViewById(R.id.btnCancel)).setText(activity.getResources().getString(R.string.Cancel));
+                    ((Button) view.findViewById(R.id.btnYes)).setText(activity.getResources().getString(R.string.Confirm));
+                    final AlertDialog alertDialog = builder.create();
+                    view.findViewById(R.id.btnYes).setOnClickListener(vi -> {
+                        detallePedido.remove(getAdapterPosition());
+                        notifyDataSetChanged();
+                        CalcularTotal();
+                        Banner.make(rootView, activity, Banner.INFO, "Ítem eliminado de la lista.", Banner.BOTTOM, 2000).show();
+                        alertDialog.dismiss();
                     });
+
+                    view.findViewById(R.id.btnCancel).setOnClickListener(vi -> alertDialog.dismiss());
+
+                    if (alertDialog.getWindow() != null)
+                        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+                    alertDialog.show();
+                });
 
                 tvCantidad.addTextChangedListener(new TextWatcher() {
                     @Override
                     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
                     }
+
                     @Override
                     public void onTextChanged(CharSequence s, int start, int before, int count) {
                         try {
@@ -178,14 +180,14 @@ public class DetallePedidoAdapter extends RecyclerView.Adapter<DetallePedidoAdap
                                 Double cant = Double.parseDouble(s.toString().trim());
                                 if (cant <= 0 && !visualizacion) {
                                     //Utils.showMessage(activity, "Especifique una cantidad mayor a 0");
-                                    Banner.make(rootView,activity,Banner.ERROR,"Especifique una cantidad mayor a 0", Banner.BOTTOM,2000).show();
+                                    Banner.make(rootView, activity, Banner.ERROR, "Especifique una cantidad mayor a 0", Banner.BOTTOM, 2000).show();
                                     detallePedido.get(getAdapterPosition()).cantidad = 0d;
                                     //tvCantidad.setText(detallePedido.get(getAdapterPosition()).cantidad.toString());
                                     tvCantidad.clearFocus();
                                     tvCantidad.requestFocus();
                                 } else {
                                     detallePedido.get(getAdapterPosition()).cantidad = cant;
-                                    if(!visualizacion) {
+                                    if (!visualizacion) {
                                         Double precio = detallePedido.get(getAdapterPosition()).getPrecio(det.producto.reglas, det.producto.precioscategoria, categoria, det.cantidad, det.precio);
                                         tvPrecio.setText(Utils.FormatoMoneda(precio, 2));
                                     }
@@ -193,10 +195,11 @@ public class DetallePedidoAdapter extends RecyclerView.Adapter<DetallePedidoAdap
                                 tvSubtotal.setText(Utils.FormatoMoneda(detallePedido.get(getAdapterPosition()).Subtotal(), 2));
                             }
                             CalcularTotal();
-                        }catch (Exception e) {
-                            Banner.make(rootView,activity,Banner.ERROR,"Ingrese un valor válido.",Banner.BOTTOM,2000).show();
+                        } catch (Exception e) {
+                            Banner.make(rootView, activity, Banner.ERROR, "Ingrese un valor válido.", Banner.BOTTOM, 2000).show();
                         }
                     }
+
                     @Override
                     public void afterTextChanged(Editable s) {
 
@@ -204,14 +207,14 @@ public class DetallePedidoAdapter extends RecyclerView.Adapter<DetallePedidoAdap
                 });
 
                 btnInfo.setOnClickListener(v -> {
-                        DialogFragment dialogFragment = new InfoItemDialogFragment();
-                        Bundle bundle = new Bundle();
-                        bundle.putInt("idproducto", detallePedido.get(getAdapterPosition()).producto.idproducto);
-                        dialogFragment.setArguments(bundle);
-                        dialogFragment.show(activity.getSupportFragmentManager(), "dialog");
-                    });
+                    DialogFragment dialogFragment = new InfoItemDialogFragment();
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("idproducto", detallePedido.get(getAdapterPosition()).producto.idproducto);
+                    dialogFragment.setArguments(bundle);
+                    dialogFragment.show(activity.getSupportFragmentManager(), "dialog");
+                });
 
-            }catch (Exception e){
+            } catch (Exception e) {
                 Log.d(TAG, e.getMessage());
             }
 

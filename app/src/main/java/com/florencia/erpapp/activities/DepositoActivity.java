@@ -125,7 +125,7 @@ public class DepositoActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void init() {
-        try{
+        try {
             toolbar = findViewById(R.id.appbar);
             setSupportActionBar(toolbar);
             rootView = findViewById(android.R.id.content);
@@ -149,6 +149,7 @@ public class DepositoActivity extends AppCompatActivity implements View.OnClickL
             rgTipoCuenta = findViewById(R.id.rgTipoCuenta);
             btnRefresh = findViewById(R.id.btnRefresh);
             pgCargando = findViewById(R.id.pbCargando);
+            btnRefresh.setVisibility(View.GONE); //COMENTAR
 
             okHttpClient = new OkHttpClient().newBuilder()
                     .connectTimeout(60, TimeUnit.SECONDS)
@@ -185,45 +186,50 @@ public class DepositoActivity extends AppCompatActivity implements View.OnClickL
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
                 }
+
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
 
                 }
+
                 @Override
                 public void afterTextChanged(Editable s) {
                     Double c = 0d;
-                    try{
-                        c = Double.parseDouble(s.toString().trim().length() == 0?"0.0":s.toString().trim());
-                    }catch (Exception e){
+                    try {
+                        c = Double.parseDouble(s.toString().trim().length() == 0 ? "0.0" : s.toString().trim());
+                    } catch (Exception e) {
                         Banner.make(rootView, DepositoActivity.this, Banner.ERROR, "Ingrese un valor válido", Banner.TOP, 2500).show();
                         c = 0d;
                     }
-                    c = Utils.RoundDecimal(((Double)lblTotalVentas.getTag()) - ((Double)lblDepositado.getTag()) - c,2);
-                    lblFaltante.setText("Faltante: ".concat(Utils.FormatoMoneda(c,2)));
+                    c = Utils.RoundDecimal(((Double) lblTotalVentas.getTag()) - ((Double) lblDepositado.getTag()) - c, 2);
+                    lblFaltante.setText("Faltante: ".concat(Utils.FormatoMoneda(c, 2)));
                     lblFaltante.setTag(c);
                     Log.d(TAG, "Ventas: " + lblTotalVentas.getTag().toString()
                             + " - Depositado: " + lblDepositado.getTag().toString()
                             + " - Monto: " + c);
                 }
             });
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, e.getMessage());
         }
     }
 
-    private void LimpiarDatos(){
-        try{
+    private void LimpiarDatos() {
+        try {
             toolbar.setTitle("Comprobante de Depósito");
             idingreso = 0;
             miIngreso = new Ingreso();
             btnFechaVenta.setText(Utils.getDateFormat("yyyy-MM-dd"));
             btnFechaDocumento.setText(Utils.getDateFormat("yyyy-MM-dd"));
-            lblTotalVentas.setTag(0d); lblTotalVentas.setText("Total: $0.00");
-            lblDepositado.setTag(0d);  lblDepositado.setText("Depositado: $0.00");
-            lblFaltante.setTag(0d);    lblFaltante.setText("Faltante: $0.00");
+            lblTotalVentas.setTag(0d);
+            lblTotalVentas.setText("Total: $0.00");
+            lblDepositado.setTag(0d);
+            lblDepositado.setText("Depositado: $0.00");
+            lblFaltante.setTag(0d);
+            lblFaltante.setText("Faltante: $0.00");
             txtMonto.setText("");
             BuscarTotalVenta(Utils.getDateFormat("yyyy-MM-dd"));
-            spEntidad.setSelection(0,true);
+            spEntidad.setSelection(0, true);
             txtConcepto.setText("");
             txtNumDocumento.setText("");
             btnCargaDocumento.setVisibility(View.VISIBLE);
@@ -234,77 +240,77 @@ public class DepositoActivity extends AppCompatActivity implements View.OnClickL
             /*if(toolbar.getMenu()!=null){
                 toolbar.getMenu().findItem(R.id.option_save).setVisible(true);
             }*/
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, "LimpiarDatos(): " + e.getMessage());
         }
     }
 
-    private boolean ValidarDatos(){
-        try{
-            if(btnFechaVenta.getText().toString().trim().equals("")){
+    private boolean ValidarDatos() {
+        try {
+            if (btnFechaVenta.getText().toString().trim().equals("")) {
                 Banner.make(rootView, DepositoActivity.this, Banner.ERROR,
                         "Debe especificar la fecha de las ventas", Banner.BOTTOM, 2500).show();
                 return false;
             }
-            if(Double.valueOf(lblTotalVentas.getTag().toString()) <= 0){
+            if (Double.valueOf(lblTotalVentas.getTag().toString()) <= 0) {
                 Banner.make(rootView, DepositoActivity.this, Banner.ERROR,
                         "No puede registrar depósitos porque no hay ventas para el día " + btnFechaVenta.getText(), Banner.BOTTOM, 3000).show();
                 return false;
             }
-            if(btnFechaDocumento.getText().toString().trim().equals("")){
+            if (btnFechaDocumento.getText().toString().trim().equals("")) {
                 Banner.make(rootView, DepositoActivity.this, Banner.ERROR,
                         "Debe especificar la fecha del documento", Banner.BOTTOM, 2500).show();
                 return false;
             }
-            if(txtMonto.getText().toString().trim().equals("") || Double.valueOf(txtMonto.getText().toString().trim()) <= 0){
+            if (txtMonto.getText().toString().trim().equals("") || Double.valueOf(txtMonto.getText().toString().trim()) <= 0) {
                 Banner.make(rootView, DepositoActivity.this, Banner.ERROR,
                         "Debe especificar un monto válido del comprobante", Banner.BOTTOM, 2500).show();
                 return false;
             }
-            if(Double.parseDouble(lblFaltante.getTag().toString())<0){
+            if (Double.parseDouble(lblFaltante.getTag().toString()) < 0) {
                 Log.d(TAG, "Faltante: " + lblFaltante.getTag().toString());
                 Double valPermitido = Double.valueOf(lblTotalVentas.getTag().toString()) - Double.valueOf(lblDepositado.getTag().toString());
                 Banner.make(rootView, DepositoActivity.this, Banner.ERROR,
                         "Al parecer hay un excedente "
-                                + Utils.FormatoMoneda(Math.abs(Double.parseDouble(lblFaltante.getTag().toString())),2)
-                                + " en el monto del depósito. Máximo permitido ".concat(Utils.FormatoMoneda(valPermitido,2)), Banner.BOTTOM, 3000).show();
+                                + Utils.FormatoMoneda(Math.abs(Double.parseDouble(lblFaltante.getTag().toString())), 2)
+                                + " en el monto del depósito. Máximo permitido ".concat(Utils.FormatoMoneda(valPermitido, 2)), Banner.BOTTOM, 3000).show();
                 return false;
             }
-            if(txtNumDocumento.getText().toString().trim().equals("")){
+            if (txtNumDocumento.getText().toString().trim().equals("")) {
                 Banner.make(rootView, DepositoActivity.this, Banner.ERROR,
                         "Debe especificar el número del comprobante", Banner.BOTTOM, 2500).show();
-                return  false;
+                return false;
             }
-            if(!rbDeposito.isChecked() && !rbTransferencia.isChecked()){
+            if (!rbDeposito.isChecked() && !rbTransferencia.isChecked()) {
                 Banner.make(rootView, DepositoActivity.this, Banner.ERROR,
                         "Debe especificar el tipo de comprobante", Banner.BOTTOM, 2500).show();
-                return  false;
+                return false;
             }
-            if(spEntidad.getAdapter() == null || spEntidad.getSelectedItemPosition()<=0){
+            if (spEntidad.getAdapter() == null || spEntidad.getSelectedItemPosition() <= 0) {
                 Banner.make(rootView, DepositoActivity.this, Banner.ERROR,
                         "Debe especificar la entidad bancaria", Banner.BOTTOM, 2500).show();
-                return  false;
+                return false;
             }
-            if(!rbAhorro.isChecked() && !rbCorriente.isChecked()){
+            if (!rbAhorro.isChecked() && !rbCorriente.isChecked()) {
                 Banner.make(rootView, DepositoActivity.this, Banner.ERROR,
                         "Debe especificar el tipo de cuenta", Banner.BOTTOM, 2500).show();
-                return  false;
+                return false;
             }
-            if(fotoAdapter.listFoto == null || fotoAdapter.listFoto.size() == 0){
+            if (fotoAdapter.listFoto == null || fotoAdapter.listFoto.size() == 0) {
                 Banner.make(rootView, DepositoActivity.this, Banner.ERROR,
                         "Debe cargar una foto del comprobante", Banner.BOTTOM, 2500).show();
-                return  false;
+                return false;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, e.getMessage());
             return false;
         }
         return true;
     }
 
-    private void GuardarDatos(){
+    private void GuardarDatos() {
         try {
-            if(!ValidarDatos())
+            if (!ValidarDatos())
                 return;
             miIngreso = new Ingreso();
             miIngreso.estado = 1;
@@ -324,11 +330,11 @@ public class DepositoActivity extends AppCompatActivity implements View.OnClickL
             DetalleIngreso miDetalle = new DetalleIngreso();
             miDetalle.tipo = 0;
             miDetalle.fechadiario = miIngreso.fechadiario;
-            miDetalle.tipodocumento = rbDeposito.isChecked()?4:3;
+            miDetalle.tipodocumento = rbDeposito.isChecked() ? 4 : 3;
             miDetalle.razonsocialtitular = SQLite.usuario.RazonSocial;
             miDetalle.niptitular = SQLite.usuario.nip;
-            miDetalle.tipodecuenta = rbAhorro.isChecked()?"A":"C";
-            miDetalle.entidadfinanciera = ((Catalogo)spEntidad.getSelectedItem());
+            miDetalle.tipodecuenta = rbAhorro.isChecked() ? "A" : "C";
+            miDetalle.entidadfinanciera = ((Catalogo) spEntidad.getSelectedItem());
             miDetalle.fechadocumento = btnFechaDocumento.getText().toString();
             miDetalle.numerodocumentoreferencia = txtNumDocumento.getText().toString();
             miDetalle.monto = miIngreso.totalingreso;
@@ -337,21 +343,21 @@ public class DepositoActivity extends AppCompatActivity implements View.OnClickL
             miIngreso.fotos.clear();
             miIngreso.fotos.addAll(fotoAdapter.listFoto);
 
-            SubirDeposito(DepositoActivity.this);
-            /*if(miIngreso.Save()){
+            //SubirDeposito(DepositoActivity.this);  DESCOMENTAR
+            if(miIngreso.Save()){
                 Banner.make(rootView, DepositoActivity.this, Banner.SUCCESS, Constants.MSG_DATOS_GUARDADOS, Banner.BOTTOM, 3000).show();
                 LimpiarDatos();
             }else{
                 Banner.make(rootView, DepositoActivity.this, Banner.ERROR, Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM, 3000).show();
-            }*/
-        }catch (Exception e){
+            }
+        } catch (Exception e) {
             Log.d(TAG, e.getMessage());
             Banner.make(rootView, DepositoActivity.this, Banner.ERROR, "Excepcion: " + Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM, 3000).show();
         }
     }
 
-    private void SubirDeposito(final Context context){
-        try{
+    private void SubirDeposito(final Context context) {
+        try {
             List<Ingreso> listIngresos = new ArrayList<>();
             for (int i = 0; i < miIngreso.fotos.size(); i++) {
                 try {
@@ -370,9 +376,9 @@ public class DepositoActivity extends AppCompatActivity implements View.OnClickL
 
             IComprobante miInterface = retrofit.create(IComprobante.class);
 
-            Map<String,Object> post = new HashMap<>();
-            post.put("usuario",SQLite.usuario.Usuario);
-            post.put("clave",SQLite.usuario.Clave);
+            Map<String, Object> post = new HashMap<>();
+            post.put("usuario", SQLite.usuario.Usuario);
+            post.put("clave", SQLite.usuario.Clave);
             post.put("depositos", listIngresos);
             post.put("periodo", SQLite.usuario.sucursal.periodo.toString() + SQLite.usuario.sucursal.mesactual);
             post.put("periodoactual", SQLite.usuario.sucursal.periodo);
@@ -384,12 +390,12 @@ public class DepositoActivity extends AppCompatActivity implements View.OnClickL
             call.enqueue(new Callback<JsonObject>() {
                 @Override
                 public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                    if(!response.isSuccessful()){
+                    if (!response.isSuccessful()) {
                         //Banner.make(rootView,DepositoActivity.this,Banner.ERROR,"Código: " + response.code() + " - " + response.message(), Banner.BOTTOM,3000).show();
-                        if(miIngreso.Save()){
+                        if (miIngreso.Save()) {
                             Banner.make(rootView, DepositoActivity.this, Banner.SUCCESS, Constants.MSG_DATOS_GUARDADOS + " Este comprobante aún no se ha sincronizado.", Banner.BOTTOM, 3500).show();
                             LimpiarDatos();
-                        }else{
+                        } else {
                             Banner.make(rootView, DepositoActivity.this, Banner.ERROR, Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM, 3000).show();
                         }
                         pbProgreso.dismiss();
@@ -402,12 +408,12 @@ public class DepositoActivity extends AppCompatActivity implements View.OnClickL
                             JsonObject obj = response.body();
                             if (!obj.get("haserror").getAsBoolean()) {
                                 JsonArray jsonDepositosUpdate = obj.getAsJsonArray("depositosupdate");
-                                if(jsonDepositosUpdate!=null && jsonDepositosUpdate.size()>0){
-                                    JsonObject upd =  jsonDepositosUpdate.get(0).getAsJsonObject();
+                                if (jsonDepositosUpdate != null && jsonDepositosUpdate.size() > 0) {
+                                    JsonObject upd = jsonDepositosUpdate.get(0).getAsJsonObject();
                                     miIngreso.codigosistema = upd.get("codigosistema_deposito").getAsInt();
                                     miIngreso.estado = upd.get("codigosistema_deposito").getAsInt();
 
-                                    if(miIngreso.Save()) {
+                                    if (miIngreso.Save()) {
                                         if (obj.has("secuencial_dep")) {
                                             Integer secuencial_pe = obj.get("secuencial_dep").getAsInt();
                                             Ingreso comprobante = new Ingreso();
@@ -417,29 +423,29 @@ public class DepositoActivity extends AppCompatActivity implements View.OnClickL
                                         }
                                         Banner.make(rootView, DepositoActivity.this, Banner.SUCCESS, Constants.MSG_DATOS_GUARDADOS, Banner.BOTTOM, 3000).show();
                                         LimpiarDatos();
-                                    }else{
+                                    } else {
                                         Banner.make(rootView, DepositoActivity.this, Banner.ERROR, Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM, 3000).show();
                                     }
-                                }else{
-                                    if(miIngreso.Save()){
+                                } else {
+                                    if (miIngreso.Save()) {
                                         Banner.make(rootView, DepositoActivity.this, Banner.SUCCESS, Constants.MSG_DATOS_GUARDADOS + " Este comprobante aún no se ha sincronizado.", Banner.BOTTOM, 3500).show();
                                         LimpiarDatos();
-                                    }else{
+                                    } else {
                                         Banner.make(rootView, DepositoActivity.this, Banner.ERROR, Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM, 3000).show();
                                     }
                                 }
 
                             } else
-                                Utils.showErrorDialog(DepositoActivity.this,"Error", obj.get("message").getAsString());
+                                Utils.showErrorDialog(DepositoActivity.this, "Error", obj.get("message").getAsString());
                         } else {
-                            Banner.make(rootView,DepositoActivity.this,Banner.ERROR, Constants.MSG_USUARIO_CLAVE_INCORRECTO, Banner.BOTTOM,3000).show();
+                            Banner.make(rootView, DepositoActivity.this, Banner.ERROR, Constants.MSG_USUARIO_CLAVE_INCORRECTO, Banner.BOTTOM, 3000).show();
                         }
-                    }catch (JsonParseException ex){
+                    } catch (JsonParseException ex) {
                         Log.d(TAG, ex.getMessage());
-                        if(miIngreso.Save()){
+                        if (miIngreso.Save()) {
                             Banner.make(rootView, DepositoActivity.this, Banner.SUCCESS, Constants.MSG_DATOS_GUARDADOS + " Este comprobante aún no se ha sincronizado.", Banner.BOTTOM, 3500).show();
                             LimpiarDatos();
-                        }else{
+                        } else {
                             Banner.make(rootView, DepositoActivity.this, Banner.ERROR, Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM, 3000).show();
                         }
                     }
@@ -450,20 +456,20 @@ public class DepositoActivity extends AppCompatActivity implements View.OnClickL
                 public void onFailure(Call<JsonObject> call, Throwable t) {
                     Log.d(TAG, t.getMessage());
                     call.cancel();
-                    if(miIngreso.Save()){
+                    if (miIngreso.Save()) {
                         Banner.make(rootView, DepositoActivity.this, Banner.SUCCESS, Constants.MSG_DATOS_GUARDADOS + " Este comprobante aún no se ha sincronizado.", Banner.BOTTOM, 3500).show();
                         LimpiarDatos();
-                    }else{
+                    } else {
                         Banner.make(rootView, DepositoActivity.this, Banner.ERROR, Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM, 3000).show();
                     }
                     pbProgreso.dismiss();
                 }
             });
 
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             Log.d(TAG, e.getMessage());
-            Utils.showErrorDialog(this, "Error",e.getMessage());
+            Utils.showErrorDialog(this, "Error", e.getMessage());
             pbProgreso.dismiss();
         }
     }
@@ -471,23 +477,23 @@ public class DepositoActivity extends AppCompatActivity implements View.OnClickL
     public void showDatePickerDialog(View v) {
         Locale l = new Locale("ES-es");
         calendar = Calendar.getInstance(l);
-        int day=calendar.get(Calendar.DAY_OF_MONTH);
-        int month=calendar.get(Calendar.MONTH);
-        int year=calendar.get(Calendar.YEAR);
-        String[] fecha= ((Button)v).getText().toString().split("-");
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        int month = calendar.get(Calendar.MONTH);
+        int year = calendar.get(Calendar.YEAR);
+        String[] fecha = ((Button) v).getText().toString().split("-");
         day = Integer.valueOf(fecha[2]);
-        month = Integer.valueOf(fecha[1])-1;
+        month = Integer.valueOf(fecha[1]) - 1;
         year = Integer.valueOf(fecha[0]);
         dtpDialog = new DatePickerDialog(v.getContext(), new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int day) {
-                String dia = (day>=0 && day<10?"0"+(day):String.valueOf(day));
-                String mes = (month>=0 && month<9?"0"+(month+1):String.valueOf(month+1));
+                String dia = (day >= 0 && day < 10 ? "0" + (day) : String.valueOf(day));
+                String mes = (month >= 0 && month < 9 ? "0" + (month + 1) : String.valueOf(month + 1));
 
                 String miFecha = year + "-" + mes + "-" + dia;
-                ((Button)v).setText(miFecha);
-                if(v.getId() == R.id.btnFechaVenta) {
-                    if(Utils.longDate(miFecha)>Utils.longDate(Utils.getDateFormat("yyyy-MM-dd"))){
+                ((Button) v).setText(miFecha);
+                if (v.getId() == R.id.btnFechaVenta) {
+                    if (Utils.longDate(miFecha) > Utils.longDate(Utils.getDateFormat("yyyy-MM-dd"))) {
                         Banner.make(rootView, DepositoActivity.this, Banner.ERROR,
                                 "Debe elegir una fecha menor o igual a la fecha actual",
                                 Banner.BOTTOM, 3000).show();
@@ -496,68 +502,68 @@ public class DepositoActivity extends AppCompatActivity implements View.OnClickL
                     BuscarTotalVenta(miFecha);
                 }
             }
-        },year,month,day);
+        }, year, month, day);
         dtpDialog.show();
     }
 
-    private void BuscarTotalVenta2(String fecha){
-        try{
-            if(toolbar.getMenu()!=null){
+    private void BuscarTotalVenta(String fecha) {
+        try {
+            if (toolbar.getMenu() != null) {
                 toolbar.getMenu().findItem(R.id.option_save).setVisible(true);
             }
             Double[] totales = Usuario.getTotalVentas(fecha);
-            lblTotalVentas.setText("Total: ".concat(Utils.FormatoMoneda(totales[0],2)));
+            lblTotalVentas.setText("Total: ".concat(Utils.FormatoMoneda(totales[0], 2)));
             lblTotalVentas.setTag(totales[0]);
-            lblDepositado.setText("Depositado: ".concat(Utils.FormatoMoneda(totales[1],2)));
+            lblDepositado.setText("Depositado: ".concat(Utils.FormatoMoneda(totales[1], 2)));
             lblDepositado.setTag(totales[1]);
 
-            Double m = txtMonto.getText().toString().trim().equals("")?0d:Double.parseDouble(txtMonto.getText().toString().trim());
-            lblFaltante.setText("Faltante: ".concat(Utils.FormatoMoneda(totales[0]-totales[1]-m,2)));
-            lblFaltante.setTag(totales[0]-totales[1]-m);
+            Double m = txtMonto.getText().toString().trim().equals("") ? 0d : Double.parseDouble(txtMonto.getText().toString().trim());
+            lblFaltante.setText("Faltante: ".concat(Utils.FormatoMoneda(totales[0] - totales[1] - m, 2)));
+            lblFaltante.setTag(totales[0] - totales[1] - m);
             Log.d(TAG, "Ventas: " + totales[0] + " - Depositado: " + totales[1] + " - Monto: " + m);
 
             Integer docNS = Usuario.numDocNoSincronizados(SQLite.usuario.IdUsuario, "01", fecha, SQLite.usuario.sucursal.IdEstablecimiento);
-            if(docNS > 0){
+            if (docNS > 0) {
                 Banner.make(rootView, DepositoActivity.this, Banner.INFO,
                         "Tiene facturas pendientes por sincronizar, y no podrá registrar comprobante de depósito", Banner.BOTTOM, 3000).show();
-                if(toolbar.getMenu()!=null){
+                if (toolbar.getMenu() != null) {
                     toolbar.getMenu().findItem(R.id.option_save).setVisible(false);
                 }
                 return;
             }
 
-            if(docNS == 0 && totales[0] > 0 && totales[0].equals(totales[1])){
+            if (docNS == 0 && totales[0] > 0 && totales[0].equals(totales[1])) {
                 Banner.make(rootView, DepositoActivity.this, Banner.INFO,
                         "Las ventas del día " + fecha + " ya han sido depositadas en su totalidad.", Banner.BOTTOM, 3000).show();
-                if(toolbar.getMenu()!=null){
+                if (toolbar.getMenu() != null) {
                     toolbar.getMenu().findItem(R.id.option_save).setVisible(false);
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, e.getMessage());
         }
     }
 
-    private void BuscarTotalVenta(String fecha){
-        try{
+    private void BuscarTotalVenta2(String fecha) {
+        try {
             pgCargando.setVisibility(View.VISIBLE);
             btnRefresh.setVisibility(View.GONE);
-            if(toolbar.getMenu()!=null){
+            if (toolbar.getMenu() != null) {
                 toolbar.getMenu().findItem(R.id.option_save).setVisible(true);
             }
 
             IUsuario miInterface = retrofit.create(IUsuario.class);
 
             Call<JsonObject> call = miInterface.getTotalVentas(
-                                            SQLite.usuario.Usuario, SQLite.usuario.Clave,
-                                            fecha, SQLite.usuario.sucursal.IdEstablecimiento);
+                    SQLite.usuario.Usuario, SQLite.usuario.Clave,
+                    fecha, SQLite.usuario.sucursal.IdEstablecimiento);
             call.enqueue(new Callback<JsonObject>() {
                 @Override
                 public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                    if(!response.isSuccessful()){
+                    if (!response.isSuccessful()) {
                         toolbar.getMenu().findItem(R.id.option_save).setVisible(false);
                         Banner.make(rootView, DepositoActivity.this, Banner.SUCCESS,
-                        "No se pudo obtener los datos de las ventas. Verifique su conexión a internet.", Banner.BOTTOM, 3000).show();
+                                "No se pudo obtener los datos de las ventas. Verifique su conexión a internet.", Banner.BOTTOM, 3000).show();
                         pgCargando.setVisibility(View.GONE);
                         btnRefresh.setVisibility(View.VISIBLE);
                         return;
@@ -567,40 +573,42 @@ public class DepositoActivity extends AppCompatActivity implements View.OnClickL
                             JsonObject obj = response.body();
                             if (!obj.get("haserror").getAsBoolean()) {
                                 JsonObject jVentas = obj.getAsJsonObject("totales");
-                                if(jVentas!=null){
+                                if (jVentas != null) {
                                     Double[] totales = Usuario.getTotalVentas(fecha);
-                                    lblTotalVentas.setText("Total: ".concat(Utils.FormatoMoneda(jVentas.get("ventas").getAsDouble(),2)));
+                                    lblTotalVentas.setText("Total: ".concat(Utils.FormatoMoneda(jVentas.get("ventas").getAsDouble(), 2)));
                                     lblTotalVentas.setTag(jVentas.get("ventas").getAsDouble());
-                                    lblDepositado.setText("Depositado: ".concat(Utils.FormatoMoneda(jVentas.get("depositado").getAsDouble(),2)));
+                                    lblDepositado.setText("Depositado: ".concat(Utils.FormatoMoneda(jVentas.get("depositado").getAsDouble(), 2)));
                                     lblDepositado.setTag(jVentas.get("depositado").getAsDouble());
 
-                                    Double m = txtMonto.getText().toString().trim().equals("")?0d:Double.parseDouble(txtMonto.getText().toString().trim());
-                                    lblFaltante.setText("Faltante: ".concat(Utils.FormatoMoneda(jVentas.get("ventas").getAsDouble()-jVentas.get("depositado").getAsDouble()-m,2)));
-                                    lblFaltante.setTag(jVentas.get("ventas").getAsDouble()-jVentas.get("depositado").getAsDouble()-m);
+                                    Double m = txtMonto.getText().toString().trim().equals("") ? 0d : Double.parseDouble(txtMonto.getText().toString().trim());
+                                    lblFaltante.setText("Faltante: ".concat(Utils.FormatoMoneda(jVentas.get("ventas").getAsDouble() - jVentas.get("depositado").getAsDouble() - m, 2)));
+                                    lblFaltante.setTag(jVentas.get("ventas").getAsDouble() - jVentas.get("depositado").getAsDouble() - m);
                                     Log.d(TAG, "Ventas: " + jVentas.get("ventas").getAsDouble() + " - Depositado: " + jVentas.get("depositado").getAsDouble() + " - Monto: " + m);
 
                                     Integer docNS = Usuario.numDocNoSincronizados(SQLite.usuario.IdUsuario, "01", fecha, SQLite.usuario.sucursal.IdEstablecimiento);
-                                    if(docNS > 0){
+                                    if (docNS > 0) {
                                         Banner.make(rootView, DepositoActivity.this, Banner.INFO,
                                                 "Tiene facturas pendientes por sincronizar, y no podrá registrar comprobante de depósito", Banner.BOTTOM, 3000).show();
-                                        if(toolbar.getMenu()!=null){
+                                        if (toolbar.getMenu() != null) {
                                             toolbar.getMenu().findItem(R.id.option_save).setVisible(false);
                                         }
+                                        pgCargando.setVisibility(View.GONE);
+                                        btnRefresh.setVisibility(View.VISIBLE);
                                         return;
                                     }
 
-                                    if(docNS == 0 && jVentas.get("ventas").getAsDouble() > 0 && jVentas.get("ventas").getAsDouble() == jVentas.get("depositado").getAsDouble()){
+                                    if (docNS == 0 && jVentas.get("ventas").getAsDouble() > 0 && jVentas.get("ventas").getAsDouble() == jVentas.get("depositado").getAsDouble()) {
                                         Banner.make(rootView, DepositoActivity.this, Banner.INFO,
                                                 "Las ventas del día " + fecha + " ya han sido depositadas en su totalidad.", Banner.BOTTOM, 3000).show();
-                                        if(toolbar.getMenu()!=null){
+                                        if (toolbar.getMenu() != null) {
                                             toolbar.getMenu().findItem(R.id.option_save).setVisible(false);
                                         }
                                     }
                                 }
                             }
                         }
-                    }catch (Exception e){
-                        Log.d(TAG,"onResponse(): " + e.getMessage());
+                    } catch (Exception e) {
+                        Log.d(TAG, "onResponse(): " + e.getMessage());
                         toolbar.getMenu().findItem(R.id.option_save).setVisible(false);
                         Banner.make(rootView, DepositoActivity.this, Banner.SUCCESS,
                                 "No se pudo obtener los datos de las ventas. Verifique su conexión a internet.", Banner.BOTTOM, 3000).show();
@@ -620,19 +628,19 @@ public class DepositoActivity extends AppCompatActivity implements View.OnClickL
                     btnRefresh.setVisibility(View.VISIBLE);
                 }
             });
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, e.getMessage());
             pgCargando.setVisibility(View.GONE);
             btnRefresh.setVisibility(View.VISIBLE);
         }
     }
 
-    private void LlenarComboEntidades(){
-        Thread th = new Thread(){
+    private void LlenarComboEntidades() {
+        Thread th = new Thread() {
             @Override
-            public void run(){
+            public void run() {
                 List<Catalogo> entidades = new ArrayList<>();
-                entidades.add(new Catalogo(-1, "","NONE","-Seleccione-",0));
+                entidades.add(new Catalogo(-1, "", "NONE", "-Seleccione-", 0));
                 entidades.addAll(Catalogo.getCatalogo("ENTIDADFINANCIE"));
                 ArrayAdapter<Catalogo> adapter = new ArrayAdapter<>(DepositoActivity.this, android.R.layout.simple_spinner_dropdown_item, entidades);
                 runOnUiThread(() -> spEntidad.setAdapter(adapter));
@@ -647,17 +655,17 @@ public class DepositoActivity extends AppCompatActivity implements View.OnClickL
             final AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Elija una opción");
             builder.setItems(opciones,
-                (dialog, which) -> {
-                    if (which == 0) { //DESDE LA CAMARA
-                        openCamera();
-                    } else if (which == 1) { //DESDE LA GALERIA
-                        Intent i = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                        i.setType("image/*");
-                        startActivityForResult(i.createChooser(i, "Seleccione"), REQUEST_SELECCIONA_FOTO);
-                    } else {
-                        dialog.dismiss();
+                    (dialog, which) -> {
+                        if (which == 0) { //DESDE LA CAMARA
+                            openCamera();
+                        } else if (which == 1) { //DESDE LA GALERIA
+                            Intent i = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                            i.setType("image/*");
+                            startActivityForResult(i.createChooser(i, "Seleccione"), REQUEST_SELECCIONA_FOTO);
+                        } else {
+                            dialog.dismiss();
+                        }
                     }
-                }
             );
             builder.show();
         } catch (Exception e) {
@@ -678,7 +686,7 @@ public class DepositoActivity extends AppCompatActivity implements View.OnClickL
             if (exists) {
                 Long consecutivo = System.currentTimeMillis() / 1000;
                 //nameFoto = consecutivo.toString() + ".jpg";
-                nameFoto = SQLite.usuario.nip + "_ingre_" + Utils.getDateFormat("yyyyMMddHHmmss")+".jpg";
+                nameFoto = SQLite.usuario.nip + "_ingre_" + Utils.getDateFormat("yyyyMMddHHmmss") + ".jpg";
                 path = getExternalMediaDirs()[0] + File.separator + Constants.FOLDER_FILES
                         + File.separator + nameFoto;
                 fileImage = new File(path);
@@ -696,7 +704,7 @@ public class DepositoActivity extends AppCompatActivity implements View.OnClickL
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.btnFechaVenta:
             case R.id.btnFechaDocumento:
                 showDatePickerDialog(v);
@@ -727,30 +735,30 @@ public class DepositoActivity extends AppCompatActivity implements View.OnClickL
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.option_save:
-                if(!SQLite.usuario.VerificaPermiso(this,Constants.PUNTO_VENTA, "escritura")){
-                    Banner.make(rootView,DepositoActivity.this,Banner.ERROR,"No tiene permisos para registrar depósitos.", Banner.BOTTOM, 3000).show();
+                if (!SQLite.usuario.VerificaPermiso(this, Constants.PUNTO_VENTA, "escritura")) {
+                    Banner.make(rootView, DepositoActivity.this, Banner.ERROR, "No tiene permisos para registrar depósitos.", Banner.BOTTOM, 3000).show();
                     break;
                 }
                 android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this, R.style.AlertDialogTheme);
                 View view = LayoutInflater.from(this).inflate(R.layout.layout_confirmation_dialog,
                         (ConstraintLayout) findViewById(R.id.lyDialogContainer));
                 builder.setView(view);
-                ((TextView)view.findViewById(R.id.lblTitle)).setText("Guardar comprobante");
-                ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Está seguro que desea guardar este comprobante de depósito?");
-                ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_save);
-                ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
-                ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
+                ((TextView) view.findViewById(R.id.lblTitle)).setText("Guardar comprobante");
+                ((TextView) view.findViewById(R.id.lblMessage)).setText("¿Está seguro que desea guardar este comprobante de depósito?");
+                ((ImageView) view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_save);
+                ((Button) view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
+                ((Button) view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
                 final android.app.AlertDialog alertDialog = builder.create();
-                view.findViewById(R.id.btnConfirm).setOnClickListener(v ->{
-                        GuardarDatos();
-                        alertDialog.dismiss();
-                    });
+                view.findViewById(R.id.btnConfirm).setOnClickListener(v -> {
+                    GuardarDatos();
+                    alertDialog.dismiss();
+                });
 
                 view.findViewById(R.id.btnCancel).setOnClickListener(v -> alertDialog.dismiss());
 
-                if(alertDialog.getWindow()!=null)
+                if (alertDialog.getWindow() != null)
                     alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
                 alertDialog.show();
                 break;
@@ -764,27 +772,27 @@ public class DepositoActivity extends AppCompatActivity implements View.OnClickL
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode==RESULT_OK){
+        if (resultCode == RESULT_OK) {
             Foto mifoto;
-            switch (requestCode){
+            switch (requestCode) {
                 case REQUEST_SELECCIONA_FOTO:
 
                     mifoto = new Foto();
                     Uri miPath = data.getData();
                     mifoto.uriFoto = miPath;
-                    String[] projection = { MediaStore.Images.Media.DATA, MediaStore.Images.Media.SIZE };
+                    String[] projection = {MediaStore.Images.Media.DATA, MediaStore.Images.Media.SIZE};
                     Cursor cursor = managedQuery(miPath, projection, null, null, null);
                     int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
                     int column_index2 = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE);
                     cursor.moveToFirst();
-                    String path1= cursor.getString(column_index);
-                    Log.d(TAG, "Index: " + column_index2 + " -> Tamaño: " + Utils.RoundDecimal((cursor.getDouble(column_index2)/1024)/1024,2));
+                    String path1 = cursor.getString(column_index);
+                    Log.d(TAG, "Index: " + column_index2 + " -> Tamaño: " + Utils.RoundDecimal((cursor.getDouble(column_index2) / 1024) / 1024, 2));
 
-                    try{
-                        mifoto.bitmap = MediaStore.Images.Media.getBitmap(DepositoActivity.this.getContentResolver(),miPath);
-                        String nombre = SQLite.usuario.nip + "_ingre_" + Utils.getDateFormat("yyyyMMddHHmmss")+".jpg";
-                        path = getExternalMediaDirs()[0]+File.separator+Constants.FOLDER_FILES
-                                +File.separator+nombre;
+                    try {
+                        mifoto.bitmap = MediaStore.Images.Media.getBitmap(DepositoActivity.this.getContentResolver(), miPath);
+                        String nombre = SQLite.usuario.nip + "_ingre_" + Utils.getDateFormat("yyyyMMddHHmmss") + ".jpg";
+                        path = getExternalMediaDirs()[0] + File.separator + Constants.FOLDER_FILES
+                                + File.separator + nombre;
 
                         Utils.insert_image(mifoto.bitmap, nombre, ExternalDirectory, getContentResolver());
                         mifoto.path = path;
@@ -824,16 +832,16 @@ public class DepositoActivity extends AppCompatActivity implements View.OnClickL
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if(keyCode == KeyEvent.KEYCODE_BACK){
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
             android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this, R.style.AlertDialogTheme);
             View view = LayoutInflater.from(this).inflate(R.layout.layout_confirmation_dialog,
                     (ConstraintLayout) findViewById(R.id.lyDialogContainer));
             builder.setView(view);
-            ((TextView)view.findViewById(R.id.lblTitle)).setText("Cerrar");
-            ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Desea salir de la ventana de comprobante de depósito?");
-            ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_check_white);
-            ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
-            ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
+            ((TextView) view.findViewById(R.id.lblTitle)).setText("Cerrar");
+            ((TextView) view.findViewById(R.id.lblMessage)).setText("¿Desea salir de la ventana de comprobante de depósito?");
+            ((ImageView) view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_check_white);
+            ((Button) view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
+            ((Button) view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
             final android.app.AlertDialog alertDialog = builder.create();
             view.findViewById(R.id.btnConfirm).setOnClickListener(v -> {
                 onBackPressed();
@@ -842,7 +850,7 @@ public class DepositoActivity extends AppCompatActivity implements View.OnClickL
 
             view.findViewById(R.id.btnCancel).setOnClickListener(v -> alertDialog.dismiss());
 
-            if(alertDialog.getWindow()!=null)
+            if (alertDialog.getWindow() != null)
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
             alertDialog.show();
             return true;

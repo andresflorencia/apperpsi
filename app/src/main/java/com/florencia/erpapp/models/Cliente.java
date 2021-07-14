@@ -31,24 +31,24 @@ public class Cliente {
     public static SQLiteDatabase sqLiteDatabase;
     public static String TAG = "TAGCLIENTE";
 
-    public Cliente(){
-        this.idcliente= 0;
-        this.tiponip= "";
-        this.nip= "";
-        this.razonsocial= "";
-        this.nombrecomercial= "";
-        this.direccion= "";
+    public Cliente() {
+        this.idcliente = 0;
+        this.tiponip = "";
+        this.nip = "";
+        this.razonsocial = "";
+        this.nombrecomercial = "";
+        this.direccion = "";
         this.lat = 0d;
         this.lon = 0d;
-        this.categoria= "0";
-        this.usuarioid= 0;
+        this.categoria = "0";
+        this.usuarioid = 0;
         this.fono1 = "";
-        this.fono2 ="";
-        this.email="";
-        this.observacion="";
-        this.ruc= "";
+        this.fono2 = "";
+        this.email = "";
+        this.observacion = "";
+        this.ruc = "";
         this.codigosistema = 0;
-        this.actualizado =0;
+        this.actualizado = 0;
         this.establecimientoid = 0;
         this.parroquiaid = 0;
         this.fecharegistro = "";
@@ -65,7 +65,7 @@ public class Cliente {
     public static boolean removeClientes(Integer idUsuario) {
         try {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
-            sqLiteDatabase.execSQL("DELETE FROM cliente WHERE usuarioid = ? AND codigosistema <> 0", new String[] {idUsuario.toString()});
+            sqLiteDatabase.execSQL("DELETE FROM cliente WHERE usuarioid = ? AND codigosistema <> 0", new String[]{idUsuario.toString()});
             sqLiteDatabase.close();
             Log.d(TAG, "CLIENTES ELIMINADOS");
             return true;
@@ -81,13 +81,13 @@ public class Cliente {
             this.sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
             if (this.idcliente == 0)
                 this.sqLiteDatabase.execSQL("INSERT INTO " +
-                        "cliente(tiponip, nip, razonsocial, nombrecomercial, direccion, lat, lon, categoria, " +
+                                "cliente(tiponip, nip, razonsocial, nombrecomercial, direccion, lat, lon, categoria, " +
                                 "usuarioid, fono1, fono2, email, observacion, ruc, codigosistema, actualizado, " +
                                 "establecimientoid, parroquiaid, fecharegistro, fechamodificacion, longdater, longdatem," +
                                 "nombrecategoria) " +
-                        "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                        new String[]{ this.tiponip, this.nip, this.razonsocial, this.nombrecomercial, this.direccion,
-                                this.lat.toString(), this.lon.toString(), this.categoria.equals("")?"0":this.categoria, this.usuarioid.toString(), this.fono1,
+                                "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        new String[]{this.tiponip, this.nip, this.razonsocial, this.nombrecomercial, this.direccion,
+                                this.lat.toString(), this.lon.toString(), this.categoria.equals("") ? "0" : this.categoria, this.usuarioid.toString(), this.fono1,
                                 this.fono2, this.email, this.observacion, this.ruc, this.codigosistema.toString(), this.actualizado.toString(),
                                 this.establecimientoid.toString(), this.parroquiaid.toString(), this.fecharegistro, this.fechamodificacion,
                                 this.longdater.toString(), this.longdatem.toString(), this.nombrecategoria});
@@ -97,17 +97,17 @@ public class Cliente {
                                 "usuarioid, fono1, fono2, email, observacion, ruc, codigosistema, actualizado, establecimientoid, " +
                                 "parroquiaid, fecharegistro, fechamodificacion, longdater, longdatem, nombrecategoria) " +
                                 "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                        new String[]{ this.idcliente.toString(), this.tiponip, this.nip, this.razonsocial, this.nombrecomercial, this.direccion,
-                                this.lat.toString(), this.lon.toString(), this.categoria.equals("")?"0":this.categoria, this.usuarioid.toString(), this.fono1,
+                        new String[]{this.idcliente.toString(), this.tiponip, this.nip, this.razonsocial, this.nombrecomercial, this.direccion,
+                                this.lat.toString(), this.lon.toString(), this.categoria.equals("") ? "0" : this.categoria, this.usuarioid.toString(), this.fono1,
                                 this.fono2, this.email, this.observacion, this.ruc, this.codigosistema.toString(), this.actualizado.toString(),
                                 this.establecimientoid.toString(), this.parroquiaid.toString(), this.fecharegistro, this.fechamodificacion,
                                 this.longdater.toString(), this.longdatem.toString(), this.nombrecategoria});
             if (this.idcliente == 0) this.idcliente = SQLite.sqlDB.getLastId();
 
             this.sqLiteDatabase.close();
-            Log.d(TAG,"SAVE CLIENTE OK");
+            Log.d(TAG, "SAVE CLIENTE OK");
             return true;
-        } catch (SQLException ex){
+        } catch (SQLException ex) {
             Log.d(TAG, this.nip + " - " + ex.getMessage());
             return false;
         }
@@ -120,7 +120,7 @@ public class Cliente {
             Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM cliente WHERE idcliente  = ?", new String[]{Id.toString()});
             if (cursor.moveToFirst()) Item = Cliente.AsignaDatos(cursor);
             sqLiteDatabase.close();
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, e.getMessage());
         }
         return Item;
@@ -133,7 +133,7 @@ public class Cliente {
             Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM cliente WHERE nip  = ?", new String[]{nip});
             if (cursor.moveToFirst()) Item = Cliente.AsignaDatos(cursor);
             sqLiteDatabase.close();
-        }catch (SQLiteException e){
+        } catch (SQLiteException e) {
             Log.d(TAG, e.getMessage());
         }
         return Item;
@@ -181,7 +181,8 @@ public class Cliente {
         if (this.nip.equals("")) str += "   -   NIP" + '\n';
         if (this.razonsocial.equals("")) str += "  -  Razón Social" + '\n';
         if (this.nombrecomercial.equals("")) str += "   -   Nombre de la tienda o comercio" + '\n';
-        if (this.fono1.equals("") && this.fono2.equals("")) str += "   -   Celular o convencional" + '\n';
+        if (this.fono1.equals("") && this.fono2.equals(""))
+            str += "   -   Celular o convencional" + '\n';
         if (this.direccion.equals("")) str += "   -   Dirección" + '\n';
         //if (this.lat == 0 || this.lon == 0) str += "   -   Coordenadas. Por favor verificar que el GPS esté activo";
         return str;
@@ -193,17 +194,17 @@ public class Cliente {
             List<String> params = new ArrayList<>();
             params.add(idUser.toString());
             String WHERE = "usuarioid = ?";
-            if(!fecha.trim().equals(""))
-                WHERE += " AND (fecharegistro like '"+fecha+"%' OR fechamodificacion like '"+fecha+"%')";
-            String[]paramsA = new String[params.size()];
+            if (!fecha.trim().equals(""))
+                WHERE += " AND (fecharegistro like '" + fecha + "%' OR fechamodificacion like '" + fecha + "%')";
+            String[] paramsA = new String[params.size()];
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
-            Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM cliente WHERE "+WHERE+" ORDER BY actualizado desc, razonsocial asc", params.toArray(paramsA));
+            Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM cliente WHERE " + WHERE + " ORDER BY actualizado desc, razonsocial asc", params.toArray(paramsA));
             Cliente cliente;
             if (cursor.moveToFirst()) {
                 do {
                     cliente = Cliente.AsignaDatos(cursor);
                     if (cliente != null) lista.add(cliente);
-                }while (cursor.moveToNext());
+                } while (cursor.moveToNext());
             }
             cursor.close();
             sqLiteDatabase.close();
@@ -224,7 +225,7 @@ public class Cliente {
                 do {
                     cliente = Cliente.AsignaDatos(cursor);
                     if (cliente != null) items.add(cliente);
-                }while (cursor.moveToNext());
+                } while (cursor.moveToNext());
             }
             cursor.close();
             sqLiteDatabase.close();
@@ -238,11 +239,11 @@ public class Cliente {
     public static boolean Update(Integer id, ContentValues data) {
         try {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
-            sqLiteDatabase.update("cliente",data, "idcliente = ?",new String[]{id.toString()});
+            sqLiteDatabase.update("cliente", data, "idcliente = ?", new String[]{id.toString()});
             sqLiteDatabase.close();
-            Log.d(TAG,"UPDATE CLIENTE OK");
+            Log.d(TAG, "UPDATE CLIENTE OK");
             return true;
-        } catch (SQLException ex){
+        } catch (SQLException ex) {
             Log.d(TAG, "Update(): " + String.valueOf(ex));
             return false;
         }

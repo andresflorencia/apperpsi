@@ -6,45 +6,51 @@
         <item
             android:id="@+id/nav_home"
             android:icon="@drawable/ic_home"
-            android:title="Inicio"/>
+            android:title="Inicio" />
         <item
             android:id="@+id/nav_cliente"
             android:icon="@drawable/ic_user"
             android:title="Clientes"
-            android:titleCondensed="pe/personas"/>
+            android:titleCondensed="pe/personas" />
         <item
             android:id="@+id/nav_factura"
             android:icon="@drawable/ic_document"
             android:title="Factura/Proforma"
-            android:titleCondensed="in/puntoventa"/>
+            android:titleCondensed="in/puntoventa" />
         <item
             android:id="@+id/nav_pedido"
             android:icon="@drawable/ic_document"
             android:title="Pedido Cliente"
-            android:titleCondensed="cc/gestiondepedidos"/>
+            android:titleCondensed="cc/gestiondepedidos" />
         <item
             android:id="@+id/nav_recepcion"
             android:icon="@drawable/ic_recepcion"
             android:title="Recepción"
-            android:titleCondensed="in/recepcion"/>
+            android:titleCondensed="in/recepcion" />
         <item
             android:id="@+id/nav_transferencia"
             android:icon="@drawable/ic_transferencia"
             android:title="Transferencia"
-            android:titleCondensed="in/transferencia"/>
+            android:titleCondensed="in/transferencia" />
         <item
             android:id="@+id/nav_pedidoinv"
             android:icon="@drawable/ic_recepcion"
             android:title="Pedido Inventario"
-            android:titleCondensed="in/pedido"/>
-        <item android:id="@+id/section_opciones"
+            android:titleCondensed="in/pedido" />
+        <item
+            android:id="@+id/nav_aceptatransf"
+            android:icon="@drawable/ic_camion"
+            android:title="Aceptar Transferencia"
+            android:titleCondensed="in/aceptatransf" />
+        <item
+            android:id="@+id/section_opciones"
             android:title="Opciones">
             <menu>
                 <item
                     android:id="@+id/nav_config"
                     android:icon="@drawable/ic_settings"
                     android:title="Configuración"
-                    android:visible="false"/>
+                    android:visible="false" />
                 <item
                     android:id="@+id/nav_cerrarsesion"
                     android:icon="@drawable/ic_exit"

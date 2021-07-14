@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorGrayLight2"
     android:fitsSystemWindows="true"
-    tools:context=".activities.ClienteBusquedaActivity"
-    android:background="@color/colorGrayLight2">
+    tools:context=".activities.ClienteBusquedaActivity">
 
-    <com.google.android.material.appbar.AppBarLayout
+    <com.google.android.material.appbar.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        xmlns:android="http://schemas.android.com/apk/res/android">
+        android:layout_height="wrap_content">
+
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/appbar"
             android:layout_width="match_parent"
@@ -24,30 +23,32 @@
         android:id="@+id/imgFondo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:src="@drawable/clientes"
-        android:layout_gravity="center"/>
+        android:layout_gravity="center"
+        android:src="@drawable/clientes" />
 
     <LinearLayout
         android:id="@+id/lyContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="55dp"
         android:orientation="vertical"
-        android:visibility="gone"
-        android:layout_marginTop="55dp">
+        android:visibility="gone">
+
         <androidx.appcompat.widget.SearchView
             android:id="@+id/svBusqueda"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:queryHint="Filtrar"
-            app:iconifiedByDefault="false"
+            android:layout_margin="5dp"
             android:background="@drawable/border1"
-            android:layout_margin="5dp"/>
+            app:iconifiedByDefault="false"
+            app:queryHint="Filtrar" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvClientes"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
     </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

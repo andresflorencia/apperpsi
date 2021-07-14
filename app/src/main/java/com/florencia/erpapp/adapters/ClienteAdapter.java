@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ClienteAdapter extends RecyclerView.Adapter<ClienteAdapter.ClienteViewHolder>{
+public class ClienteAdapter extends RecyclerView.Adapter<ClienteAdapter.ClienteViewHolder> {
 
     private static String TAG = "TAGCLIENTE_ADAPTER";
     public List<Cliente> listClients;
@@ -51,7 +51,7 @@ public class ClienteAdapter extends RecyclerView.Adapter<ClienteAdapter.ClienteV
     public ClienteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new ClienteViewHolder(
                 LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.card_cliente, parent, false));
+                        .inflate(R.layout.card_cliente, parent, false));
     }
 
     @Override
@@ -64,26 +64,26 @@ public class ClienteAdapter extends RecyclerView.Adapter<ClienteAdapter.ClienteV
         return listClients.size();
     }
 
-    public void filter(final String busqueda){
+    public void filter(final String busqueda) {
         listClients.clear();
-        if(busqueda.length()==0){
+        if (busqueda.length() == 0) {
             listClients.addAll(orginalItems);
-        }else{
+        } else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 List<Cliente> collect = orginalItems.stream()
                         .filter(i -> i.nip.concat(i.razonsocial.toLowerCase())
                                 .concat(i.nombrecomercial.toLowerCase())
                                 .concat(i.direccion.toLowerCase()
-                                .concat(i.nombrecategoria.toLowerCase())
+                                        .concat(i.nombrecategoria.toLowerCase())
                                 ).contains(busqueda.toLowerCase()))
                         .collect(Collectors.<Cliente>toList());
                 listClients.addAll(collect);
-            }else{
-                for(Cliente i: orginalItems){
-                    if(i.nip.concat(i.razonsocial.toLowerCase())
+            } else {
+                for (Cliente i : orginalItems) {
+                    if (i.nip.concat(i.razonsocial.toLowerCase())
                             .concat(i.nombrecomercial.toLowerCase())
                             .concat(i.direccion.toLowerCase()
-                            .concat(i.nombrecategoria.toLowerCase())
+                                    .concat(i.nombrecategoria.toLowerCase())
                             ).contains(busqueda.toLowerCase()))
                         listClients.add(i);
                 }
@@ -105,7 +105,7 @@ public class ClienteAdapter extends RecyclerView.Adapter<ClienteAdapter.ClienteV
         RoundedImageView imgCliente;
         CardView cvCliente;
 
-        ClienteViewHolder(@NonNull View itemView){
+        ClienteViewHolder(@NonNull View itemView) {
             super(itemView);
             tvRazonSocial = itemView.findViewById(R.id.tv_RazonSocial);
             tvNombreComercial = itemView.findViewById(R.id.tv_NombreComercial);
@@ -119,19 +119,19 @@ public class ClienteAdapter extends RecyclerView.Adapter<ClienteAdapter.ClienteV
             //cvCliente.setOnCreateContextMenuListener(this);
         }
 
-        void bindCliente(final Cliente cliente){
-            tvRazonSocial.setText(cliente.nip + " - "+ cliente.razonsocial);
+        void bindCliente(final Cliente cliente) {
+            tvRazonSocial.setText(cliente.nip + " - " + cliente.razonsocial);
             tvNombreComercial.setText(cliente.nombrecomercial);
             tvDireccion.setText(cliente.direccion);
             tvContacto.setText(cliente.fono1 + " - " + cliente.fono2 + " - Categoría: " + cliente.nombrecategoria);
             //btnEdit.setTag(cliente.idcliente);
             //btnNewDocument.setTag(cliente.idcliente);
-            if((cliente.codigosistema == 0 || cliente.actualizado == 1) && !cliente.nip.contains("999999999")) {
+            if ((cliente.codigosistema == 0 || cliente.actualizado == 1) && !cliente.nip.contains("999999999")) {
                 tvEstado.setText("No sincronizado");
                 tvEstado.setTextColor(itemView.getContext().getResources().getColor(R.color.colorend_splash));
                 tvEstado.setVisibility(View.VISIBLE);
                 itemView.setBackgroundResource(R.drawable.bg_btn_red);
-            }else{
+            } else {
                 tvEstado.setVisibility(View.GONE);
                 itemView.setBackgroundResource(R.drawable.bg_btn_gps);
             }
@@ -139,28 +139,28 @@ public class ClienteAdapter extends RecyclerView.Adapter<ClienteAdapter.ClienteV
             btnOptions.setOnClickListener(v -> showPopupMenu(v));
 
             itemView.setOnClickListener(v -> {
-                    if(!listClients.get(getAdapterPosition()).nip.contains("99999999")) {
-                        Intent i = new Intent(context, ClienteActivity.class);
-                        i.putExtra("idcliente", listClients.get(getAdapterPosition()).idcliente);
-                        context.startActivity(i);
-                    }else
-                        Utils.showMessage(v.getContext(),"No se puede editar datos de «CONSUMIDOR FINAL»");
-                });
+                if (!listClients.get(getAdapterPosition()).nip.contains("99999999")) {
+                    Intent i = new Intent(context, ClienteActivity.class);
+                    i.putExtra("idcliente", listClients.get(getAdapterPosition()).idcliente);
+                    context.startActivity(i);
+                } else
+                    Utils.showMessage(v.getContext(), "No se puede editar datos de " + Constants.COMILLA_ABRE + "CONSUMIDOR FINAL" + Constants.COMILLA_CIERRA);
+            });
         }
 
-        private void showPopupMenu(View v){
-            PopupMenu menu = new PopupMenu(v.getContext(),v);
+        private void showPopupMenu(View v) {
+            PopupMenu menu = new PopupMenu(v.getContext(), v);
             menu.inflate(R.menu.popup_menu_cliente);
-            if((listClients.get(this.getAdapterPosition()).codigosistema.equals(0)
-                    || SQLite.usuario.VerificaPermiso(v.getContext(), Constants.REGISTRO_CLIENTE,"lectura")
-                    || SQLite.usuario.VerificaPermiso(v.getContext(), Constants.REGISTRO_CLIENTE,"modificacion"))
-            && !listClients.get(this.getAdapterPosition()).nip.contains("999999999")) {
+            if ((listClients.get(this.getAdapterPosition()).codigosistema.equals(0)
+                    || SQLite.usuario.VerificaPermiso(v.getContext(), Constants.REGISTRO_CLIENTE, "lectura")
+                    || SQLite.usuario.VerificaPermiso(v.getContext(), Constants.REGISTRO_CLIENTE, "modificacion"))
+                    && !listClients.get(this.getAdapterPosition()).nip.contains("999999999")) {
                 menu.getMenu().findItem(R.id.action_editar).setVisible(true);
-            }else
+            } else
                 menu.getMenu().findItem(R.id.action_editar).setVisible(false);
 
-            menu.getMenu().findItem(R.id.action_comprobante).setVisible(SQLite.usuario.VerificaPermiso(v.getContext(),Constants.PUNTO_VENTA,"escritura"));
-            menu.getMenu().findItem(R.id.action_pedido).setVisible(SQLite.usuario.VerificaPermiso(v.getContext(),Constants.PEDIDO,"escritura"));
+            menu.getMenu().findItem(R.id.action_comprobante).setVisible(SQLite.usuario.VerificaPermiso(v.getContext(), Constants.PUNTO_VENTA, "escritura"));
+            menu.getMenu().findItem(R.id.action_pedido).setVisible(SQLite.usuario.VerificaPermiso(v.getContext(), Constants.PEDIDO, "escritura"));
             menu.setOnMenuItemClickListener(this);
             menu.show();
         }

@@ -158,6 +158,9 @@
         ALTER TABLE comprobante ADD COLUMN longdate INTEGER DEFAULT 0;
         ALTER TABLE comprobante ADD COLUMN formapago INTEGER DEFAULT 1;
         ALTER TABLE comprobante ADD COLUMN establecimientoprecioid INTEGER DEFAULT 0;
+        ALTER TABLE comprobante ADD COLUMN responsableid INTEGER DEFAULT 0;
+        ALTER TABLE comprobante ADD COLUMN estadoresponsable VARCHAR(2) DEFAULT \'\';
+        ALTER TABLE comprobante ADD COLUMN nombreresponsable VARCHAR(150) DEFAULT \'\';
     </string>
 
     <string name="dbDetalleComprobante">
@@ -405,6 +408,17 @@
             tipo INTEGER
         );
     </string>
+
+    <string name="dbVersion">
+        CREATE TABLE IF NOT EXISTS version(
+            idversion integer,
+            version varchar(100),
+            link varchar(250),
+            requerida varchar(1),
+            instalada verchar(1),
+            CONSTRAINT ukcanton UNIQUE(idversion)
+        );
+    </string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="update"><![CDATA[<u>Actualizar</u>]]></string>
@@ -418,8 +432,8 @@
     <string name="leyendaProforma"><![CDATA[*Este comprobante no tiene validez tributaria.]]></string>
     <string name="leyendaFactura"><![CDATA[*Este comprobante no tiene validez tributaria.
     Puede revisar su factura en <strong>https://comprobantes.sanisidrosa.com/</strong>,
-    utilice como usuario y contraseña su número de indentificación.]]></string>
+    utilice como usuario y contraseña su número de identificación.]]></string>
     <string name="leyendaFactura2">Este comprobante no tiene validez tributaria.
     Puede revisar su factura en https://comprobantes.sanisidrosa.com/,
-    por primera vez utilice como usuario y contraseña su número de indentificación.</string>
+    por primera vez utilice como usuario y contraseña su número de identificación.</string>
 </resources>

@@ -1,29 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorGrayLight2"
     android:fitsSystemWindows="true"
-    tools:context=".activities.ClienteActivity"
-    android:background="@color/colorGrayLight2">
+    tools:context=".activities.ClienteActivity">
 
-    <com.google.android.material.appbar.AppBarLayout
+    <com.google.android.material.appbar.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        xmlns:android="http://schemas.android.com/apk/res/android">
+        android:layout_height="wrap_content">
+
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/appbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"/>
+            android:background="?attr/colorPrimary" />
     </com.google.android.material.appbar.AppBarLayout>
 
-    <LinearLayout android:orientation="vertical"
-        android:layout_height="fill_parent"
+    <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_marginTop="55dp">
+        android:layout_height="fill_parent"
+        android:layout_marginTop="55dp"
+        android:orientation="vertical">
+
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -36,150 +37,165 @@
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:layout_margin="10dp"
                     android:orientation="vertical"
                     app:cardCornerRadius="6dp"
-                    app:cardElevation="10dp"
-                    android:layout_margin="10dp">
+                    app:cardElevation="10dp">
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
                         android:orientation="vertical"
-                        android:padding="5dp"
-                        android:layout_marginBottom="5dp">
+                        android:padding="5dp">
+
                         <TextView
                             android:id="@+id/lblInfoPersonal"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Información Personal"
                             android:layout_margin="5dp"
+                            android:drawableRight="@drawable/ic_row_up"
+                            android:text="Información Personal"
                             android:textColor="@color/colorDate"
                             android:textSize="18sp"
-                            android:drawableRight="@drawable/ic_row_up"
-                            android:textStyle="bold"/>
+                            android:textStyle="bold" />
 
                         <LinearLayout
                             android:id="@+id/lyInfoPersonal"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical">
+
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:weightSum="2">
+
                                 <LinearLayout
                                     android:layout_width="0dp"
-                                    android:layout_weight="1"
                                     android:layout_height="match_parent"
+                                    android:layout_weight="1"
                                     android:background="@drawable/border_radius_spinner">
+
                                     <Spinner
                                         android:id="@+id/spTipoDocumento"
                                         android:layout_width="match_parent"
                                         android:layout_height="match_parent"
-                                        android:spinnerMode="dropdown"/>
+                                        android:spinnerMode="dropdown" />
                                 </LinearLayout>
+
                                 <com.google.android.material.textfield.TextInputLayout
                                     android:layout_width="0dp"
-                                    android:layout_weight="1"
                                     android:layout_height="wrap_content"
-                                    android:hint="Identificación*"
-                                    android:textColorHint="@color/texthint"
+                                    android:layout_marginLeft="5dp"
+                                    android:layout_weight="1"
                                     android:background="@drawable/border_radius_spinner"
+                                    android:hint="Identificación*"
                                     android:paddingHorizontal="5dp"
-                                    android:layout_marginLeft="5dp">
-                                    <EditText android:layout_weight="40"
+                                    android:textColorHint="@color/texthint">
+
+                                    <EditText
                                         android:id="@+id/txtNIP"
                                         android:layout_width="match_parent"
-                                        android:inputType="phone"
-                                        android:textAlignment="center"
                                         android:layout_height="35dp"
+                                        android:layout_weight="40"
                                         android:background="@null"
-                                        android:selectAllOnFocus="true"/>
+                                        android:inputType="phone"
+                                        android:selectAllOnFocus="true"
+                                        android:textAlignment="center" />
                                 </com.google.android.material.textfield.TextInputLayout>
                             </LinearLayout>
 
                             <com.google.android.material.textfield.TextInputLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:hint="Razón Social*"
-                                android:textColorHint="@color/texthint"
-                                android:background="@drawable/border_radius_spinner"
                                 android:layout_marginTop="5dp"
-                                android:paddingHorizontal="5dp">
+                                android:background="@drawable/border_radius_spinner"
+                                android:hint="Razón Social*"
+                                android:paddingHorizontal="5dp"
+                                android:textColorHint="@color/texthint">
+
                                 <EditText
                                     android:id="@+id/txtRazonSocial"
                                     android:layout_width="match_parent"
-                                    android:inputType="textCapCharacters"
                                     android:layout_height="35dp"
                                     android:background="@null"
-                                    android:selectAllOnFocus="true"/>
+                                    android:inputType="textCapCharacters"
+                                    android:selectAllOnFocus="true" />
                             </com.google.android.material.textfield.TextInputLayout>
 
                             <com.google.android.material.textfield.TextInputLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:hint="Nombre Comercial"
-                                android:textColorHint="@color/texthint"
-                                android:background="@drawable/border_radius_spinner"
                                 android:layout_marginTop="5dp"
-                                android:paddingHorizontal="5dp">
+                                android:background="@drawable/border_radius_spinner"
+                                android:hint="Nombre Comercial"
+                                android:paddingHorizontal="5dp"
+                                android:textColorHint="@color/texthint">
+
                                 <EditText
                                     android:id="@+id/txtNombreComercial"
                                     android:layout_width="match_parent"
-                                    android:inputType="textCapCharacters"
                                     android:layout_height="35dp"
                                     android:background="@null"
-                                    android:selectAllOnFocus="true"/>
+                                    android:inputType="textCapCharacters"
+                                    android:selectAllOnFocus="true" />
                             </com.google.android.material.textfield.TextInputLayout>
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="5dp">
+
                                 <com.google.android.material.textfield.TextInputLayout
                                     android:layout_width="0dp"
-                                    android:layout_weight="1.35"
                                     android:layout_height="wrap_content"
-                                    android:hint="Latitud"
-                                    android:textColorHint="@color/colorPrimary"
+                                    android:layout_marginRight="2dp"
+                                    android:layout_weight="1.35"
                                     android:background="@drawable/border_radius_spinner"
+                                    android:hint="Latitud"
                                     android:paddingHorizontal="5dp"
-                                    android:layout_marginRight="2dp">
+                                    android:textColorHint="@color/colorPrimary">
+
                                     <EditText
                                         android:id="@+id/txtLatitud"
                                         android:layout_width="match_parent"
                                         android:layout_height="35dp"
-                                        android:enabled="false"
                                         android:background="@null"
-                                        android:selectAllOnFocus="true"/>
+                                        android:enabled="false"
+                                        android:selectAllOnFocus="true" />
                                 </com.google.android.material.textfield.TextInputLayout>
+
                                 <com.google.android.material.textfield.TextInputLayout
                                     android:layout_width="0dp"
-                                    android:layout_weight="1.35"
                                     android:layout_height="wrap_content"
-                                    android:hint="Longitud"
-                                    android:textColorHint="@color/colorPrimary"
+                                    android:layout_marginLeft="2dp"
+                                    android:layout_weight="1.35"
                                     android:background="@drawable/border_radius_spinner"
+                                    android:hint="Longitud"
                                     android:paddingHorizontal="5dp"
-                                    android:layout_marginLeft="2dp">
+                                    android:textColorHint="@color/colorPrimary">
+
                                     <EditText
                                         android:id="@+id/txtLongitud"
                                         android:layout_width="match_parent"
                                         android:layout_height="35dp"
-                                        android:enabled="false"
                                         android:background="@null"
-                                        android:selectAllOnFocus="true"/>
+                                        android:enabled="false"
+                                        android:selectAllOnFocus="true" />
                                 </com.google.android.material.textfield.TextInputLayout>
+
                                 <ImageButton
                                     android:id="@+id/btnObtenerDireccion"
-                                    android:layout_weight="0.3"
                                     android:layout_width="0dp"
                                     android:layout_height="45dp"
-                                    android:text="GPS"
-                                    android:src="@drawable/ic_location"
-                                    android:background="@drawable/border_radius_spinner"
                                     android:layout_gravity="center"
+                                    android:layout_marginLeft="2dp"
+                                    android:layout_weight="0.3"
+                                    android:background="@drawable/border_radius_spinner"
                                     android:clickable="true"
-                                    android:layout_marginLeft="2dp"/>
+                                    android:src="@drawable/ic_location"
+                                    android:text="GPS" />
                             </LinearLayout>
 
                             <LinearLayout
@@ -187,84 +203,95 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
                                 android:orientation="horizontal">
+
                                 <TextView
+                                    style="@style/EstiloText_Black2"
                                     android:layout_width="0dp"
-                                    android:layout_weight="1"
                                     android:layout_height="wrap_content"
+                                    android:layout_weight="1"
                                     android:text="Provincia"
-                                    android:textSize="12dp"
-                                    style="@style/EstiloText_Black2"/>
+                                    android:textSize="12dp" />
+
                                 <TextView
+                                    style="@style/EstiloText_Black2"
                                     android:layout_width="0dp"
-                                    android:layout_weight="1"
                                     android:layout_height="wrap_content"
+                                    android:layout_weight="1"
                                     android:text="Cantón"
-                                    android:textSize="12dp"
-                                    style="@style/EstiloText_Black2"/>
+                                    android:textSize="12dp" />
+
                                 <TextView
+                                    style="@style/EstiloText_Black2"
                                     android:layout_width="0dp"
-                                    android:layout_weight="1"
                                     android:layout_height="wrap_content"
+                                    android:layout_weight="1"
                                     android:text="Parroquia"
-                                    android:textSize="12dp"
-                                    style="@style/EstiloText_Black2"/>
+                                    android:textSize="12dp" />
                             </LinearLayout>
+
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:orientation="horizontal"
-                                android:layout_marginBottom="4dp">
+                                android:layout_marginBottom="4dp"
+                                android:orientation="horizontal">
+
                                 <LinearLayout
                                     android:layout_width="0dp"
-                                    android:layout_weight="1"
                                     android:layout_height="wrap_content"
-                                    android:background="@drawable/border_radius_spinner"
-                                    android:layout_marginRight="2dp">
+                                    android:layout_marginRight="2dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/border_radius_spinner">
+
                                     <Spinner
                                         android:id="@+id/cbProvincia"
                                         android:layout_width="match_parent"
-                                        android:layout_height="35dp"/>
+                                        android:layout_height="35dp" />
                                 </LinearLayout>
+
                                 <LinearLayout
                                     android:layout_width="0dp"
-                                    android:layout_weight="1"
                                     android:layout_height="wrap_content"
-                                    android:background="@drawable/border_radius_spinner"
-                                    android:layout_marginRight="2dp">
+                                    android:layout_marginRight="2dp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/border_radius_spinner">
+
                                     <Spinner
                                         android:id="@+id/cbCanton"
                                         android:layout_width="match_parent"
-                                        android:layout_height="35dp"/>
+                                        android:layout_height="35dp" />
                                 </LinearLayout>
+
                                 <LinearLayout
                                     android:layout_width="0dp"
-                                    android:layout_weight="1"
                                     android:layout_height="wrap_content"
+                                    android:layout_weight="1"
                                     android:background="@drawable/border_radius_spinner">
+
                                     <Spinner
                                         android:id="@+id/cbParroquia"
                                         android:layout_width="match_parent"
-                                        android:layout_height="35dp"/>
+                                        android:layout_height="35dp" />
                                 </LinearLayout>
                             </LinearLayout>
 
                             <com.google.android.material.textfield.TextInputLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:hint="Dirección 1*"
-                                android:textColorHint="@color/colorPrimaryDark"
-                                android:background="@drawable/border_radius_spinner"
                                 android:layout_marginTop="5dp"
-                                android:paddingHorizontal="5dp">
+                                android:background="@drawable/border_radius_spinner"
+                                android:hint="Dirección 1*"
+                                android:paddingHorizontal="5dp"
+                                android:textColorHint="@color/colorPrimaryDark">
+
                                 <EditText
                                     android:id="@+id/txtDireccion"
-                                    android:lines="2"
                                     android:layout_width="match_parent"
-                                    android:maxLines="2"
-                                    android:inputType="textMultiLine|textCapCharacters"
                                     android:layout_height="wrap_content"
                                     android:background="@null"
-                                    android:selectAllOnFocus="true"/>
+                                    android:inputType="textMultiLine|textCapCharacters"
+                                    android:lines="2"
+                                    android:maxLines="2"
+                                    android:selectAllOnFocus="true" />
                             </com.google.android.material.textfield.TextInputLayout>
                         </LinearLayout>
                     </LinearLayout>
@@ -273,114 +300,125 @@
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_marginBottom="5dp"
                     android:orientation="vertical"
                     app:cardCornerRadius="6dp"
-                    app:cardElevation="5dp"
-                    android:layout_marginHorizontal="10dp"
-                    android:layout_marginBottom="5dp">
+                    app:cardElevation="5dp">
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
                         android:orientation="vertical"
-                        android:padding="5dp"
-                        android:layout_marginBottom="5dp">
+                        android:padding="5dp">
+
                         <TextView
                             android:id="@+id/lblInfoContacto"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Información de Contacto"
                             android:layout_margin="5dp"
+                            android:drawableRight="@drawable/ic_row_up"
+                            android:text="Información de Contacto"
                             android:textColor="@color/colorDate"
                             android:textSize="18sp"
-                            android:textStyle="bold"
-                            android:drawableRight="@drawable/ic_row_up"/>
+                            android:textStyle="bold" />
 
                         <LinearLayout
                             android:id="@+id/lyInfoContacto"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical">
+
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:orientation="horizontal"
-                                android:layout_marginTop="3dp">
+                                android:layout_marginTop="3dp"
+                                android:orientation="horizontal">
+
                                 <com.google.android.material.textfield.TextInputLayout
                                     android:layout_width="0dp"
-                                    android:layout_weight="1"
                                     android:layout_height="wrap_content"
-                                    android:hint="Celular"
-                                    android:textColorHint="@color/texthint"
+                                    android:layout_marginRight="2dp"
+                                    android:layout_weight="1"
                                     android:background="@drawable/border_radius_spinner"
+                                    android:hint="Celular"
                                     android:paddingHorizontal="5dp"
-                                    android:layout_marginRight="2dp">
+                                    android:textColorHint="@color/texthint">
+
                                     <EditText
                                         android:id="@+id/txtfono1"
                                         android:layout_width="match_parent"
-                                        android:inputType="phone"
-                                        android:textAlignment="center"
-                                        android:layout_height="35dp" android:hint=""
-                                        android:paddingHorizontal="5dp"
+                                        android:layout_height="35dp"
                                         android:background="@null"
-                                        android:selectAllOnFocus="true"/>
+                                        android:hint=""
+                                        android:inputType="phone"
+                                        android:paddingHorizontal="5dp"
+                                        android:selectAllOnFocus="true"
+                                        android:textAlignment="center" />
                                 </com.google.android.material.textfield.TextInputLayout>
+
                                 <com.google.android.material.textfield.TextInputLayout
                                     android:layout_width="0dp"
-                                    android:layout_weight="1"
                                     android:layout_height="wrap_content"
-                                    android:hint="Convencional"
-                                    android:textColorHint="@color/texthint"
+                                    android:layout_marginLeft="2dp"
+                                    android:layout_weight="1"
                                     android:background="@drawable/border_radius_spinner"
+                                    android:hint="Convencional"
                                     android:paddingHorizontal="5dp"
-                                    android:layout_marginLeft="2dp">
+                                    android:textColorHint="@color/texthint">
+
                                     <EditText
                                         android:id="@+id/txtfono2"
                                         android:layout_width="match_parent"
-                                        android:inputType="phone"
-                                        android:textAlignment="center"
                                         android:layout_height="35dp"
-                                        android:hint=""
-                                        android:paddingHorizontal="5dp"
                                         android:background="@null"
-                                        android:selectAllOnFocus="true"/>
+                                        android:hint=""
+                                        android:inputType="phone"
+                                        android:paddingHorizontal="5dp"
+                                        android:selectAllOnFocus="true"
+                                        android:textAlignment="center" />
                                 </com.google.android.material.textfield.TextInputLayout>
                             </LinearLayout>
+
                             <com.google.android.material.textfield.TextInputLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:hint="Correo"
-                                android:textColorHint="@color/texthint"
-                                android:background="@drawable/border_radius_spinner"
                                 android:layout_marginTop="5dp"
-                                android:paddingHorizontal="5dp">
+                                android:background="@drawable/border_radius_spinner"
+                                android:hint="Correo"
+                                android:paddingHorizontal="5dp"
+                                android:textColorHint="@color/texthint">
+
                                 <EditText
                                     android:id="@+id/txtCorreo"
                                     android:layout_width="match_parent"
-                                    android:inputType="textEmailAddress"
                                     android:layout_height="35dp"
-                                    android:hint=""
                                     android:background="@null"
-                                    android:selectAllOnFocus="true"/>
+                                    android:hint=""
+                                    android:inputType="textEmailAddress"
+                                    android:selectAllOnFocus="true" />
                             </com.google.android.material.textfield.TextInputLayout>
 
                             <com.google.android.material.textfield.TextInputLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:hint="Observación"
-                                android:textColorHint="@color/texthint"
-                                android:background="@drawable/border_radius_spinner"
                                 android:layout_marginTop="5dp"
-                                android:paddingHorizontal="5dp">
+                                android:background="@drawable/border_radius_spinner"
+                                android:hint="Observación"
+                                android:paddingHorizontal="5dp"
+                                android:textColorHint="@color/texthint">
+
                                 <EditText
                                     android:id="@+id/txtObservacion"
-                                    android:lines="3"
                                     android:layout_width="match_parent"
-                                    android:maxLines="3"
-                                    android:inputType="textMultiLine|textCapCharacters"
                                     android:layout_height="wrap_content"
-                                    android:background="@null"/>
+                                    android:background="@null"
+                                    android:inputType="textMultiLine|textCapCharacters"
+                                    android:lines="3"
+                                    android:maxLines="3" />
                             </com.google.android.material.textfield.TextInputLayout>
-                    </LinearLayout>
+                        </LinearLayout>
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
@@ -388,40 +426,43 @@
                     android:id="@+id/cvInfo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_marginVertical="5dp"
                     android:orientation="vertical"
                     app:cardCornerRadius="6dp"
-                    app:cardElevation="5dp"
-                    android:layout_marginHorizontal="10dp"
-                    android:layout_marginVertical="5dp">
+                    app:cardElevation="5dp">
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
                         android:orientation="vertical"
-                        android:padding="5dp"
-                        android:layout_marginBottom="5dp">
+                        android:padding="5dp">
+
                         <TextView
                             android:id="@+id/lblInfoAdicional"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Información Adicional"
                             android:layout_margin="5dp"
+                            android:drawableRight="@drawable/ic_row_up"
+                            android:text="Información Adicional"
                             android:textColor="@color/colorDate"
                             android:textSize="18sp"
-                            android:textStyle="bold"
-                            android:drawableRight="@drawable/ic_row_up"/>
+                            android:textStyle="bold" />
 
                         <LinearLayout
                             android:id="@+id/lyInfoAdicional"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:layout_marginHorizontal="5dp">
-                                <TextView
-                                    android:id="@+id/lblInfo"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:text="Fecha Registro: "
-                                    style="@style/TextAppearance.AppCompat.Widget.PopupMenu.Small"/>
+                            android:layout_marginHorizontal="5dp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/lblInfo"
+                                style="@style/TextAppearance.AppCompat.Widget.PopupMenu.Small"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Fecha Registro: " />
                         </LinearLayout>
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>

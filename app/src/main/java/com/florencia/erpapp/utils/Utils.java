@@ -55,17 +55,17 @@ import java.util.zip.DataFormatException;
 
 public class Utils {
     // UNICODE 0x23 = #
-    public static final byte[] UNICODE_TEXT = new byte[] {0x23, 0x23, 0x23,
-            0x23, 0x23, 0x23,0x23, 0x23, 0x23,0x23, 0x23, 0x23,0x23, 0x23, 0x23,
-            0x23, 0x23, 0x23,0x23, 0x23, 0x23,0x23, 0x23, 0x23,0x23, 0x23, 0x23,
+    public static final byte[] UNICODE_TEXT = new byte[]{0x23, 0x23, 0x23,
+            0x23, 0x23, 0x23, 0x23, 0x23, 0x23, 0x23, 0x23, 0x23, 0x23, 0x23, 0x23,
+            0x23, 0x23, 0x23, 0x23, 0x23, 0x23, 0x23, 0x23, 0x23, 0x23, 0x23, 0x23,
             0x23, 0x23, 0x23};
 
     private static String hexStr = "0123456789ABCDEF";
-    private static String[] binaryArray = { "0000", "0001", "0010", "0011",
+    private static String[] binaryArray = {"0000", "0001", "0010", "0011",
             "0100", "0101", "0110", "0111", "1000", "1001", "1010", "1011",
-            "1100", "1101", "1110", "1111" };
+            "1100", "1101", "1110", "1111"};
 
-    public static byte[] decodeBitmap(Bitmap bmp){
+    public static byte[] decodeBitmap(Bitmap bmp) {
         int bmpWidth = bmp.getWidth();
         int bmpHeight = bmp.getHeight();
 
@@ -128,7 +128,7 @@ public class Utils {
         heightHexString = heightHexString + "00";
 
         List<String> commandList = new ArrayList<String>();
-        commandList.add(commandHexString+widthHexString+heightHexString);
+        commandList.add(commandHexString + widthHexString + heightHexString);
         commandList.addAll(bmpHexList);
 
         return hexList2Byte(commandList);
@@ -209,54 +209,55 @@ public class Utils {
         return (byte) "0123456789ABCDEF".indexOf(c);
     }
 
-    public static String getDateNow(){
-        String fecha="";
+    public static String getDateNow() {
+        String fecha = "";
         try {
             Locale idioma = new Locale("es", "ES");
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", idioma);
             Date date = new Date();
             fecha = dateFormat.format(date);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return fecha;
     }
 
 
-    public static String getDateFormat(String formato){
+    public static String getDateFormat(String formato) {
         String fecha = "";
         try {
             Locale idioma = new Locale("es", "ES");
-            SimpleDateFormat sdf = new SimpleDateFormat(formato,idioma);
+            SimpleDateFormat sdf = new SimpleDateFormat(formato, idioma);
             fecha = sdf.format(new Date());
-        }catch (Exception e){
-            fecha="";
+        } catch (Exception e) {
+            fecha = "";
         }
         return fecha;
     }
 
-    public static void showMessage(Context context, String Message){
-        try{
+    public static void showMessage(Context context, String Message) {
+        try {
             Toast.makeText(context, Message, Toast.LENGTH_LONG).show();
-        }catch (Exception e){
-            Toast.makeText(context, "MostrarError(): "+ e.getMessage(), Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(context, "MostrarError(): " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
-    public static void showMessageShort(Context context, String Message){
-        try{
+
+    public static void showMessageShort(Context context, String Message) {
+        try {
             Toast.makeText(context, Message, Toast.LENGTH_SHORT).show();
-        }catch (Exception e){
-            Toast.makeText(context, "MostrarError(): "+ e.getMessage(), Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            Toast.makeText(context, "MostrarError(): " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
     public static Double RoundDecimal(Double numero, Integer numeroDecimales) {
-        return (double)Math.round(numero * Math.pow(10, numeroDecimales)) / Math.pow(10, numeroDecimales);
+        return (double) Math.round(numero * Math.pow(10, numeroDecimales)) / Math.pow(10, numeroDecimales);
     }
 
-    public static void verificarPermisos(Activity context){
+    public static void verificarPermisos(Activity context) {
         ArrayList<String> pe = new ArrayList<>();
-        try{
+        try {
             if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                     && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
                     && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -265,28 +266,28 @@ public class Utils {
                 pe.add(Manifest.permission.ACCESS_COARSE_LOCATION);
             }
             //if(ActivityCompat.checkSelfPermission(context,Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED)
-              //  pe.add(Manifest.permission.READ_CONTACTS);
-            if(ActivityCompat.checkSelfPermission(context,Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
-                    || ActivityCompat.checkSelfPermission(context,Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            //  pe.add(Manifest.permission.READ_CONTACTS);
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                    || ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 pe.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
                 pe.add(Manifest.permission.READ_EXTERNAL_STORAGE);
             }
 
-            if(ActivityCompat.checkSelfPermission(context,Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
                 pe.add(Manifest.permission.CAMERA);
 
-            if(ActivityCompat.checkSelfPermission(context,Manifest.permission.INSTALL_PACKAGES) != PackageManager.PERMISSION_GRANTED)
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.INSTALL_PACKAGES) != PackageManager.PERMISSION_GRANTED)
                 pe.add(Manifest.permission.INSTALL_PACKAGES);
 
-            if(pe.size()>0) {
+            if (pe.size() > 0) {
                 String[] permisos = new String[pe.size()];
-                for (int i=0; i<pe.size();i++)
-                    permisos[i]=pe.get(i);
+                for (int i = 0; i < pe.size(); i++)
+                    permisos[i] = pe.get(i);
                 ActivityCompat.requestPermissions(context, permisos, 1000);
             }
 
-        }catch (Exception e){
-            Log.d("TAGP",e.getMessage());
+        } catch (Exception e) {
+            Log.d("TAGP", e.getMessage());
         }
     }
 
@@ -297,12 +298,14 @@ public class Utils {
         NetworkInfo networkInfo = null; //connectivityManager.getActiveNetworkInfo();
         return networkInfo != null && networkInfo.isAvailable() && networkInfo.isConnected();
     }
+
     //fin de "metodo verficar conexion a internet"
     public static boolean isTablet(Context context) {
         return (context.getResources().getConfiguration().screenLayout
                 & Configuration.SCREENLAYOUT_SIZE_MASK)
                 >= Configuration.SCREENLAYOUT_SIZE_LARGE;
     }
+
     public static boolean verificaConexion1(Context ctx) {
         boolean bConectado = false;
         ConnectivityManager connec = (ConnectivityManager) ctx
@@ -318,11 +321,12 @@ public class Utils {
         }
         return bConectado;
     }
-    public static boolean isOnlineNet( String IPServer) {
+
+    public static boolean isOnlineNet(String IPServer) {
 
         try {
             Process p = Runtime.getRuntime().getRuntime().exec(Constants.PING_Server + IPServer);
-            int val           = p.waitFor();
+            int val = p.waitFor();
             boolean reachable = (val == 0);
             return reachable;
 
@@ -346,103 +350,104 @@ public class Utils {
     /////// Fin Animacion ///////////////
 
 
-    public static String FormatoMoneda(Double valor, int numeroDecimales){
+    public static String FormatoMoneda(Double valor, int numeroDecimales) {
         String retorno = "$0,00";
         try {
-            NumberFormat format = NumberFormat.getCurrencyInstance(new Locale("es", "EC"));
+            NumberFormat format = NumberFormat.getCurrencyInstance(new Locale("en", "US"));
             valor = RoundDecimal(valor, numeroDecimales);
             retorno = format.format(valor);
-        }catch (Exception e){
-            Log.d("TAGERROR","FormatoMoneda(): " + e.getMessage());
+        } catch (Exception e) {
+            Log.d("TAGERROR", "FormatoMoneda(): " + e.getMessage());
         }
         return retorno;
     }
 
-    public static long longDate(String fecha){
-        long lon =0;
+    public static long longDate(String fecha) {
+        long lon = 0;
         try {
             Locale idioma = new Locale("es", "ES");
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", idioma);
-            Date date =dateFormat.parse(fecha);
+            Date date = dateFormat.parse(fecha);
             lon = date.getTime();
-        }catch (ParseException e){
+        } catch (ParseException e) {
             lon = 0;
-            Log.d("TAGFECHA",e.getMessage());
+            Log.d("TAGFECHA", e.getMessage());
         }
         return lon;
 
     }
 
-    public static void MostrarTeclado(Context context, EditText et){
+    public static void MostrarTeclado(Context context, EditText et) {
         et.requestFocus();//Asegurar que editText tiene focus
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.showSoftInput(et, InputMethodManager.SHOW_FORCED);
     }
-    public static void EfectoLayout(LinearLayout lyEfecto){
-        if (lyEfecto.getVisibility() == View.GONE){
+
+    public static void EfectoLayout(LinearLayout lyEfecto) {
+        if (lyEfecto.getVisibility() == View.GONE) {
             lyEfecto.setVisibility(View.VISIBLE);
-        }else if (lyEfecto.getVisibility() == View.VISIBLE){
+        } else if (lyEfecto.getVisibility() == View.VISIBLE) {
             lyEfecto.setVisibility(View.GONE);
         }
     }
 
-    public static void EfectoLayout(View lyEfecto, TextView lblEfecto){
-        if (lyEfecto.getVisibility() == View.GONE){
+    public static void EfectoLayout(View lyEfecto, TextView lblEfecto) {
+        if (lyEfecto.getVisibility() == View.GONE) {
             lyEfecto.setVisibility(View.VISIBLE);
-            lblEfecto.setCompoundDrawablesWithIntrinsicBounds( 0, 0, R.drawable.ic_row_up,0);
-        }else if (lyEfecto.getVisibility() == View.VISIBLE){
+            lblEfecto.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_row_up, 0);
+        } else if (lyEfecto.getVisibility() == View.VISIBLE) {
             lyEfecto.setVisibility(View.GONE);
-            lblEfecto.setCompoundDrawablesWithIntrinsicBounds( 0, 0, R.drawable.ic_row_down,0);
+            lblEfecto.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_row_down, 0);
         }
     }
 
-    public static void showErrorDialog(Activity context, String title, String message){
-        try{
+    public static void showErrorDialog(Activity context, String title, String message) {
+        try {
             AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AlertDialogTheme);
             View view = LayoutInflater.from(context).inflate(R.layout.layout_error_dialog,
                     (ConstraintLayout) context.findViewById(R.id.lyDialogContainer));
             builder.setView(view);
-            ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_info);
+            ((ImageView) view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_info);
             ((TextView) view.findViewById(R.id.lblTitle)).setText(title);
             ((TextView) view.findViewById(R.id.lblMessage)).setText(message);
-            ((Button)view.findViewById(R.id.btnAction)).setText("Ok");
+            ((Button) view.findViewById(R.id.btnAction)).setText("Ok");
             final AlertDialog alertDialog = builder.create();
             view.findViewById(R.id.btnAction).setOnClickListener(v -> alertDialog.dismiss());
-            if(alertDialog.getWindow()!=null)
+            if (alertDialog.getWindow() != null)
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
             alertDialog.show();
-        }catch (Exception e){
-            Log.d("TAGUTILS","showErrorDialog(): " + e.getMessage());
+        } catch (Exception e) {
+            Log.d("TAGUTILS", "showErrorDialog(): " + e.getMessage());
         }
     }
 
-    public static void showSuccessDialog(Activity context, String title, String message, boolean finishActivity, boolean returnOK){
-        try{
+    public static void showSuccessDialog(Activity context, String title, String message, boolean finishActivity, boolean returnOK) {
+        try {
             AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AlertDialogTheme);
             View view = LayoutInflater.from(context).inflate(R.layout.layout_success_dialog,
                     (ConstraintLayout) context.findViewById(R.id.lyDialogContainer));
             builder.setView(view);
-            ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_info);
+            ((ImageView) view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_info);
             ((TextView) view.findViewById(R.id.lblTitle)).setText(title);
             ((TextView) view.findViewById(R.id.lblMessage)).setText(message);
-            ((Button)view.findViewById(R.id.btnAction)).setText("Ok");
+            ((Button) view.findViewById(R.id.btnAction)).setText("Ok");
             final AlertDialog alertDialog = builder.create();
             view.findViewById(R.id.btnAction).setOnClickListener(
-                (v)-> {
-                    if(returnOK){
-                        context.setResult(Activity.RESULT_OK);
-                        context.finish();
-                    }else if(finishActivity)
-                        context.finish();
-                    else
-                        alertDialog.dismiss();
-                }
+                    (v) -> {
+                        if (returnOK) {
+                            context.setResult(Activity.RESULT_OK);
+                            context.finish();
+                        } else if (finishActivity)
+                            context.finish();
+                        else
+                            alertDialog.dismiss();
+                    }
             );
-            if(alertDialog.getWindow()!=null)
+            if (alertDialog.getWindow() != null)
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
             alertDialog.show();
-        }catch (Exception e){
-            Log.d("TAGUTILS","showSuccessDialog(): " + e.getMessage());
+        } catch (Exception e) {
+            Log.d("TAGUTILS", "showSuccessDialog(): " + e.getMessage());
         }
     }
 
@@ -457,27 +462,27 @@ public class Utils {
             Date d = c.getTime();
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", idioma);
             retorno = dateFormat.format(d);
-        }catch (Exception e) {
+        } catch (Exception e) {
             Log.d("TAGUTILS", "SumarFecha(): " + e.getMessage());
         }
         return retorno;
     }
 
-    public static boolean CopyToClipboard(Context c, String text){
+    public static boolean CopyToClipboard(Context c, String text) {
         boolean retorno = false;
-        try{
+        try {
             ClipboardManager clipboard = (ClipboardManager) c.getSystemService(Context.CLIPBOARD_SERVICE);
-            ClipData clip = ClipData.newPlainText("text",  text);
+            ClipData clip = ClipData.newPlainText("text", text);
             clipboard.setPrimaryClip(clip);
             showMessage(c, "Enlace de descarga copiado al portapapeles");
             retorno = true;
-        }catch (Exception e){
+        } catch (Exception e) {
             retorno = false;
         }
         return retorno;
     }
 
-    public static String getMes(int mes, boolean abreviatura){
+    public static String getMes(int mes, boolean abreviatura) {
         String[] meses = new String[]{"Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
                 "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"};
         String[] meses_ab = new String[]{"Ene", "Feb", "Mar", "Abr", "May", "Jun",
@@ -486,10 +491,10 @@ public class Utils {
     }
 
     public static String fechaMes(String fecha) {
-        if(fecha.equals(""))
+        if (fecha.equals(""))
             fecha = Utils.getDateFormat("yyyy-MM-dd");
         String[] newF = fecha.split("-");
-        fecha = newF[2] + "-" + Utils.getMes(Integer.valueOf( newF[1])-1,true) + "-" + newF[0];
+        fecha = newF[2] + "-" + Utils.getMes(Integer.valueOf(newF[1]) - 1, true) + "-" + newF[0];
         return fecha;
     }
 
@@ -505,68 +510,68 @@ public class Utils {
         }
     }
 
-    public static String convertImageToString(Bitmap bitmap){
-        String base64="";
-        try{
+    public static String convertImageToString(Bitmap bitmap) {
+        String base64 = "";
+        try {
             ByteArrayOutputStream array = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, array);
             byte[] imageByteO = array.toByteArray();
-            double MB = ((double) imageByteO.length/1024d)/1024d;
+            double MB = ((double) imageByteO.length / 1024d) / 1024d;
             Log.d("TAGUTILS", "MB Original: " + MB);
-            if(MB > 1) {//Si pesa más de 1MB se comprime
-                double proporcion = MB>4 ? 0.6 : 0.7;
+            if (MB > 1) {//Si pesa más de 1MB se comprime
+                double proporcion = MB > 4 ? 0.6 : 0.7;
                 int bitmapWidth = (int) (((double) bitmap.getWidth()) * proporcion); // para utilizar width de la imagen original: bitmap.getWidth();
                 int bitmapHeight = (int) (((double) bitmap.getHeight()) * proporcion); // para utilizar height de la imagen original: bitmap.getHeight();
                 Bitmap bitmapout = Bitmap.createScaledBitmap(bitmap, bitmapWidth, bitmapHeight, false);
 
                 array = new ByteArrayOutputStream();
-                bitmapout.compress(Bitmap.CompressFormat.JPEG, MB>4 ? 80 : 90, array);
+                bitmapout.compress(Bitmap.CompressFormat.JPEG, MB > 4 ? 80 : 90, array);
                 byte[] imageByteC = array.toByteArray();
                 base64 = Base64.encodeToString(imageByteC, Base64.DEFAULT);
-                Log.d("TAGUTILS", "MB Comp: "+ (((double)imageByteC.length/1024d)/1024d) +" - Bytes Comprimido: " + imageByteC.length);
-            }else {
+                Log.d("TAGUTILS", "MB Comp: " + (((double) imageByteC.length / 1024d) / 1024d) + " - Bytes Comprimido: " + imageByteC.length);
+            } else {
                 base64 = Base64.encodeToString(imageByteO, Base64.DEFAULT);
                 Log.d("TAGUTILS", "Bytes Original: " + imageByteO.length);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d("TAGUTILS", "convertImageToString(): " + e.getMessage());
         }
         return base64;
     }
 
     public static void insert_image(String sourceFile, String destinationFile) {
-        try{
+        try {
 
             File inFile = new File(sourceFile);
             File outFile = new File(destinationFile);
 
             FileInputStream in = new FileInputStream(inFile);
-            FileOutputStream out =new FileOutputStream(outFile);
+            FileOutputStream out = new FileOutputStream(outFile);
 
             byte[] buffer = new byte[1024];
             int c;
 
 
-            while( (c = in.read(buffer) ) != -1)
+            while ((c = in.read(buffer)) != -1)
                 out.write(buffer, 0, c);
 
             out.flush();
             in.close();
             out.close();
 
-        } catch(IOException e) {
+        } catch (IOException e) {
 
             Log.d("insert_image(): ", e.getMessage());
 
         }
     }
 
-    public static void insert_image(Bitmap bitmap, String name, String path, ContentResolver cr){
-        try{
+    public static void insert_image(Bitmap bitmap, String name, String path, ContentResolver cr) {
+        try {
             double proporcion = 0.5;
             String newPath = path + File.separator + name;
-            int bitmapWidth = (int)(((double) bitmap.getWidth())*proporcion); // para utilizar width de la imagen original: bitmap.getWidth();
-            int bitmapHeight = (int) (((double) bitmap.getHeight())*proporcion); // para utilizar height de la imagen original: bitmap.getHeight();
+            int bitmapWidth = (int) (((double) bitmap.getWidth()) * proporcion); // para utilizar width de la imagen original: bitmap.getWidth();
+            int bitmapHeight = (int) (((double) bitmap.getHeight()) * proporcion); // para utilizar height de la imagen original: bitmap.getHeight();
             Bitmap bitmapout = Bitmap.createScaledBitmap(bitmap, bitmapWidth, bitmapHeight, false);
 
             bitmapout.compress(Bitmap.CompressFormat.JPEG, 80, new FileOutputStream(newPath));
@@ -576,13 +581,13 @@ public class Utils {
             ContentValues values = new ContentValues();
             values.put(MediaStore.Images.Media.TITLE, "Titulo");
             values.put(MediaStore.Images.Media.DESCRIPTION, "Descripción");
-            values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis ());
+            values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis());
             values.put(MediaStore.Images.ImageColumns.BUCKET_ID, filefinal.toString().toLowerCase(Locale.getDefault()).hashCode());
             values.put(MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME, filefinal.getName().toLowerCase(Locale.getDefault()));
             values.put("_data", filefinal.getAbsolutePath());
             cr.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
             Log.d("TAGUTILS", newPath);
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d("TAGUTILS", "insert_image(): " + e.getMessage());
         }
     }

@@ -43,6 +43,7 @@ import com.florencia.erpapp.models.DetalleComprobante;
 import com.florencia.erpapp.models.DetallePedido;
 import com.florencia.erpapp.models.DetallePedidoInv;
 import com.florencia.erpapp.models.Producto;
+import com.florencia.erpapp.utils.Constants;
 import com.florencia.erpapp.utils.Utils;
 import com.shasin.notificationbanner.Banner;
 
@@ -51,7 +52,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.ProductoViewHolder>{
+public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.ProductoViewHolder> {
     private static String TAG = "TAGDETALLEPRODUCTO_ADAPTER";
     public List<Producto> listProductos;
     private List<Producto> orginalItems = new ArrayList<>();
@@ -85,33 +86,34 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.Produc
     public void onBindViewHolder(@NonNull ProductoViewHolder holder, int position) {
         holder.bindProducto(listProductos.get(position));
     }
+
     @Override
     public int getItemCount() {
         return listProductos.size();
     }
 
-    public void filter(final String busqueda){
+    public void filter(final String busqueda) {
         listProductos.clear();
-        if(busqueda.length()==0){
+        if (busqueda.length() == 0) {
             //listProductos.addAll(orginalItems);
             filter_by_clasif(clasificacionid);
-        }else{
+        } else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 List<Producto> collect = orginalItems.stream()
                         .filter(i -> i.nombreproducto.toLowerCase()
                                 .concat(i.codigoproducto.toLowerCase())
                                 .concat(i.numerolote.toLowerCase())
                                 .contains(busqueda.toLowerCase()) &&
-                                (clasificacionid != -1?i.clasificacionid:1) == (clasificacionid != -1?clasificacionid:1))
+                                (clasificacionid != -1 ? i.clasificacionid : 1) == (clasificacionid != -1 ? clasificacionid : 1))
                         .collect(Collectors.<Producto>toList());
                 listProductos.addAll(collect);
-            }else{
-                for(Producto i: orginalItems){
-                    if(i.nombreproducto.toLowerCase()
+            } else {
+                for (Producto i : orginalItems) {
+                    if (i.nombreproducto.toLowerCase()
                             .concat(i.codigoproducto.toLowerCase())
                             .concat(i.numerolote.toLowerCase())
                             .contains(busqueda.toLowerCase()) &&
-                            (clasificacionid != -1?i.clasificacionid:1) == (clasificacionid != -1?clasificacionid:1))
+                            (clasificacionid != -1 ? i.clasificacionid : 1) == (clasificacionid != -1 ? clasificacionid : 1))
                         listProductos.add(i);
                 }
             }
@@ -119,13 +121,13 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.Produc
         notifyDataSetChanged();
     }
 
-    public void filter_by_clasif(final Integer clasificacionid){
-        try{
+    public void filter_by_clasif(final Integer clasificacionid) {
+        try {
             this.clasificacionid = clasificacionid;
             listProductos.clear();
-            if(clasificacionid.equals(-1)){
+            if (clasificacionid.equals(-1)) {
                 listProductos.addAll(orginalItems);
-            }else {
+            } else {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     List<Producto> collect = orginalItems.stream()
                             .filter(i -> i.clasificacionid
@@ -140,7 +142,7 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.Produc
                 }
             }
             notifyDataSetChanged();
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, "filter_by_clasif(): " + e.getMessage());
         }
     }
@@ -151,13 +153,13 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.Produc
         Utils.animateCircularReveal(holder.itemView);
     }*/
 
-    class ProductoViewHolder extends RecyclerView.ViewHolder{
+    class ProductoViewHolder extends RecyclerView.ViewHolder {
 
         TextView tvNombreProducto, tvPrecio, tvStock;
         ImageButton btnInfo;
         CheckBox ckIva;
 
-        ProductoViewHolder(@NonNull View itemView){
+        ProductoViewHolder(@NonNull View itemView) {
             super(itemView);
             tvNombreProducto = itemView.findViewById(R.id.tv_NombreProducto);
             tvPrecio = itemView.findViewById(R.id.tv_Precio);
@@ -166,79 +168,80 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.Produc
             btnInfo = itemView.findViewById(R.id.btnInfo);
         }
 
-        void bindProducto(final Producto producto){
+        void bindProducto(final Producto producto) {
 
             try {
                 tvNombreProducto.setText(producto.nombreproducto);
                 ckIva.setChecked(producto.porcentajeiva > 0);
 
-                if(tipobusqueda.equals("4,20") || tipobusqueda.equals("20,4")) {//TRANSFERENCIAS
+                if (tipobusqueda.equals("4,20") || tipobusqueda.equals("20,4")) {//TRANSFERENCIAS
                     ckIva.setVisibility(View.GONE);
                     btnInfo.setVisibility(View.GONE);
-                    tvPrecio.setText(("P. Costo: " + Utils.FormatoMoneda(producto.lotes.get(0).preciocosto,2))
-                            .concat("\n")
+                    tvPrecio.setText(//("P. Costo: " + Utils.FormatoMoneda(producto.lotes.get(0).preciocosto, 2))
+                            ("\n")
                             .concat("Vence: " + producto.lotes.get(0).fechavencimiento));
-                    tvStock.setText(("Stock: " + Utils.RoundDecimal(producto.lotes.get(0).stock,2))
+                    tvStock.setText(("Stock: " + Utils.RoundDecimal(producto.lotes.get(0).stock, 2))
                             .concat("\n")
                             .concat("Lote: " + producto.lotes.get(0).numerolote));
-                }else {
+                } else {
                     ckIva.setVisibility(View.VISIBLE);
                     btnInfo.setVisibility(View.VISIBLE);
-                    tvPrecio.setText("PVP: " + Utils.FormatoMoneda(producto.getPrecioSugerido(),2));
-                    if(producto.stock>0 && producto.tipo.equalsIgnoreCase("P")) {
+                    tvPrecio.setText("PVP: " + Utils.FormatoMoneda(producto.getPrecioSugerido(), 2));
+                    if (producto.stock > 0 && producto.tipo.equalsIgnoreCase("P")) {
                         tvStock.setText("Stock: " + Utils.RoundDecimal(producto.stock, 2));
                         tvStock.setTextColor(Color.BLACK);
-                    }else if(producto.tipo.equalsIgnoreCase("S")) {
+                    } else if (producto.tipo.equalsIgnoreCase("S")) {
                         tvStock.setText("SERVICIO");
                         tvStock.setTextColor(Color.BLACK);
-                    }else{
+                    } else {
                         tvStock.setText("Sin stock");
                         tvStock.setTextColor(itemView.getContext().getResources().getColor(R.color.texthintenabled));
                     }
                 }
 
 
-                itemView.setOnClickListener(v -> IngresarCantidad(v.getContext(),listProductos.get(getAdapterPosition())));
-                btnInfo.setOnClickListener(v ->{
-                        DialogFragment dialogFragment = new InfoItemDialogFragment();
-                        Bundle bundle = new Bundle();
-                        bundle.putInt("idproducto", listProductos.get(getAdapterPosition()).idproducto);
-                        dialogFragment.setArguments(bundle);
-                        dialogFragment.show(activity.getSupportFragmentManager(), "dialog");
-                    });
-            }catch (Exception e){
-                Log.d(TAG,e.getMessage());
+                itemView.setOnClickListener(v -> IngresarCantidad(v.getContext(), listProductos.get(getAdapterPosition())));
+                btnInfo.setOnClickListener(v -> {
+                    DialogFragment dialogFragment = new InfoItemDialogFragment();
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("idproducto", listProductos.get(getAdapterPosition()).idproducto);
+                    dialogFragment.setArguments(bundle);
+                    dialogFragment.show(activity.getSupportFragmentManager(), "dialog");
+                });
+            } catch (Exception e) {
+                Log.d(TAG, e.getMessage());
             }
 
         }
+
         @SuppressLint("RestrictedApi")
-        void IngresarCantidad(Context context, Producto producto){
+        void IngresarCantidad(Context context, Producto producto) {
             try {
 
-                if(tipobusqueda.equals("01") || tipobusqueda.equals("PR")) {
+                if (tipobusqueda.equals("01") || tipobusqueda.equals("PR")) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         if (productosSelected.stream().filter(i -> i.producto.equals(producto)).
                                 collect(Collectors.toList()).size() > 0) {
-                            Banner.make(rootView,activity,Banner.WARNING, "Item ya seleccionado...", Banner.BOTTOM,2000).show();
+                            Banner.make(rootView, activity, Banner.WARNING, "Item ya seleccionado...", Banner.BOTTOM, 2000).show();
                             return;
                         }
                     } else {
                         for (DetalleComprobante detalle : productosSelected) {
                             if (detalle.producto.equals(producto)) {
-                                Banner.make(rootView,activity,Banner.WARNING, "Item ya seleccionado...", Banner.BOTTOM,2000).show();
+                                Banner.make(rootView, activity, Banner.WARNING, "Item ya seleccionado...", Banner.BOTTOM, 2000).show();
                                 return;
                             }
                         }
                     }
-                }else if(tipobusqueda.equals("PC") || tipobusqueda.equals("PI")){
+                } else if (tipobusqueda.equals("PC") || tipobusqueda.equals("PI")) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        if(tipobusqueda.equals("PC")) {
+                        if (tipobusqueda.equals("PC")) {
                             if (productosSelectedP.stream().filter(i -> i.producto.equals(producto)).
                                     collect(Collectors.toList()).size() > 0) {
                                 Banner.make(rootView, activity, Banner.WARNING, "Item ya seleccionado...", Banner.BOTTOM, 2000).show();
                                 return;
                             }
-                        }else if(tipobusqueda.equals("PI")){
+                        } else if (tipobusqueda.equals("PI")) {
                             if (productosSelectedPI.stream().filter(i -> i.producto.equals(producto)).
                                     collect(Collectors.toList()).size() > 0) {
                                 Banner.make(rootView, activity, Banner.WARNING, "Item ya seleccionado...", Banner.BOTTOM, 2000).show();
@@ -246,14 +249,14 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.Produc
                             }
                         }
                     } else {
-                        if(tipobusqueda.equals("PC")) {
+                        if (tipobusqueda.equals("PC")) {
                             for (DetallePedido detalle : productosSelectedP) {
                                 if (detalle.producto.equals(producto)) {
                                     Banner.make(rootView, activity, Banner.WARNING, "Item ya seleccionado...", Banner.BOTTOM, 2000).show();
                                     return;
                                 }
                             }
-                        }else if(tipobusqueda.equals("PI")){
+                        } else if (tipobusqueda.equals("PI")) {
                             for (DetallePedidoInv detalle : productosSelectedPI) {
                                 if (detalle.producto.equals(producto)) {
                                     Banner.make(rootView, activity, Banner.WARNING, "Item ya seleccionado...", Banner.BOTTOM, 2000).show();
@@ -264,11 +267,11 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.Produc
                     }
                 }
 
-                if(tipobusqueda.equals("01") && producto.stock <= 0 && producto.tipo.equalsIgnoreCase("P")){
-                    Banner.make(rootView,activity,Banner.WARNING, "Producto sin stock disponible.",Banner.BOTTOM,2000).show();
+                if (tipobusqueda.equals("01") && producto.stock <= 0 && producto.tipo.equalsIgnoreCase("P")) {
+                    Banner.make(rootView, activity, Banner.WARNING, "Producto sin stock disponible.", Banner.BOTTOM, 2000).show();
                     return;
-                }else if((tipobusqueda.equals("4,20") || tipobusqueda.equals("20,4")) && producto.lotes.get(0).stock <= 0){
-                    Banner.make(rootView,activity,Banner.WARNING, "Lote del producto sin stock disponible.", Banner.BOTTOM,2000).show();
+                } else if ((tipobusqueda.equals("4,20") || tipobusqueda.equals("20,4")) && producto.lotes.get(0).stock <= 0) {
+                    Banner.make(rootView, activity, Banner.WARNING, "Lote del producto sin stock disponible.", Banner.BOTTOM, 2000).show();
                     return;
                 }
 
@@ -280,25 +283,30 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.Produc
                         (ConstraintLayout) activity.findViewById(R.id.lyDialogContainer));
                 builder.setView(view);
                 txtCantidad = view.findViewById(R.id.txtCantidad);
-                lblMessage = (TextView)view.findViewById(R.id.lblMessage);
-                btnOk = (Button)view.findViewById(R.id.btnConfirm);
-                ((Button)view.findViewById(R.id.btnCancel)).setText("Cancelar");
+                lblMessage = (TextView) view.findViewById(R.id.lblMessage);
+                btnOk = (Button) view.findViewById(R.id.btnConfirm);
+                ((Button) view.findViewById(R.id.btnCancel)).setText("Cancelar");
 
                 btnOk.setText("Confirmar");
-                txtCantidad.setText("1"); txtCantidad.setSelectAllOnFocus(true);
+                txtCantidad.setText("1");
+                txtCantidad.setSelectAllOnFocus(true);
 
                 txtCantidad.addTextChangedListener(new TextWatcher() {
                     @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    }
+
                     @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {}
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    }
+
                     @Override
                     public void afterTextChanged(Editable s) {
-                        try{
+                        try {
                             Double c = Double.parseDouble(s.toString().trim());
                             lblMessage.setText("");
                             btnOk.setEnabled(true);
-                        }catch (Exception e){
+                        } catch (Exception e) {
                             btnOk.setEnabled(false);
                             lblMessage.setText("Ingrese una cantidad válida.");
                         }
@@ -307,7 +315,7 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.Produc
 
                 final android.app.AlertDialog alertDialog = builder.create();
                 btnOk.setOnClickListener(
-                    v -> {
+                        v -> {
                             if (txtCantidad.getText().toString().equals("")) {
                                 Banner.make(rootView, activity, Banner.ERROR, "Debe especificar una cantidad.", Banner.BOTTOM, 2000).show();
                                 return;
@@ -317,8 +325,8 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.Produc
                                     Banner.make(rootView, activity, Banner.ERROR, "La cantidad máxima de venta es: " + producto.stock, Banner.BOTTOM, 2000).show();
                                     return;
                                 } else if ((tipobusqueda.equals("4,20") || tipobusqueda.equals("20,4")) && cantidad > producto.lotes.get(0).stock) {
-                                    Banner.make(rootView, activity, Banner.ERROR, "La cantidad máxima de transferencia del lote «"
-                                            + producto.lotes.get(0).numerolote + "» es: " + producto.lotes.get(0).stock, Banner.BOTTOM, 2000).show();
+                                    Banner.make(rootView, activity, Banner.ERROR, "La cantidad máxima de transferencia del lote " + Constants.COMILLA_ABRE
+                                            + producto.lotes.get(0).numerolote + Constants.COMILLA_CIERRA + " es: " + producto.lotes.get(0).stock, Banner.BOTTOM, 2000).show();
                                     return;
                                 }
                                 Integer counter = 0;
@@ -370,10 +378,10 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.Produc
 
                 view.findViewById(R.id.btnCancel).setOnClickListener(v -> alertDialog.dismiss());
 
-                if(alertDialog.getWindow()!=null)
+                if (alertDialog.getWindow() != null)
                     alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
                 alertDialog.show();
-            }catch (Exception e){
+            } catch (Exception e) {
                 Log.d(TAG, e.getMessage());
             }
 

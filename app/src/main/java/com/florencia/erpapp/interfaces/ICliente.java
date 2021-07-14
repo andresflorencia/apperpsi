@@ -16,13 +16,13 @@ public interface ICliente {
     @FormUrlEncoded
     @POST("loadclientes")
     Call<JsonObject> LoadCliente(@Field("usuario") String user, @Field("clave") String clave,
-                                  @Body List<Cliente> clientes);
+                                 @Body List<Cliente> clientes);
 
     @POST("loadclientes")
-    Call<JsonObject> LoadCliente2(@Body Map<String,Object> clientes);
+    Call<JsonObject> LoadCliente2(@Body Map<String, Object> clientes);
 
     @FormUrlEncoded
     @POST("getdeudacliente")
     Call<JsonObject> getDeudaCliente(@Field("usuario") String user, @Field("clave") String clave,
-                                 @Field("idpersona") Integer idpersona);
+                                     @Field("idpersona") Integer idpersona);
 }

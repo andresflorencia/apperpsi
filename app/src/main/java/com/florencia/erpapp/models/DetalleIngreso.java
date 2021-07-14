@@ -14,13 +14,13 @@ public class DetalleIngreso {
     public Integer ingresoid, linea, tipodocumento, tipo;
     public Double monto;
     public String numerodocumentoreferencia, fechadocumento, tipodecuenta,
-    niptitular, razonsocialtitular, fechadiario;
+            niptitular, razonsocialtitular, fechadiario;
     public Catalogo entidadfinanciera;
 
     public static String TAG = "TAGDETALLE_INGRESO";
     public static SQLiteDatabase sqLiteDatabase;
 
-    public DetalleIngreso(){
+    public DetalleIngreso() {
         ingresoid = 0;
         linea = 0;
         tipo = 0;
@@ -48,7 +48,7 @@ public class DetalleIngreso {
                 } while (cursor.moveToNext());
             }
             sqLiteDatabase.close();
-        }catch (SQLiteException e){
+        } catch (SQLiteException e) {
             Log.d(TAG, "getDetalle(): " + e.getMessage());
         }
         return Items;
@@ -70,7 +70,7 @@ public class DetalleIngreso {
             Item.tipodocumento = cursor.getInt(9);
             Item.fechadiario = cursor.getString(10);
             Item.tipo = cursor.getInt(11);
-            if(Item.entidadfinanciera == null)
+            if (Item.entidadfinanciera == null)
                 Item.entidadfinanciera = new Catalogo();
         } catch (Exception ec) {
             ec.printStackTrace();

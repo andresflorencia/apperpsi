@@ -17,7 +17,7 @@ public class Catalogo {
     public static SQLiteDatabase sqLiteDatabase;
     public static final String TAG = "TAGCATALOGO";
 
-    public Catalogo(){
+    public Catalogo() {
         this.idcatalogo = 0;
         this.codigocatalogo = "";
         this.codigopadre = "";
@@ -25,7 +25,8 @@ public class Catalogo {
         this.cuentaid = 0;
         this.entidadfinancieracodigo = "";
     }
-    public Catalogo(Integer idcatalogo, String codigocatalogo, String codigopadre, String nombrecatalogo, Integer cuentaid){
+
+    public Catalogo(Integer idcatalogo, String codigocatalogo, String codigopadre, String nombrecatalogo, Integer cuentaid) {
         this.idcatalogo = idcatalogo;
         this.codigocatalogo = codigocatalogo;
         this.codigopadre = codigopadre;
@@ -34,7 +35,7 @@ public class Catalogo {
     }
 
     public static Catalogo get(String codigo) {
-        Catalogo catalogo=null;
+        Catalogo catalogo = null;
         try {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
             Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM catalogo where codigocatalogo = ?", new String[]{codigo});
@@ -50,7 +51,7 @@ public class Catalogo {
     }
 
     public static Catalogo getByPadre(String codigo, String codigopadre) {
-        Catalogo catalogo=null;
+        Catalogo catalogo = null;
         try {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
             Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM catalogo where codigopadre = ? and codigocatalogo = ?", new String[]{codigopadre, codigo});
@@ -75,7 +76,7 @@ public class Catalogo {
                 do {
                     catalogo = Catalogo.AsignaDatos(cursor);
                     if (catalogo != null) lista.add(catalogo);
-                }while (cursor.moveToNext());
+                } while (cursor.moveToNext());
             }
             cursor.close();
             sqLiteDatabase.close();
@@ -89,7 +90,7 @@ public class Catalogo {
     public static boolean SaveLista(List<Catalogo> catalogos) {
         try {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
-            for (Catalogo item:catalogos) {
+            for (Catalogo item : catalogos) {
                 sqLiteDatabase.execSQL("INSERT OR REPLACE INTO " +
                                 "catalogo(idcatalogo, codigocatalogo, nombrecatalogo, codigopadre, cuentaid, entidadfinancieracodigo)" +
                                 "values(?, ?, ?, ?, ?, ?)",
@@ -97,7 +98,7 @@ public class Catalogo {
                                 item.cuentaid.toString(), item.entidadfinancieracodigo});
             }
             sqLiteDatabase.close();
-            Log.d(TAG,"Guardó lista catalogos");
+            Log.d(TAG, "Guardó lista catalogos");
             return true;
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -125,9 +126,9 @@ public class Catalogo {
     public static boolean Delete(String codigopadre) {
         try {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
-            sqLiteDatabase.execSQL("DELETE FROM catalogo WHERE codigopadre <> ?", new String[] {codigopadre});
+            sqLiteDatabase.execSQL("DELETE FROM catalogo WHERE codigopadre <> ?", new String[]{codigopadre});
             sqLiteDatabase.close();
-            Log.d(TAG, "CATALOGO "+ codigopadre +" ELIMINADOS");
+            Log.d(TAG, "CATALOGO " + codigopadre + " ELIMINADOS");
             return true;
         } catch (Exception ec) {
             ec.printStackTrace();

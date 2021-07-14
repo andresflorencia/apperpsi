@@ -6,7 +6,7 @@ public class Categoria {
     public Boolean seleccionado;
     public Integer cantidad;
 
-    public Categoria(){
+    public Categoria() {
         this.categoriaid = 0;
         this.nombrecategoria = "";
         this.seleccionado = false;

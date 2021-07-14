@@ -21,14 +21,14 @@ import com.google.gson.JsonObject;
 
 import java.util.List;
 
-public class ClasificacionAdapter extends RecyclerView.Adapter<ClasificacionAdapter.ClasificacionViewHolder>{
+public class ClasificacionAdapter extends RecyclerView.Adapter<ClasificacionAdapter.ClasificacionViewHolder> {
     public static final String TAG = "TAG_CLASIFICACIONADAPTER";
 
     public List<Categoria> categorias;
     private ProductoBusquedaActivity activity;
     View rootView;
 
-    public ClasificacionAdapter(ProductoBusquedaActivity activity, List<Categoria> categorias){
+    public ClasificacionAdapter(ProductoBusquedaActivity activity, List<Categoria> categorias) {
         this.categorias = categorias;
         this.activity = activity;
         rootView = activity.findViewById(android.R.id.content);
@@ -55,31 +55,31 @@ public class ClasificacionAdapter extends RecyclerView.Adapter<ClasificacionAdap
     class ClasificacionViewHolder extends RecyclerView.ViewHolder {
         TextView tvNombre;
 
-        ClasificacionViewHolder(@NonNull View itemView){
+        ClasificacionViewHolder(@NonNull View itemView) {
             super(itemView);
             tvNombre = itemView.findViewById(R.id.tvNombre);
         }
 
-        void bindClasificacion(final Categoria categoria){
+        void bindClasificacion(final Categoria categoria) {
             tvNombre.setText(categoria.nombrecategoria.toUpperCase().concat(" (" + categoria.cantidad + ")"));
-            if(categoria.seleccionado){
+            if (categoria.seleccionado) {
                 tvNombre.setTextColor(Color.WHITE);
                 itemView.setBackgroundResource(R.drawable.bg_button_confirmation);
-            }else{
+            } else {
                 tvNombre.setTextColor(Color.BLACK);
                 itemView.setBackgroundResource(R.drawable.bg_white);
             }
 
             itemView.setOnClickListener(v -> {
-                    Categoria miC = categorias.get(getAdapterPosition());
-                    categorias.get(getAdapterPosition()).seleccionado = true;
-                    for(Categoria c:categorias){
-                        if(!c.nombrecategoria.equals(miC.nombrecategoria))
-                            c.seleccionado = false;
-                    }
-                    notifyDataSetChanged();
-                    activity.productoAdapter.filter_by_clasif(miC.categoriaid);
-                });
+                Categoria miC = categorias.get(getAdapterPosition());
+                categorias.get(getAdapterPosition()).seleccionado = true;
+                for (Categoria c : categorias) {
+                    if (!c.nombrecategoria.equals(miC.nombrecategoria))
+                        c.seleccionado = false;
+                }
+                notifyDataSetChanged();
+                activity.productoAdapter.filter_by_clasif(miC.categoriaid);
+            });
         }
 
     }

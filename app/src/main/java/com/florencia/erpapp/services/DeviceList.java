@@ -22,12 +22,10 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
 
-
-
 public class DeviceList extends ListActivity {
 
-    static public final int REQUEST_CONNECT_BT = 0*2300;
-    static private final int REQUEST_ENABLE_BT = 0*1000;
+    static public final int REQUEST_CONNECT_BT = 0 * 2300;
+    static private final int REQUEST_ENABLE_BT = 0 * 1000;
     static private BluetoothAdapter mBluetoothAdapter = null;
     static private ArrayAdapter<String> mArrayAdapter = null;
 
@@ -94,6 +92,7 @@ public class DeviceList extends ListActivity {
         }
 
     }
+
     private int initDevicesList() {
         flushData();
 
@@ -180,7 +179,7 @@ public class DeviceList extends ListActivity {
                     if (btDevices.getPosition(device) < 0) {
                         btDevices.add(device);
                         mArrayAdapter.add(device.getName() + "\n"
-                                + device.getAddress() + "\n" );
+                                + device.getAddress() + "\n");
                         mArrayAdapter.notifyDataSetInvalidated();
                     }
                 } catch (Exception ex) {
@@ -284,8 +283,7 @@ public class DeviceList extends ListActivity {
     }
 
     @Override
-    protected void onStop()
-    {
+    protected void onStop() {
         super.onStop();
         try {
             unregisterReceiver(mBTReceiver);

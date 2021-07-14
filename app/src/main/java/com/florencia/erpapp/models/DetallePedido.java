@@ -19,7 +19,7 @@ public class DetallePedido {
     public static SQLiteDatabase sqLiteDatabase;
     public static String TAG = "TAGDETALLEPEDIDO";
 
-    public DetallePedido(){
+    public DetallePedido() {
         this.pedidoid = 0;
         this.orden = 0;
         this.usuarioid = 0;
@@ -30,21 +30,21 @@ public class DetallePedido {
         this.producto = new Producto();
     }
 
-    public Double Subtotal(){
-        Double retorno= 0d;
-        try{
-            retorno =this.cantidad * this.precio;
-        }catch (Exception e){
+    public Double Subtotal() {
+        Double retorno = 0d;
+        try {
+            retorno = this.cantidad * this.precio;
+        } catch (Exception e) {
             Log.d(TAG, "Subtotal(): " + e.getMessage());
         }
         return retorno;
     }
 
-    public Double Subtotaliva(){
-        Double retorno= 0d;
-        try{
-            retorno =this.cantidad * (this.precio +(this.precio * this.producto.porcentajeiva/100));
-        }catch (Exception e){
+    public Double Subtotaliva() {
+        Double retorno = 0d;
+        try {
+            retorno = this.cantidad * (this.precio + (this.precio * this.producto.porcentajeiva / 100));
+        } catch (Exception e) {
             Log.d(TAG, "Subtotaliva(): " + e.getMessage());
         }
         return retorno;
@@ -63,7 +63,7 @@ public class DetallePedido {
                 } while (cursor.moveToNext());
             }
             sqLiteDatabase.close();
-        }catch (SQLiteException e){
+        } catch (SQLiteException e) {
             Log.d(TAG, "getDetalle(): " + e.getMessage());
         }
         return Items;
@@ -84,7 +84,7 @@ public class DetallePedido {
             Item.porcentajeiva = cursor.getDouble(8);
             Item.codigoproducto = cursor.getString(9);
             Item.nombreproducto = cursor.getString(10);
-            if(Item.producto == null){
+            if (Item.producto == null) {
                 Item.producto = new Producto();
                 Item.producto.idproducto = cursor.getInt(5);
                 Item.producto.codigoproducto = Item.codigoproducto;
@@ -99,7 +99,7 @@ public class DetallePedido {
         return Item;
     }
 
-    public Double getPrecio(String categoria){
+    public Double getPrecio(String categoria) {
         try {
             this.precio = this.producto.getPrecio(categoria);
             Double ptemp = this.precio;//GUARDAMOS EL PRECIO DE LA CATEGORIA
@@ -114,13 +114,13 @@ public class DetallePedido {
             //SI PRECIO DE CATEGORIA ES MENOR AL PRECIO DE ALGUNA REGLAPRECIO, CONSERVAMOS EL DE LA CATEGORIA
             if (ptemp < this.precio)
                 this.precio = ptemp;
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, "getPrecio(): " + e.getMessage());
         }
         return this.precio;
     }
 
-    public Double getPrecio(List<Regla> reglas, List<PrecioCategoria> categorias, String categcliente, Double cantidad, Double precio_act){
+    public Double getPrecio(List<Regla> reglas, List<PrecioCategoria> categorias, String categcliente, Double cantidad, Double precio_act) {
         try {
             this.precio = precio_act;
             Double precioregla = 0d;
@@ -135,8 +135,8 @@ public class DetallePedido {
                 }
             }
             PrecioCategoria categ_temp = null;
-            for (PrecioCategoria cat: categorias) {
-                if(cat.categoriaid == Integer.valueOf(categcliente)){
+            for (PrecioCategoria cat : categorias) {
+                if (cat.categoriaid == Integer.valueOf(categcliente)) {
                     precio_act = cat.valor;
                     categ_temp = cat;
                     break;
@@ -147,11 +147,11 @@ public class DetallePedido {
             if (this.precio > precio_act)
                 this.precio = ptemp;
 
-            if(categ_temp != null){
-                if(precioregla == 0 || categ_temp.prioridad.equalsIgnoreCase("t"))
+            if (categ_temp != null) {
+                if (precioregla == 0 || categ_temp.prioridad.equalsIgnoreCase("t"))
                     this.precio = categ_temp.valor;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, "getPrecio2(): " + e.getMessage());
         }
         return this.precio;

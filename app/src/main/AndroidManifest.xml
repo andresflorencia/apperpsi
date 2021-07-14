@@ -35,10 +35,13 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".activities.DepositoActivity"
-            android:theme="@style/ClienteTheme"/>
-        <activity android:name=".activities.PedidoInventarioActivity"
-            android:theme="@style/ClienteTheme"/>
+        <activity android:name=".activities.AceptaTransferenciaActivity"></activity>
+        <activity
+            android:name=".activities.DepositoActivity"
+            android:theme="@style/ClienteTheme" />
+        <activity
+            android:name=".activities.PedidoInventarioActivity"
+            android:theme="@style/ClienteTheme" />
         <activity android:name=".activities.ConfigActivity" />
         <activity
             android:name=".activities.TransferenciaActivity"
@@ -89,9 +92,9 @@
             android:theme="@style/ClienteTheme" />
         <activity
             android:name=".activities.LoginActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustResize|adjustPan"
-            android:screenOrientation="portrait">
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize|adjustPan">
 
             <!--
             <intent-filter>
@@ -116,6 +119,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.services.GenericFileProvider"

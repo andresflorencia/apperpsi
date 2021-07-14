@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/lin_lay"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@drawable/splash_fondo"
     android:layout_gravity="center"
-    android:id="@+id/lin_lay"
+    android:background="@drawable/splash_fondo"
+    android:fitsSystemWindows="true"
     android:gravity="center"
-    android:orientation="vertical"
-    android:fitsSystemWindows="true">
+    android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/lySplash"
@@ -21,34 +20,39 @@
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:gravity="center">
+
             <ImageView
+                android:id="@+id/splash"
                 android:layout_width="150dp"
                 android:layout_height="150dp"
-                android:id="@+id/splash"
-                android:background="@drawable/logosi"
-                android:layout_gravity="center"/>
+                android:layout_gravity="center"
+                android:background="@drawable/logosi" />
         </LinearLayout>
     </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center"
         android:layout_gravity="bottom"
+        android:layout_marginBottom="15dp"
         android:elevation="5dp"
-        android:layout_marginBottom="15dp">
+        android:gravity="center"
+        android:orientation="vertical">
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
                 android:text="from  "
                 android:textAlignment="center"
-                android:layout_gravity="bottom"
-                android:textSize="14sp"
-                android:textColor="@color/colorWhite"/>
+                android:textColor="@color/colorWhite"
+                android:textSize="14sp" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -57,14 +61,15 @@
                 android:textAlignment="center"
                 android:textColor="@color/colorWhite"
                 android:textSize="18sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
         </LinearLayout>
+
         <TextView
             android:id="@+id/lblVersion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="v1.0.1"
             android:textAlignment="center"
-            android:textColor="@color/colorWhite"/>
+            android:textColor="@color/colorWhite" />
     </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

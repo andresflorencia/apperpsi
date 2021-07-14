@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:id="@+id/option_addclient"
+    <item
+        android:id="@+id/option_addclient"
+        android:icon="@drawable/ic_person_add_white"
         android:title="Agregar cliente"
-        app:showAsAction="ifRoom"
-        android:icon="@drawable/ic_person_add_white"/>
+        app:showAsAction="ifRoom" />
 </menu>

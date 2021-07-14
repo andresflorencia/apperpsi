@@ -22,7 +22,8 @@ public class PrecioCategoria {
 
     public static SQLiteDatabase sqLiteDatabase;
     public static final String TAG = "TAGCATEGORIA";
-    public PrecioCategoria(){
+
+    public PrecioCategoria() {
         this.idproductocategoria = 0;
         this.productoid = 0;
         this.establecimientoid = 0;
@@ -39,24 +40,24 @@ public class PrecioCategoria {
             this.sqLiteDatabase.execSQL("INSERT OR REPLACE INTO " +
                     "preciocategoria(idproductocategoria, productoid, establecimientoid, categoriaid, valor, nombrecategoria, prioridad, aplicacredito) " +
                     "values(?, ?, ?, ?, ?, ?, ?, ?)", new String[]{this.idproductocategoria.toString(), this.productoid.toString(), this.establecimientoid.toString(),
-                    this.categoriaid.toString(),this.valor.toString(), this.nombrecategoria, this.prioridad, this.aplicacredito});
+                    this.categoriaid.toString(), this.valor.toString(), this.nombrecategoria, this.prioridad, this.aplicacredito});
             this.sqLiteDatabase.close();
-            Log.d(TAG,"SAVE PrecioCategoria OK");
+            Log.d(TAG, "SAVE PrecioCategoria OK");
             return true;
-        } catch (SQLException ex){
+        } catch (SQLException ex) {
             Log.d(TAG, ex.getMessage());
             return false;
         }
     }
 
-    public static boolean InsertMultiple(Integer idproducto, Integer establecimientoid, List<PrecioCategoria> categorias){
+    public static boolean InsertMultiple(Integer idproducto, Integer establecimientoid, List<PrecioCategoria> categorias) {
         try {
             ContentValues values;
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
-            sqLiteDatabase.delete("preciocategoria","productoid = ?", new String[]{idproducto.toString()});
-            for(PrecioCategoria categoria: categorias) {
-                sqLiteDatabase.delete("preciocategoria","idproductocategoria = ?", new String[]{categoria.idproductocategoria.toString()});
-                values= new ContentValues();
+            sqLiteDatabase.delete("preciocategoria", "productoid = ?", new String[]{idproducto.toString()});
+            for (PrecioCategoria categoria : categorias) {
+                sqLiteDatabase.delete("preciocategoria", "idproductocategoria = ?", new String[]{categoria.idproductocategoria.toString()});
+                values = new ContentValues();
                 values.put("idproductocategoria", categoria.idproductocategoria);
                 values.put("productoid", categoria.productoid);
                 values.put("establecimientoid", categoria.establecimientoid);
@@ -70,7 +71,7 @@ public class PrecioCategoria {
             sqLiteDatabase.close();
             Log.d(TAG, "INSERT PRECIOS CATEGORIAS OK");
             return true;
-        }catch (SQLiteException e){
+        } catch (SQLiteException e) {
             Log.d(TAG, e.getMessage());
             return false;
         }
@@ -88,13 +89,14 @@ public class PrecioCategoria {
             Item.nombrecategoria = cursor.getString(5);
             Item.prioridad = cursor.getString(6);
             Item.aplicacredito = cursor.getString(7);
-        }catch(Exception e){
+        } catch (Exception e) {
             Log.d(TAG, "AsignaDatos(): " + e.getMessage());
-        } finally { }
+        } finally {
+        }
         return Item;
     }
 
-    public static ArrayList<PrecioCategoria> getAll(Integer idproducto, Integer establecimientoid){
+    public static ArrayList<PrecioCategoria> getAll(Integer idproducto, Integer establecimientoid) {
         ArrayList<PrecioCategoria> Items = new ArrayList<>();
         sqLiteDatabase = SQLite.sqlDB.getReadableDatabase();
         Cursor cursor = sqLiteDatabase.rawQuery(
@@ -104,14 +106,14 @@ public class PrecioCategoria {
         if (cursor.moveToFirst()) {
             do {
                 Item = AsignaDatos(cursor);
-                if (Item!=null) Items.add(Item);
-            } while(cursor.moveToNext());
+                if (Item != null) Items.add(Item);
+            } while (cursor.moveToNext());
         }
         sqLiteDatabase.close();
         return Items;
     }
 
-    public static PrecioCategoria get(Integer id){
+    public static PrecioCategoria get(Integer id) {
         sqLiteDatabase = SQLite.sqlDB.getReadableDatabase();
         Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM preciocategoria WHERE idproductocategoria = ?",
                 new String[]{id.toString()});
@@ -122,14 +124,14 @@ public class PrecioCategoria {
         return Item;
     }
 
-    public static boolean Delete(String [] where) {
+    public static boolean Delete(String[] where) {
         try {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
-            sqLiteDatabase.delete("preciocategoria", "productoid = ? and establecimientoid = ?",where);
+            sqLiteDatabase.delete("preciocategoria", "productoid = ? and establecimientoid = ?", where);
             sqLiteDatabase.close();
-            Log.d(TAG,"DELETE CATEGORIAS PRECIO OK");
+            Log.d(TAG, "DELETE CATEGORIAS PRECIO OK");
             return true;
-        } catch (SQLException ex){
+        } catch (SQLException ex) {
             Log.d(TAG, ex.getMessage());
             return false;
         }
@@ -138,8 +140,8 @@ public class PrecioCategoria {
     @NonNull
     @Override
     public String toString() {
-        return  this.nombrecategoria +
-                " - Pro: "+ this.productoid +
+        return this.nombrecategoria +
+                " - Pro: " + this.productoid +
                 " - Est: " + this.establecimientoid +
                 " - Val: " + this.valor +
                 " - Pri: " + this.prioridad +

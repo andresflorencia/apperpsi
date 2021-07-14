@@ -39,6 +39,7 @@ public class InfoItemDialogFragment extends AppCompatDialogFragment {
     private ProgressBar pbCargando;
     private ImageButton btnCerrar;
     Producto producto = new Producto();
+
     public InfoItemDialogFragment() {
         // Required empty public constructor
     }
@@ -65,81 +66,81 @@ public class InfoItemDialogFragment extends AppCompatDialogFragment {
         pbCargando = view.findViewById(R.id.pbCargando);
         btnCerrar = view.findViewById(R.id.btnCerrar);
 
-        if(!getArguments().isEmpty()) {
-            int id = getArguments().getInt("idproducto",0);
-            if(id>0)
+        if (!getArguments().isEmpty()) {
+            int id = getArguments().getInt("idproducto", 0);
+            if (id > 0)
                 BuscarDatos(id);
         }
 
         btnCerrar.setOnClickListener(v -> getDialog().dismiss());
 
-        if(getDialog().getWindow()!=null)
+        if (getDialog().getWindow() != null)
             getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(0));
         return view;
     }
 
     private void BuscarDatos(int id) {
-        try{
-            Thread th = new Thread(){
+        try {
+            Thread th = new Thread() {
                 @Override
-                public void run(){
+                public void run() {
                     pbCargando.setVisibility(View.VISIBLE);
                     producto = Producto.get(id, SQLite.usuario.sucursal.IdEstablecimiento);
                     getActivity().runOnUiThread(() -> {
-                            if(producto != null){
-                                txtNombre.setText(producto.nombreproducto);
-                                String textLeft = "", textRight = "";
+                        if (producto != null) {
+                            txtNombre.setText(producto.nombreproducto);
+                            String textLeft = "", textRight = "";
 
-                                textLeft = textLeft.concat("Código:\n")
+                            textLeft = textLeft.concat("Código:\n")
                                     .concat("Tipo:\n")
                                     .concat("Clasificación:\n")
                                     .concat("PVP Normal:\n")
                                     .concat("IVA:\n")
-                                    .concat(producto.unidadesporcaja > 0?"U/Caja:\n":"")
-                                    .concat(producto.tipo.equalsIgnoreCase("S")?"":"Stock:\n")
-                                    .concat(producto.lotes.size()>0?"\n\nLOTES:":"");
+                                    .concat(producto.unidadesporcaja > 0 ? "U/Caja:\n" : "")
+                                    .concat(producto.tipo.equalsIgnoreCase("S") ? "" : "Stock:\n")
+                                    .concat(producto.lotes.size() > 0 ? "\n\nLOTES:" : "");
 
-                                textRight = textRight.concat(producto.codigoproducto).concat("\n")
-                                        .concat(producto.tipo.equalsIgnoreCase("S")?"SERVICIO":"PRODUCTO").concat("\n")
-                                        .concat(producto.nombreclasificacion).concat("\n")
-                                        .concat(Utils.FormatoMoneda(producto.getPrecioSugerido(),2).concat("\n"))
-                                        .concat(producto.porcentajeiva>0?"Si":"No").concat("\n")
-                                        .concat(producto.unidadesporcaja > 0?producto.unidadesporcaja.toString()+"\n":"")
-                                        .concat(producto.tipo.equalsIgnoreCase("S")?"":producto.stock.toString());
+                            textRight = textRight.concat(producto.codigoproducto).concat("\n")
+                                    .concat(producto.tipo.equalsIgnoreCase("S") ? "SERVICIO" : "PRODUCTO").concat("\n")
+                                    .concat(producto.nombreclasificacion).concat("\n")
+                                    .concat(Utils.FormatoMoneda(producto.getPrecioSugerido(), 2).concat("\n"))
+                                    .concat(producto.porcentajeiva > 0 ? "Si" : "No").concat("\n")
+                                    .concat(producto.unidadesporcaja > 0 ? producto.unidadesporcaja.toString() + "\n" : "")
+                                    .concat(producto.tipo.equalsIgnoreCase("S") ? "" : producto.stock.toString());
 
                                 /*for(PrecioCategoria pc: producto.precioscategoria)
                                     textRight = textRight.concat("\n" + pc.nombrecategoria + " -> "+ pc.valor
                                             + " - " + pc.prioridad + " - " + pc.aplicacredito);*/
 
-                                txtInfoLeft.setText(textLeft);
-                                txtInfoRight.setText(textRight);
+                            txtInfoLeft.setText(textLeft);
+                            txtInfoRight.setText(textRight);
 
-                                if(producto.lotes.size()>0){
-                                    for(Lote lote:producto.lotes) {
-                                        lblNumLote.setText(lblNumLote.getText().toString().concat(lote.numerolote.equals("")?"Sin Lote":lote.numerolote).concat("\n"));
-                                        lblFecVenc.setText(lblFecVenc.getText().toString().concat(lote.fechavencimiento).concat("\n"));
-                                        lblStock.setText(lblStock.getText().toString().concat(Utils.RoundDecimal(lote.stock,2).toString()).concat("\n"));
-                                    }
-                                }else
-                                    lyLotes.setVisibility(View.GONE);
-
-                                if(producto.reglas.size()>0){
-                                    for(Regla regla:producto.reglas) {
-                                        lblCant.setText(lblCant.getText().toString().concat(Utils.RoundDecimal(regla.cantidad,2).toString()).concat("\n"));
-                                        lblValido.setText(lblValido.getText().toString().concat(regla.fechamaxima).concat("\n"));
-                                        lblPrecio.setText(lblPrecio.getText().toString().concat(Utils.FormatoMoneda(regla.precio,2)).concat("\n"));
-                                    }
-                                }else {
-                                    lyReglasPrecio.setVisibility(View.GONE);
-                                    lblReglasPrecio.setVisibility(View.GONE);
+                            if (producto.lotes.size() > 0) {
+                                for (Lote lote : producto.lotes) {
+                                    lblNumLote.setText(lblNumLote.getText().toString().concat(lote.numerolote.equals("") ? "Sin Lote" : lote.numerolote).concat("\n"));
+                                    lblFecVenc.setText(lblFecVenc.getText().toString().concat(lote.fechavencimiento).concat("\n"));
+                                    lblStock.setText(lblStock.getText().toString().concat(Utils.RoundDecimal(lote.stock, 2).toString()).concat("\n"));
                                 }
+                            } else
+                                lyLotes.setVisibility(View.GONE);
+
+                            if (producto.reglas.size() > 0) {
+                                for (Regla regla : producto.reglas) {
+                                    lblCant.setText(lblCant.getText().toString().concat(Utils.RoundDecimal(regla.cantidad, 2).toString()).concat("\n"));
+                                    lblValido.setText(lblValido.getText().toString().concat(regla.fechamaxima).concat("\n"));
+                                    lblPrecio.setText(lblPrecio.getText().toString().concat(Utils.FormatoMoneda(regla.precio, 2)).concat("\n"));
+                                }
+                            } else {
+                                lyReglasPrecio.setVisibility(View.GONE);
+                                lblReglasPrecio.setVisibility(View.GONE);
                             }
-                            pbCargando.setVisibility(View.GONE);
-                        });
+                        }
+                        pbCargando.setVisibility(View.GONE);
+                    });
                 }
             };
             th.start();
-        }catch (Exception e){
+        } catch (Exception e) {
             pbCargando.setVisibility(View.GONE);
             Log.d(TAG, e.getMessage());
         }

@@ -35,10 +35,10 @@ public class ClienteBusquedaAdapter extends RecyclerView.Adapter<ClienteBusqueda
     View rootView;
 
     public ClienteBusquedaAdapter(Activity activity, List<Cliente> listClients, String tipobusqueda) {
-        this.activity =activity;
+        this.activity = activity;
         this.listClients = listClients;
         this.orginalItems.addAll(this.listClients);
-        this.tipobusqueda= tipobusqueda;
+        this.tipobusqueda = tipobusqueda;
         rootView = activity.findViewById(android.R.id.content);
     }
 
@@ -60,26 +60,26 @@ public class ClienteBusquedaAdapter extends RecyclerView.Adapter<ClienteBusqueda
         return listClients.size();
     }
 
-    public void filter(final String busqueda){
+    public void filter(final String busqueda) {
         listClients.clear();
-        if(busqueda.length()==0){
+        if (busqueda.length() == 0) {
             listClients.addAll(orginalItems);
-        }else{
+        } else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 List<Cliente> collect = orginalItems.stream()
                         .filter(i -> i.nip.concat(i.razonsocial.toLowerCase())
                                 .concat(i.nombrecomercial.toLowerCase())
                                 .concat(i.direccion.toLowerCase()
-                                .concat(i.nombrecategoria.toLowerCase())
+                                        .concat(i.nombrecategoria.toLowerCase())
                                 ).contains(busqueda.toLowerCase()))
                         .collect(Collectors.<Cliente>toList());
                 listClients.addAll(collect);
-            }else{
-                for(Cliente i: orginalItems){
-                    if(i.nip.concat(i.razonsocial.toLowerCase())
+            } else {
+                for (Cliente i : orginalItems) {
+                    if (i.nip.concat(i.razonsocial.toLowerCase())
                             .concat(i.nombrecomercial.toLowerCase())
                             .concat(i.direccion.toLowerCase()
-                            .concat(i.nombrecategoria.toLowerCase())
+                                    .concat(i.nombrecategoria.toLowerCase())
                             ).contains(busqueda.toLowerCase()))
                         listClients.add(i);
                 }
@@ -88,11 +88,11 @@ public class ClienteBusquedaAdapter extends RecyclerView.Adapter<ClienteBusqueda
         notifyDataSetChanged();
     }
 
-    class ClienteViewHolder extends RecyclerView.ViewHolder{
+    class ClienteViewHolder extends RecyclerView.ViewHolder {
 
         TextView tvNombreComercial, tvRazonSocial, tvDireccion, tvContacto;
 
-        ClienteViewHolder(@NonNull View itemView){
+        ClienteViewHolder(@NonNull View itemView) {
             super(itemView);
             tvRazonSocial = itemView.findViewById(R.id.tv_RazonSocial);
             tvNombreComercial = itemView.findViewById(R.id.tv_NombreComercial);
@@ -102,22 +102,22 @@ public class ClienteBusquedaAdapter extends RecyclerView.Adapter<ClienteBusqueda
             itemView.findViewById(R.id.tv_Estado).setVisibility(View.GONE);
         }
 
-        void bindCliente(final Cliente cliente){
-            tvRazonSocial.setText(cliente.nip + " - "+ cliente.razonsocial);
+        void bindCliente(final Cliente cliente) {
+            tvRazonSocial.setText(cliente.nip + " - " + cliente.razonsocial);
             tvNombreComercial.setText(cliente.nombrecomercial);
             tvDireccion.setText(cliente.direccion);
-            tvContacto.setText(cliente.fono1 + " - " + cliente.fono2 +" - Categoría: " + cliente.nombrecategoria);
+            tvContacto.setText(cliente.fono1 + " - " + cliente.fono2 + " - Categoría: " + cliente.nombrecategoria);
 
             itemView.setOnClickListener(v -> {
-                    if(tipobusqueda.equals("PC") &&
-                            (listClients.get(getAdapterPosition()).idcliente==0 || listClients.get(getAdapterPosition()).nip.contains("99999999"))){
-                        Banner.make(rootView, activity, Banner.INFO,"No se puede registrar pedidos para CONSUMIDOR FINAL", Banner.BOTTOM,3000).show();
-                        return;
-                    }
-                    activity.setResult(Activity.RESULT_OK,new Intent().putExtra("idcliente",listClients.get(getAdapterPosition()).idcliente));
-                    activity.onBackPressed();
-                    activity.overridePendingTransition(R.anim.right_in, R.anim.right_out);
-                });
+                if (tipobusqueda.equals("PC") &&
+                        (listClients.get(getAdapterPosition()).idcliente == 0 || listClients.get(getAdapterPosition()).nip.contains("99999999"))) {
+                    Banner.make(rootView, activity, Banner.INFO, "No se puede registrar pedidos para CONSUMIDOR FINAL", Banner.BOTTOM, 3000).show();
+                    return;
+                }
+                activity.setResult(Activity.RESULT_OK, new Intent().putExtra("idcliente", listClients.get(getAdapterPosition()).idcliente));
+                activity.onBackPressed();
+                activity.overridePendingTransition(R.anim.right_in, R.anim.right_out);
+            });
 
         }
     }

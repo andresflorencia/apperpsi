@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorGrayLight2"
     android:fitsSystemWindows="true"
-    tools:context=".activities.ComprobanteActivity"
-    android:background="@color/colorGrayLight2">
+    tools:context=".activities.ComprobanteActivity">
 
-    <com.google.android.material.appbar.AppBarLayout
+    <com.google.android.material.appbar.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        xmlns:android="http://schemas.android.com/apk/res/android">
+        android:layout_height="wrap_content">
+
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/appbar"
             android:layout_width="match_parent"
@@ -20,72 +19,81 @@
             android:background="?attr/colorPrimary" />
     </com.google.android.material.appbar.AppBarLayout>
 
-    <LinearLayout android:orientation="vertical"
-        android:layout_height="fill_parent"
+    <LinearLayout
         android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
         android:layout_marginTop="55dp"
-        android:layout_marginBottom="50dp">
+        android:layout_marginBottom="50dp"
+        android:orientation="vertical">
+
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:layout_margin="5dp">
+                android:layout_margin="5dp"
+                android:orientation="vertical">
 
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:cardCornerRadius="10dp"
-                    app:cardElevation="5dp"
-                    android:background="@color/colorPrimary"
+                    android:layout_marginHorizontal="5dp"
                     android:layout_marginTop="5dp"
-                    android:layout_marginHorizontal="5dp">
+                    android:background="@color/colorPrimary"
+                    app:cardCornerRadius="10dp"
+                    app:cardElevation="5dp">
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:padding="5dp">
+
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal">
+
                             <TextView
                                 android:id="@+id/lblCliente"
-                                android:layout_width="0dp"
-                                android:layout_weight="1"
-                                android:layout_height="wrap_content"
-                                android:text="CLIENTE"
                                 style="@style/EstiloText_Black"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:clickable="true"
                                 android:drawableRight="@drawable/ic_row_up"
                                 android:gravity="center_vertical"
-                                android:clickable="true"
-                                android:paddingLeft="10dp"/>
+                                android:paddingLeft="10dp"
+                                android:text="CLIENTE" />
+
                             <RadioGroup
                                 android:id="@+id/rgTipoDocumento"
                                 android:layout_width="0dp"
-                                android:layout_weight="1"
                                 android:layout_height="wrap_content"
-                                android:orientation="horizontal"
+                                android:layout_weight="1"
                                 android:gravity="center"
+                                android:orientation="horizontal"
                                 android:visibility="gone">
+
                                 <RadioButton
                                     android:id="@+id/rbFactura"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Factura"
-                                    android:checked="true"
                                     android:layout_marginRight="10dp"
-                                    android:textSize="13sp"/>
+                                    android:checked="true"
+                                    android:text="Factura"
+                                    android:textSize="13sp" />
+
                                 <RadioButton
                                     android:id="@+id/rbProforma"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Proforma"
-                                    android:checked="false"
                                     android:layout_marginRight="5dp"
-                                    android:textSize="13sp"/>
+                                    android:checked="false"
+                                    android:text="Proforma"
+                                    android:textSize="13sp" />
                             </RadioGroup>
                         </LinearLayout>
 
@@ -94,72 +102,78 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical">
+
                             <com.google.android.material.textfield.TextInputLayout
                                 android:id="@+id/txtHinFB"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content">
+
                                 <EditText
                                     android:id="@+id/txtCliente"
+                                    style="@style/EditText_Round"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:ems="10"
-                                    android:inputType="text"
-                                    android:hint="Buscar por cédula o nombre"
                                     android:drawableLeft="@drawable/ic_user"
-                                    style="@style/EditText_Round"
-                                    android:selectAllOnFocus="true"
-                                    android:imeOptions="actionSearch"/>
+                                    android:ems="10"
+                                    android:hint="Buscar por cédula o nombre"
+                                    android:imeOptions="actionSearch"
+                                    android:inputType="text"
+                                    android:selectAllOnFocus="true" />
                             </com.google.android.material.textfield.TextInputLayout>
+
                             <TextView
                                 android:id="@+id/lblLeyendaCF"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textSize="11sp"
-                                android:text=""
                                 android:paddingLeft="5dp"
-                                android:textColor="@color/colornavheader"/>
+                                android:text=""
+                                android:textColor="@color/colornavheader"
+                                android:textSize="11sp" />
+
                             <LinearLayout
                                 android:id="@+id/lyFormaPago"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:orientation="horizontal"
-                                android:padding="5dp"
                                 android:layout_gravity="center"
                                 android:gravity="center"
+                                android:orientation="horizontal"
+                                android:padding="5dp"
                                 android:visibility="visible">
 
                                 <TextView
+                                    style="@style/EstiloText_Black"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="FORMA PAGO:"
-                                    style="@style/EstiloText_Black"
+                                    android:layout_marginRight="5dp"
                                     android:clickable="true"
-                                    android:textSize="14sp"
                                     android:paddingLeft="10dp"
-                                    android:layout_marginRight="5dp"/>
+                                    android:text="FORMA PAGO:"
+                                    android:textSize="14sp" />
 
                                 <RadioGroup
                                     android:id="@+id/rgTipoTransaccion"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:orientation="horizontal"
-                                    android:gravity="center">
+                                    android:gravity="center"
+                                    android:orientation="horizontal">
+
                                     <RadioButton
                                         android:id="@+id/rbEfectivo"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="Efectivo"
-                                        android:checked="true"
                                         android:layout_marginRight="10dp"
-                                        android:textSize="13sp"/>
+                                        android:checked="true"
+                                        android:text="Efectivo"
+                                        android:textSize="13sp" />
+
                                     <RadioButton
                                         android:id="@+id/rbCredito"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="Crédito (Disp:$0.00)"
-                                        android:checked="false"
                                         android:layout_marginRight="5dp"
-                                        android:textSize="13sp"/>
+                                        android:checked="false"
+                                        android:text="Crédito (Disp:$0.00)"
+                                        android:textSize="13sp" />
                                 </RadioGroup>
                             </LinearLayout>
 
@@ -167,34 +181,34 @@
                                 android:id="@+id/lyEstablecimiento"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:orientation="horizontal"
-                                android:padding="5dp"
                                 android:layout_gravity="center"
                                 android:gravity="center"
+                                android:orientation="horizontal"
+                                android:padding="5dp"
                                 android:visibility="gone">
 
                                 <TextView
                                     android:id="@+id/lblEstablecimiento"
-                                    android:layout_width="0dp"
-                                    android:layout_weight="1"
-                                    android:layout_height="wrap_content"
-                                    android:text="PVP Establecimiento:"
                                     style="@style/EstiloText_Black"
-                                    android:textAlignment="center"
-                                    android:textSize="14sp"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginRight="5dp"
+                                    android:layout_weight="1"
                                     android:paddingLeft="10dp"
-                                    android:layout_marginRight="5dp"/>
+                                    android:text="PVP Establecimiento:"
+                                    android:textAlignment="center"
+                                    android:textSize="14sp" />
 
                                 <Button
                                     android:id="@+id/btnCambiaEstablecimiento"
                                     android:layout_width="wrap_content"
                                     android:layout_height="30dp"
-                                    android:text="Cambiar"
-                                    android:textColor="@color/colorWhite"
-                                    android:paddingHorizontal="10dp"
                                     android:background="@drawable/bg_button_neutral"
                                     android:drawableRight="@drawable/ic_store"
-                                    android:drawableTint="@color/colorWhite"/>
+                                    android:drawableTint="@color/colorWhite"
+                                    android:paddingHorizontal="10dp"
+                                    android:text="Cambiar"
+                                    android:textColor="@color/colorWhite" />
                             </LinearLayout>
                         </LinearLayout>
                     </LinearLayout>
@@ -204,81 +218,87 @@
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:cardCornerRadius="10dp"
-                    app:cardElevation="5dp"
+                    android:layout_marginHorizontal="5dp"
                     android:layout_marginVertical="10dp"
-                    android:layout_marginHorizontal="5dp">
+                    app:cardCornerRadius="10dp"
+                    app:cardElevation="5dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:padding="5dp">
+
                         <TextView
                             android:id="@+id/lblProducto"
+                            style="@style/EstiloText_Black"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="PRODUCTOS"
-                            style="@style/EstiloText_Black"
+                            android:clickable="true"
                             android:drawableRight="@drawable/ic_row_down"
                             android:gravity="center_vertical"
-                            android:clickable="true"
-                            android:paddingLeft="10dp"/>
+                            android:paddingLeft="10dp"
+                            android:text="PRODUCTOS" />
 
                         <LinearLayout
                             android:id="@+id/lyProductos"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical">
+
                             <LinearLayout
                                 android:id="@+id/lyBotones"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:orientation="horizontal"
                                 android:layout_marginBottom="7dp"
-                                android:paddingVertical="3dp"
-                                android:gravity="center">
+                                android:gravity="center"
+                                android:orientation="horizontal"
+                                android:paddingVertical="3dp">
+
                                 <LinearLayout
                                     android:layout_width="0dp"
-                                    android:layout_weight="1"
                                     android:layout_height="wrap_content"
+                                    android:layout_weight="1"
                                     android:orientation="vertical">
+
                                     <TextView
                                         android:id="@+id/lblTitleFecha"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="Fecha de entrega"
-                                        android:textSize="10sp"
-                                        android:textColor="@color/colorDate"
                                         android:layout_marginLeft="10dp"
-                                        android:visibility="gone"/>
+                                        android:text="Fecha de entrega"
+                                        android:textColor="@color/colorDate"
+                                        android:textSize="10sp"
+                                        android:visibility="gone" />
+
                                     <Button
                                         android:id="@+id/btnFechaDocumento"
                                         android:layout_width="match_parent"
                                         android:layout_height="35dp"
-                                        android:text="01-01-0001"
+                                        android:layout_marginRight="3dp"
+                                        android:background="@drawable/bg_btn_date"
                                         android:drawableLeft="@drawable/ic_date"
                                         android:paddingLeft="10dp"
+                                        android:text="01-01-0001"
+                                        android:textAllCaps="false"
                                         android:textColor="@color/colorDate"
-                                        android:background="@drawable/bg_btn_date"
-                                        android:visibility="invisible"
-                                        android:layout_marginRight="3dp"
-                                        android:textAllCaps="false"/>
+                                        android:visibility="invisible" />
                                 </LinearLayout>
+
                                 <Button
                                     android:id="@+id/btnBuscarProducto"
                                     android:layout_width="0dp"
-                                    android:layout_weight="1"
                                     android:layout_height="35dp"
-                                    android:text="BUSCAR PRODUCTO"
-                                    android:drawableRight="@drawable/ic_search"
-                                    android:paddingRight="10dp"
-                                    android:background="@drawable/border2"
-                                    android:focusedByDefault="true"
+                                    android:layout_gravity="bottom"
                                     android:layout_marginLeft="3dp"
-                                    android:textSize="13sp"
+                                    android:layout_weight="1"
+                                    android:background="@drawable/border2"
+                                    android:drawableRight="@drawable/ic_search"
+                                    android:focusedByDefault="true"
+                                    android:paddingRight="10dp"
+                                    android:text="BUSCAR PRODUCTO"
                                     android:textAllCaps="false"
-                                    android:layout_gravity="bottom"/>
+                                    android:textSize="13sp" />
                             </LinearLayout>
 
                             <androidx.recyclerview.widget.RecyclerView
@@ -286,7 +306,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:orientation="vertical"
-                                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+                                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
                         </LinearLayout>
                     </LinearLayout>
 
@@ -299,65 +319,72 @@
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardCornerRadius="10dp"
-        app:cardElevation="5dp"
-        android:layout_marginTop="10dp"
+        android:layout_gravity="bottom"
         android:layout_marginHorizontal="5dp"
+        android:layout_marginTop="10dp"
         android:layout_marginBottom="5dp"
-        android:layout_gravity="bottom">
+        app:cardCornerRadius="10dp"
+        app:cardElevation="5dp">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="5dp">
+
             <ImageButton
                 android:id="@+id/btViewSubtotales"
                 android:layout_width="match_parent"
                 android:layout_height="10dp"
-                android:src="@drawable/ic_row_up"
                 android:background="@null"
                 android:scaleX="1.5"
-                android:scaleY="0.7"/>
+                android:scaleY="0.7"
+                android:src="@drawable/ic_row_up" />
+
             <LinearLayout
                 android:id="@+id/lySubtotales"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:layout_marginTop="5dp"
-                android:layout_marginBottom="10dp"
                 android:layout_marginRight="10dp"
+                android:layout_marginBottom="10dp"
+                android:orientation="horizontal"
                 android:visibility="gone">
+
                 <TextView
                     android:id="@+id/tvsubtotales"
+                    style="@style/EstiloText_Black3"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Subtotales"
-                    style="@style/EstiloText_Black3"/>
+                    android:text="Subtotales" />
             </LinearLayout>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="2"
                 android:layout_marginHorizontal="10dp"
-                android:layout_marginTop="5dp">
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
                 <ImageButton
                     android:id="@+id/btnObservacion"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_eye_white"
                     android:background="@drawable/bg_button_confirmation"
                     android:paddingHorizontal="20dp"
+                    android:src="@drawable/ic_eye_white"
                     android:tooltipText="Observación del pedido"
-                    android:visibility="gone"/>
+                    android:visibility="gone" />
+
                 <TextView
                     android:id="@+id/lblTotal"
+                    style="@style/EstiloText_Black"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Total: $0.00"
-                    style="@style/EstiloText_Black"
-                    android:textAlignment="viewEnd"/>
+                    android:textAlignment="viewEnd" />
             </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>

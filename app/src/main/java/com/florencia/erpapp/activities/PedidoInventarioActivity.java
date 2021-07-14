@@ -46,14 +46,14 @@ public class PedidoInventarioActivity extends AppCompatActivity implements View.
     public static final int REQUEST_BUSQUEDA_PEDIDO = 2;
     RecyclerView rvDetalle;
     CardView cvInformacion;
-    TextView lblProducto,lblPedido, lblCodDocumento, lblFechaReg, lblEstado, lblObservacion;
+    TextView lblProducto, lblPedido, lblCodDocumento, lblFechaReg, lblEstado, lblObservacion;
     EditText tvObservacion;
     Button btnBuscaProducto;
     PedidoInventario pedido = new PedidoInventario();
     DetallePedidoInvAdapter detalleAdapter;
     List<DetallePedidoInv> detalleProductos = new ArrayList<>();
     public static final List<DetallePedidoInv> productBusqueda = new ArrayList<>();
-    Integer idpedido=0;
+    Integer idpedido = 0;
     ProgressDialog pgCargando;
     Toolbar toolbar;
     View rootView;
@@ -100,25 +100,25 @@ public class PedidoInventarioActivity extends AppCompatActivity implements View.
         lblObservacion.setOnClickListener(this::onClick);
         btnBuscaProducto.setOnClickListener(this::onClick);
 
-        if(getIntent().getExtras()!=null){
-            idpedido = getIntent().getExtras().getInt("idcomprobante",0);
+        if (getIntent().getExtras() != null) {
+            idpedido = getIntent().getExtras().getInt("idcomprobante", 0);
         }
 
         detalleProductos = new ArrayList<>();
         detalleAdapter = new DetallePedidoInvAdapter(this, detalleProductos, idpedido > 0, "PI");
         rvDetalle.setAdapter(detalleAdapter);
 
-        if(idpedido>0){
+        if (idpedido > 0) {
             BuscaPedido(idpedido);
         }
     }
 
     @Override
     public void onClick(View v) {
-        try{
-            switch(v.getId()){
+        try {
+            switch (v.getId()) {
                 case R.id.btnBuscarProducto:
-                    Intent i = new Intent(v.getContext(),ProductoBusquedaActivity.class);
+                    Intent i = new Intent(v.getContext(), ProductoBusquedaActivity.class);
                     i.putExtra("tipobusqueda", "PI");
                     startActivityForResult(i, REQUEST_PRODUCTO);
                     overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
@@ -133,7 +133,8 @@ public class PedidoInventarioActivity extends AppCompatActivity implements View.
                     Utils.EfectoLayout(tvObservacion, lblObservacion);
                     break;
             }
-        }catch (Exception e){}
+        } catch (Exception e) {
+        }
     }
 
     @Override
@@ -142,9 +143,9 @@ public class PedidoInventarioActivity extends AppCompatActivity implements View.
         inflater.inflate(R.menu.menu_save, menu);
         menu.findItem(R.id.option_newclient).setVisible(false);
         menu.findItem(R.id.option_reimprimir).setVisible(false);
-        if(idpedido==0) {
+        if (idpedido == 0) {
             //menu.findItem(R.id.option_reimprimir).setVisible(false);
-        }else{
+        } else {
             menu.findItem(R.id.option_save).setVisible(false);
             menu.findItem(R.id.option_newdocument).setVisible(false);
         }
@@ -153,38 +154,38 @@ public class PedidoInventarioActivity extends AppCompatActivity implements View.
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.option_save:
-                if(!SQLite.usuario.VerificaPermiso(this, Constants.PEDIDO_INVENTARIO, "escritura")){
+                if (!SQLite.usuario.VerificaPermiso(this, Constants.PEDIDO_INVENTARIO, "escritura")) {
                     //Utils.showMessage(this,"No tiene permisos para registrar pedidos.");
-                    Banner.make(rootView,PedidoInventarioActivity.this,Banner.ERROR,"No tiene permisos para registrar pedidos.", Banner.BOTTOM,3000).show();
+                    Banner.make(rootView, PedidoInventarioActivity.this, Banner.ERROR, "No tiene permisos para registrar pedidos.", Banner.BOTTOM, 3000).show();
                     break;
                 }
 
-                if(detalleAdapter.detallePedido.size()==0) {
-                    Banner.make(rootView,PedidoInventarioActivity.this,Banner.ERROR,"Agregue productos al pedido...", Banner.BOTTOM,3000).show();
+                if (detalleAdapter.detallePedido.size() == 0) {
+                    Banner.make(rootView, PedidoInventarioActivity.this, Banner.ERROR, "Agregue productos al pedido...", Banner.BOTTOM, 3000).show();
                     break;
                 }
                 AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogTheme);
                 View view = LayoutInflater.from(this).inflate(R.layout.layout_confirmation_dialog,
                         (ConstraintLayout) findViewById(R.id.lyDialogContainer));
                 builder.setView(view);
-                ((TextView)view.findViewById(R.id.lblTitle)).setText("Guardar pedido");
-                ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Está seguro que desea guardar este pedido?");
-                ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_save);
-                ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
-                ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
+                ((TextView) view.findViewById(R.id.lblTitle)).setText("Guardar pedido");
+                ((TextView) view.findViewById(R.id.lblMessage)).setText("¿Está seguro que desea guardar este pedido?");
+                ((ImageView) view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_save);
+                ((Button) view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
+                ((Button) view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
                 final AlertDialog alertDialog = builder.create();
                 view.findViewById(R.id.btnConfirm).setOnClickListener(
-                    v -> {
-                        GuardarDatos();
-                        alertDialog.dismiss();
-                    }
+                        v -> {
+                            GuardarDatos();
+                            alertDialog.dismiss();
+                        }
                 );
 
                 view.findViewById(R.id.btnCancel).setOnClickListener(v -> alertDialog.dismiss());
 
-                if(alertDialog.getWindow()!=null)
+                if (alertDialog.getWindow() != null)
                     alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
                 alertDialog.show();
                 break;
@@ -208,7 +209,7 @@ public class PedidoInventarioActivity extends AppCompatActivity implements View.
                 break;
             case R.id.option_listdocument:
                 Intent i = new Intent(this, ListaComprobantesActivity.class);
-                i.putExtra("tipobusqueda","PI");
+                i.putExtra("tipobusqueda", "PI");
                 startActivityForResult(i, REQUEST_BUSQUEDA_PEDIDO);
                 overridePendingTransition(R.anim.left_in, R.anim.left_out);
                 break;
@@ -217,7 +218,7 @@ public class PedidoInventarioActivity extends AppCompatActivity implements View.
     }
 
     private void LimpiarDatos() {
-        try{
+        try {
             toolbar.setTitle("Nuevo pedido");
             toolbar.setSubtitle("");
             pedido = new PedidoInventario();
@@ -234,31 +235,33 @@ public class PedidoInventarioActivity extends AppCompatActivity implements View.
             btnBuscaProducto.setVisibility(View.VISIBLE);
             cvInformacion.setVisibility(View.GONE);
             idpedido = 0;
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, "LimpiarDatos(): " + e.getMessage());
         }
     }
 
-    private boolean ValidaDatos() throws Exception{
+    private boolean ValidaDatos() throws Exception {
         pedido.detalle.clear();
         pedido.detalle.addAll(detalleAdapter.detallePedido);
-        if( SQLite.usuario.sucursal == null){
+        if (SQLite.usuario.sucursal == null) {
             //Utils.showMessage(this, "Datos incompletos de la Sucursal para emitir facturas.");
-            Banner.make(rootView,PedidoInventarioActivity.this,Banner.ERROR,"Datos incompletos de la Sucursal para emitir facturas.", Banner.BOTTOM,3000).show();
+            Banner.make(rootView, PedidoInventarioActivity.this, Banner.ERROR, "Datos incompletos de la Sucursal para emitir facturas.", Banner.BOTTOM, 3000).show();
             return false;
-        }else if(SQLite.usuario.sucursal.CodigoEstablecimiento.equals("")) {
+        } else if (SQLite.usuario.sucursal.CodigoEstablecimiento.equals("")) {
             //Utils.showMessage(this, "Datos incompletos de la Sucursal para emitir facturas.");
-            Banner.make(rootView,PedidoInventarioActivity.this,Banner.ERROR,"Datos incompletos de la Sucursal para emitir facturas.", Banner.BOTTOM,3000).show();
+            Banner.make(rootView, PedidoInventarioActivity.this, Banner.ERROR, "Datos incompletos de la Sucursal para emitir facturas.", Banner.BOTTOM, 3000).show();
             return false;
         }
 
-        if(pedido.detalle.size()==0){
-            Banner.make(rootView,PedidoInventarioActivity.this,Banner.ERROR,"Especifique un detalle para el pedido", Banner.BOTTOM,3000).show();
+        if (pedido.detalle.size() == 0) {
+            Banner.make(rootView, PedidoInventarioActivity.this, Banner.ERROR, "Especifique un detalle para el pedido", Banner.BOTTOM, 3000).show();
             return false;
-        }else{
-            for(DetallePedidoInv det:pedido.detalle) {
+        } else {
+            for (DetallePedidoInv det : pedido.detalle) {
                 if (det.cantidadpedida <= 0) {
-                    Banner.make(rootView, PedidoInventarioActivity.this, Banner.ERROR, "La cantidad para «" + det.producto.nombreproducto + "» debe ser mayor a 0", Banner.BOTTOM, 3500).show();
+                    Banner.make(rootView, PedidoInventarioActivity.this, Banner.ERROR,
+                            "La cantidad para " + Constants.COMILLA_ABRE + det.producto.nombreproducto
+                                    + Constants.COMILLA_CIERRA + " debe ser mayor a 0", Banner.BOTTOM, 3500).show();
                     return false;
                 }
             }
@@ -267,8 +270,8 @@ public class PedidoInventarioActivity extends AppCompatActivity implements View.
     }
 
     private void GuardarDatos() {
-        try{
-            if(!ValidaDatos()) return;
+        try {
+            if (!ValidaDatos()) return;
 
             pedido.detalle.clear();
             pedido.detalle.addAll(detalleAdapter.detallePedido);
@@ -284,10 +287,10 @@ public class PedidoInventarioActivity extends AppCompatActivity implements View.
 
             if (pedido.Save()) {
                 LimpiarDatos();
-                Banner.make(rootView,PedidoInventarioActivity.this,Banner.SUCCESS,Constants.MSG_DATOS_GUARDADOS,Banner.BOTTOM,3000).show();
-            }else
-                Banner.make(rootView,PedidoInventarioActivity.this,Banner.ERROR,Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM,3000).show();
-        }catch (Exception e){
+                Banner.make(rootView, PedidoInventarioActivity.this, Banner.SUCCESS, Constants.MSG_DATOS_GUARDADOS, Banner.BOTTOM, 3000).show();
+            } else
+                Banner.make(rootView, PedidoInventarioActivity.this, Banner.ERROR, Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM, 3000).show();
+        } catch (Exception e) {
             Log.d(TAG, e.getMessage());
         }
     }
@@ -302,32 +305,32 @@ public class PedidoInventarioActivity extends AppCompatActivity implements View.
                     pedido = new PedidoInventario();
                     pedido = PedidoInventario.get(idpedido);
                     runOnUiThread(() -> {
-                            if (pedido != null) {
-                                toolbar.setTitle(pedido.codigopedido);
-                                toolbar.setSubtitle("");
-                                cvInformacion.setVisibility(View.VISIBLE);
-                                btnBuscaProducto.setVisibility(View.GONE);
-                                lblCodDocumento.setText(pedido.codigopedido);
-                                lblFechaReg.setText(pedido.fecharegistro);
-                                lblEstado.setText(pedido.estadomovil == 1?"No sincronizado":"Sincronizado");
-                                lblEstado.setTextColor(pedido.estadomovil == 1?getResources().getColor(R.color.black_overlay):getResources().getColor(R.color.colorSuccess));
-                                detalleAdapter.visualizacion = true;
-                                detalleProductos.clear();
-                                detalleProductos.addAll(pedido.detalle);
-                                detalleAdapter.detallePedido.clear();
-                                detalleAdapter.detallePedido.addAll(pedido.detalle);
-                                detalleAdapter.notifyDataSetChanged();
-                                tvObservacion.setText(pedido.observacion);
-                                tvObservacion.setEnabled(false);
-                            } else {
-                                Banner.make(rootView,PedidoInventarioActivity.this, Banner.ERROR,"Ocurrió un error al obtener los datos para este pedido.", Banner.BOTTOM, 3000).show();
-                            }
-                            pgCargando.dismiss();
-                        });
+                        if (pedido != null) {
+                            toolbar.setTitle(pedido.codigopedido);
+                            toolbar.setSubtitle("");
+                            cvInformacion.setVisibility(View.VISIBLE);
+                            btnBuscaProducto.setVisibility(View.GONE);
+                            lblCodDocumento.setText(pedido.codigopedido);
+                            lblFechaReg.setText(pedido.fecharegistro);
+                            lblEstado.setText(pedido.estadomovil == 1 ? "No sincronizado" : "Sincronizado");
+                            lblEstado.setTextColor(pedido.estadomovil == 1 ? getResources().getColor(R.color.black_overlay) : getResources().getColor(R.color.colorSuccess));
+                            detalleAdapter.visualizacion = true;
+                            detalleProductos.clear();
+                            detalleProductos.addAll(pedido.detalle);
+                            detalleAdapter.detallePedido.clear();
+                            detalleAdapter.detallePedido.addAll(pedido.detalle);
+                            detalleAdapter.notifyDataSetChanged();
+                            tvObservacion.setText(pedido.observacion);
+                            tvObservacion.setEnabled(false);
+                        } else {
+                            Banner.make(rootView, PedidoInventarioActivity.this, Banner.ERROR, "Ocurrió un error al obtener los datos para este pedido.", Banner.BOTTOM, 3000).show();
+                        }
+                        pgCargando.dismiss();
+                    });
                 }
             };
             th.start();
-        }catch (Exception e){
+        } catch (Exception e) {
             pgCargando.dismiss();
             Log.d(TAG, e.getMessage());
         }
@@ -341,7 +344,7 @@ public class PedidoInventarioActivity extends AppCompatActivity implements View.
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case REQUEST_PRODUCTO:
-                    if(pedido==null)
+                    if (pedido == null)
                         pedido = new PedidoInventario();
                     detalleAdapter.visualizacion = false;
                     detalleAdapter.detallePedido.addAll(productBusqueda);
@@ -360,13 +363,14 @@ public class PedidoInventarioActivity extends AppCompatActivity implements View.
             }
         }
     }
+
     @Override
     public void onResume() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.appbar);
         toolbar.setTitleTextColor(Color.WHITE);
         toolbar.setSubtitleTextColor(Color.WHITE);
         toolbar.setTitle("Nuevo pedido");
-        if(pedido == null)
+        if (pedido == null)
             pedido = new PedidoInventario();
         pedido.tipotransaccion = "PI";
         pedido.establecimientoid = SQLite.usuario.sucursal.IdEstablecimiento;
@@ -376,16 +380,16 @@ public class PedidoInventarioActivity extends AppCompatActivity implements View.
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if(keyCode == KeyEvent.KEYCODE_BACK){
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogTheme);
             View view = LayoutInflater.from(this).inflate(R.layout.layout_confirmation_dialog,
                     (ConstraintLayout) findViewById(R.id.lyDialogContainer));
             builder.setView(view);
-            ((TextView)view.findViewById(R.id.lblTitle)).setText("Cerrar");
-            ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Desea salir de la ventana de pedido?");
-            ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_check_white);
-            ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
-            ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
+            ((TextView) view.findViewById(R.id.lblTitle)).setText("Cerrar");
+            ((TextView) view.findViewById(R.id.lblMessage)).setText("¿Desea salir de la ventana de pedido?");
+            ((ImageView) view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_check_white);
+            ((Button) view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
+            ((Button) view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
             final AlertDialog alertDialog = builder.create();
             view.findViewById(R.id.btnConfirm).setOnClickListener(v -> {
                 onBackPressed();
@@ -394,7 +398,7 @@ public class PedidoInventarioActivity extends AppCompatActivity implements View.
 
             view.findViewById(R.id.btnCancel).setOnClickListener(v -> alertDialog.dismiss());
 
-            if(alertDialog.getWindow()!=null)
+            if (alertDialog.getWindow() != null)
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
             alertDialog.show();
             return true;

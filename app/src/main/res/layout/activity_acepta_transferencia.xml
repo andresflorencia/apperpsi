@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/colorGrayLight2"
     android:fitsSystemWindows="true"
-    tools:context=".activities.RecepcionActivity">
+    tools:context=".activities.AceptaTransferenciaActivity">
 
     <com.google.android.material.appbar.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
@@ -60,7 +60,7 @@
                             android:drawableRight="@drawable/ic_row_up"
                             android:gravity="center_vertical"
                             android:paddingLeft="10dp"
-                            android:text="TRANSFERENCIA A RECIBIR" />
+                            android:text="TRANSFERENCIAS" />
 
                         <LinearLayout
                             android:id="@+id/lyCombo"
@@ -245,8 +245,9 @@
             </LinearLayout>
         </ScrollView>
     </LinearLayout>
-
+    <!--BOTONES PARA ACEPTAR O RECHAZAR-->
     <androidx.cardview.widget.CardView
+        android:id="@+id/cvBotones"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
@@ -259,35 +260,28 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:padding="5dp">
 
-            <TextView
-                android:id="@+id/lblObservacion"
-                style="@style/EstiloText_Black3"
-                android:layout_width="match_parent"
+            <Button
+                android:id="@+id/btnRechazar"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:drawableRight="@drawable/ic_row_up"
-                android:text="OBSERVACIÓN"
-                android:textAlignment="viewStart" />
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
+                android:layout_weight="1"
+                android:text="RECHAZAR"
+                android:background="@drawable/bg_button_error"
+                android:textColor="@color/colorWhite"
+                android:layout_marginRight="2dp"/>
+            <Button
+                android:id="@+id/btnAceptar"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textColorHint="@color/colorPrimaryDark">
-
-                <EditText
-                    android:id="@+id/tvObservacion"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:hint="Observación"
-                    android:lines="2"
-                    android:textColor="@color/colorGray"
-                    android:textSize="16sp"
-                    android:visibility="gone" />
-            </com.google.android.material.textfield.TextInputLayout>
+                android:layout_weight="1"
+                android:text="ACEPTAR"
+                android:background="@drawable/bg_button_confirmation"
+                android:textColor="@color/colorWhite"
+                android:layout_marginLeft="2dp"/>
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

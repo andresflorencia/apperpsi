@@ -73,7 +73,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.florencia.erpapp.services.Printer.btsocket;
 
-public class TransferenciaActivity extends AppCompatActivity implements View.OnClickListener{
+public class TransferenciaActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final int REQUEST_BUSQUEDA_PRODUCTO = 1;
     private static final int REQUEST_BUSQUEDA_TRANSFERENCIA = 2;
@@ -92,8 +92,8 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
     ImageButton btnRefresh;
     TextView lblObservacion;
     EditText tvObservacion;
-    Integer idtransferencia=0;
-    List<Comprobante> listTransacciones= new ArrayList<>();
+    Integer idtransferencia = 0;
+    List<Comprobante> listTransacciones = new ArrayList<>();
     public static final List<DetalleComprobante> productBusqueda = new ArrayList<>();
     LinearLayout lyCombo, lyDatosInformativos, lyProductos;
     TextView lblTransferencia, lblEnvia, lblRecibe, lblDocTransferencia, lblProducto;
@@ -104,10 +104,11 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
     BottomSheetDialog btsDialog;
     Button btnPositive, btnNegative;
     View viewSeparator, rootView;
-    String tipoAccion="";
+    String tipoAccion = "";
     RadioGroup rgTipoTransaccion;
     RadioButton rbTransferencia, rbDevolucion;
     Retrofit retrofit;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -125,7 +126,7 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 try {
                     miestablecimiento = listEstablecimientos.get(position);
-                }catch (Exception e){
+                } catch (Exception e) {
                     Log.d(TAG, "cbEstablecimiento(): " + e.getMessage());
                 }
             }
@@ -137,7 +138,7 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
         });
     }
 
-    private void init(){
+    private void init() {
         cbEstablecimientos = findViewById(R.id.cbEstablecimiento);
         rvDetalleProducto = findViewById(R.id.rvDetalleProductos);
         pbCargando = findViewById(R.id.pbCargando);
@@ -177,7 +178,7 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
         LlenarEstablecimientos(this);
 
         mitransferencia = new Comprobante();
-        detalleAdapter = new DetalleRecepcionAdapter(this,detalleProductos,"",false,"4,20");
+        detalleAdapter = new DetalleRecepcionAdapter(this, detalleProductos, "", false, "4,20");
         rvDetalleProducto.setAdapter(detalleAdapter);
 
         btnRefresh.setOnClickListener(this::onClick);
@@ -186,30 +187,30 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
         lblProducto.setOnClickListener(this::onClick);
         lblTransferencia.setOnClickListener(this::onClick);
 
-        if(getIntent().getExtras()!=null){
-            idtransferencia = getIntent().getExtras().getInt("idcomprobante",0);
-            if(idtransferencia>0)
+        if (getIntent().getExtras() != null) {
+            idtransferencia = getIntent().getExtras().getInt("idcomprobante", 0);
+            if (idtransferencia > 0)
                 BuscaTransferencia(idtransferencia);
         }
     }
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.btnRefresh:
                 LlenarEstablecimientos(v.getContext());
                 break;
             case R.id.lblObservacion:
-                Utils.EfectoLayout(tvObservacion,lblObservacion);
+                Utils.EfectoLayout(tvObservacion, lblObservacion);
                 break;
             case R.id.btnBuscarProducto:
-                Intent i = new Intent(v.getContext(),ProductoBusquedaActivity.class);
+                Intent i = new Intent(v.getContext(), ProductoBusquedaActivity.class);
                 i.putExtra("tipobusqueda", "4,20");
                 startActivityForResult(i, REQUEST_BUSQUEDA_PRODUCTO);
                 overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
                 break;
             case R.id.btnPositive:
-                if(tipoAccion.equals("MESSAGE")) {
+                if (tipoAccion.equals("MESSAGE")) {
                     btnNegative.setVisibility(View.VISIBLE);
                     viewSeparator.setVisibility(View.VISIBLE);
                     lblTitle.setVisibility(View.VISIBLE);
@@ -220,7 +221,7 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
                 btsDialog.dismiss();
                 break;
             case R.id.lblTransferencia:
-                if(idtransferencia>0)
+                if (idtransferencia > 0)
                     Utils.EfectoLayout(lyDatosInformativos, lblTransferencia);
                 else
                     Utils.EfectoLayout(lyCombo, lblTransferencia);
@@ -232,7 +233,7 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
     }
 
     private void LlenarEstablecimientos(Context context) {
-        try{
+        try {
             /*if(!Utils.isOnlineNet(SQLite.configuracion.urlbase)) {
                 Banner.make(rootView,TransferenciaActivity.this,Banner.ERROR,Constants.MSG_COMPROBAR_CONEXION_INTERNET, Banner.BOTTOM,3000).show();
                 return;
@@ -243,12 +244,12 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
 
             IComprobante miInterface = retrofit.create(IComprobante.class);
 
-            Call<JsonObject> call=null;
-            call=miInterface.getEstablecimientos(SQLite.usuario.Usuario,SQLite.usuario.Clave,SQLite.usuario.sucursal.IdEstablecimiento);
+            Call<JsonObject> call = null;
+            call = miInterface.getEstablecimientos(SQLite.usuario.Usuario, SQLite.usuario.Clave, SQLite.usuario.sucursal.IdEstablecimiento);
             call.enqueue(new Callback<JsonObject>() {
                 @Override
                 public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                    if(!response.isSuccessful()){
+                    if (!response.isSuccessful()) {
                         showError("Error código: " + response.code());
                         pbCargando.setVisibility(View.GONE);
                         btnRefresh.setVisibility(View.VISIBLE);
@@ -260,10 +261,10 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
                             cbEstablecimientos.setAdapter(null);
                             if (!obj.get("haserror").getAsBoolean()) {
                                 JsonArray jsonEstablecimientos = obj.getAsJsonArray("sucursales");
-                                if(jsonEstablecimientos!=null){
+                                if (jsonEstablecimientos != null) {
                                     listEstablecimientos.clear();
                                     Sucursal miestablecimiento = new Sucursal();
-                                    miestablecimiento.NombreSucursal="Escoja el destino";
+                                    miestablecimiento.NombreSucursal = "Escoja el destino";
                                     listEstablecimientos.add(miestablecimiento);
                                     for (JsonElement ele : jsonEstablecimientos) {
                                         JsonObject trans = ele.getAsJsonObject();
@@ -277,15 +278,15 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
                                     }
                                     spinnerAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, listEstablecimientos);
                                     cbEstablecimientos.setAdapter(spinnerAdapter);
-                                    cbEstablecimientos.setSelection(0,true);
+                                    cbEstablecimientos.setSelection(0, true);
                                 }
-                            }else
-                                Utils.showErrorDialog(TransferenciaActivity.this,"Error",obj.get("message").getAsString());
-                        }else
-                            Banner.make(rootView,TransferenciaActivity.this,Banner.ERROR,"Ocurrió un error al cargar los datos.",Banner.BOTTOM,3000).show();
+                            } else
+                                Utils.showErrorDialog(TransferenciaActivity.this, "Error", obj.get("message").getAsString());
+                        } else
+                            Banner.make(rootView, TransferenciaActivity.this, Banner.ERROR, "Ocurrió un error al cargar los datos.", Banner.BOTTOM, 3000).show();
 
-                    }catch (Exception e){
-                        Log.d(TAG,"onResponse(): " + e.getMessage());
+                    } catch (Exception e) {
+                        Log.d(TAG, "onResponse(): " + e.getMessage());
                     }
                     pbCargando.setVisibility(View.GONE);
                     btnRefresh.setVisibility(View.VISIBLE);
@@ -293,46 +294,46 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
 
                 @Override
                 public void onFailure(Call<JsonObject> call, Throwable t) {
-                    Utils.showErrorDialog(TransferenciaActivity.this,"Error",t.getMessage());
+                    Utils.showErrorDialog(TransferenciaActivity.this, "Error", t.getMessage());
                     Log.d(TAG, "onFailure(): " + t.getMessage());
                     call.cancel();
                     pbCargando.setVisibility(View.GONE);
                     btnRefresh.setVisibility(View.VISIBLE);
                 }
             });
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, "LlenarEstablecimientos(): " + e.getMessage());
             pbCargando.setVisibility(View.GONE);
             btnRefresh.setVisibility(View.VISIBLE);
         }
     }
 
-    private boolean ValidarDatos(){
-        try{
-            if(!rbTransferencia.isChecked() && !rbDevolucion.isChecked()){
-                Banner.make(rootView,TransferenciaActivity.this,Banner.ERROR,"Debe especificar el tipo de transacción a realizar.", Banner.BOTTOM,3000).show();
+    private boolean ValidarDatos() {
+        try {
+            if (!rbTransferencia.isChecked() && !rbDevolucion.isChecked()) {
+                Banner.make(rootView, TransferenciaActivity.this, Banner.ERROR, "Debe especificar el tipo de transacción a realizar.", Banner.BOTTOM, 3000).show();
                 return false;
             }
-            if(cbEstablecimientos.getAdapter()==null){
-                Banner.make(rootView,TransferenciaActivity.this,Banner.ERROR,"No hay establecimientos o bódegas disponibles para la transferencia.", Banner.BOTTOM,3000).show();
+            if (cbEstablecimientos.getAdapter() == null) {
+                Banner.make(rootView, TransferenciaActivity.this, Banner.ERROR, "No hay establecimientos o bódegas disponibles para la transferencia.", Banner.BOTTOM, 3000).show();
                 return false;
             }
-            if(cbEstablecimientos.getSelectedItemPosition()==0){
-                Banner.make(rootView,TransferenciaActivity.this,Banner.ERROR,"Escoja el establecimiento/bodega de destino.", Banner.BOTTOM,3000).show();
+            if (cbEstablecimientos.getSelectedItemPosition() == 0) {
+                Banner.make(rootView, TransferenciaActivity.this, Banner.ERROR, "Escoja el establecimiento/bodega de destino.", Banner.BOTTOM, 3000).show();
                 return false;
             }
-            if(detalleAdapter.detalleComprobante.size()==0){
-                Banner.make(rootView,TransferenciaActivity.this,Banner.ERROR,"No ha especificado los productos para la transferencia.",Banner.BOTTOM,3000).show();
+            if (detalleAdapter.detalleComprobante.size() == 0) {
+                Banner.make(rootView, TransferenciaActivity.this, Banner.ERROR, "No ha especificado los productos para la transferencia.", Banner.BOTTOM, 3000).show();
                 return false;
-            }else{
-                for (DetalleComprobante midetalle:detalleAdapter.detalleComprobante){
-                    if(midetalle.cantidad<=0){
-                        Banner.make(rootView,TransferenciaActivity.this,Banner.ERROR,"No ha especificado la cantidad a tranferir para «"+midetalle.producto.nombreproducto+"»",Banner.BOTTOM,3000).show();
+            } else {
+                for (DetalleComprobante midetalle : detalleAdapter.detalleComprobante) {
+                    if (midetalle.cantidad <= 0) {
+                        Banner.make(rootView, TransferenciaActivity.this, Banner.ERROR, "No ha especificado la cantidad a tranferir para " + Constants.COMILLA_ABRE + midetalle.producto.nombreproducto + Constants.COMILLA_CIERRA, Banner.BOTTOM, 3000).show();
                         return false;
                     }
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, "ValidarDatos(): " + e.getMessage());
             return false;
         }
@@ -340,15 +341,15 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
     }
 
     private void GuardarDatos() {
-        try{
-            if(!ValidarDatos()) return;
+        try {
+            if (!ValidarDatos()) return;
 
             listTransacciones.clear();
             Sucursal destino = new Sucursal();
             destino = (Sucursal) cbEstablecimientos.getSelectedItem();
 
-            mitransferencia.tipotransaccion = rbTransferencia.isChecked()?"4":"20";
-            mitransferencia.codigotransaccion = (rbTransferencia.isChecked()?"TR-":"DEVINV-") + SQLite.usuario.sucursal.IdSucursal + "-" + Utils.getDateFormat("yyMMdd-HHmmss");
+            mitransferencia.tipotransaccion = rbTransferencia.isChecked() ? "4" : "20";
+            mitransferencia.codigotransaccion = (rbTransferencia.isChecked() ? "TR-" : "DEVINV-") + SQLite.usuario.sucursal.IdSucursal + "-" + Utils.getDateFormat("yyMMdd-HHmmss");
             mitransferencia.total = 0d;
             mitransferencia.codigoestablecimiento = SQLite.usuario.sucursal.CodigoEstablecimiento;
             mitransferencia.observacion = tvObservacion.getText().toString().trim();
@@ -360,19 +361,19 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
             SQLite.gpsTracker.getLastKnownLocation();
             mitransferencia.lat = SQLite.gpsTracker.getLatitude();
             mitransferencia.lon = SQLite.gpsTracker.getLongitude();
-            if(mitransferencia.lat == null)
+            if (mitransferencia.lat == null)
                 mitransferencia.lat = 0d;
-            if(mitransferencia.lon == null)
+            if (mitransferencia.lon == null)
                 mitransferencia.lon = 0d;
 
-            for(DetalleComprobante midetalle:mitransferencia.detalle)
+            for (DetalleComprobante midetalle : mitransferencia.detalle)
                 mitransferencia.total += midetalle.Subtotalcosto();
             mitransferencia.subtotal = mitransferencia.total;
 
             listTransacciones.add(mitransferencia);
 
-            Comprobante mitransferencia2= new Comprobante();
-            mitransferencia2.tipotransaccion = rbTransferencia.isChecked()?"5":"21";
+            Comprobante mitransferencia2 = new Comprobante();
+            mitransferencia2.tipotransaccion = rbTransferencia.isChecked() ? "5" : "21";
             mitransferencia2.codigotransaccion = mitransferencia.codigotransaccion;
             mitransferencia2.total = 0d;
             mitransferencia2.codigoestablecimiento = destino.CodigoEstablecimiento;
@@ -391,18 +392,18 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
             listTransacciones.add(mitransferencia2);
 
             EnviarDatos(this);
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, "GuardarDatos(): " + e.getMessage());
         }
     }
 
     private void EnviarDatos(Context context) {
-        try{
+        try {
             /*if(!Utils.isOnlineNet(SQLite.configuracion.urlbase)){
                 Banner.make(rootView,TransferenciaActivity.this,Banner.ERROR,Constants.MSG_COMPROBAR_CONEXION_INTERNET, Banner.BOTTOM,3000).show();
                 return;
             }*/
-            if(listTransacciones.size()>0){
+            if (listTransacciones.size() > 0) {
                 pgCargando.setTitle("Guardando transacción");
                 pgCargando.setMessage("Espere un momento...");
                 pgCargando.setCancelable(false);
@@ -410,19 +411,19 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
 
                 IComprobante miInterface = retrofit.create(IComprobante.class);
 
-                Map<String,Object> post = new HashMap<>();
-                post.put("usuario",SQLite.usuario.Usuario);
-                post.put("clave",SQLite.usuario.Clave);
-                post.put("establecimientoid",SQLite.usuario.sucursal.IdEstablecimiento);
+                Map<String, Object> post = new HashMap<>();
+                post.put("usuario", SQLite.usuario.Usuario);
+                post.put("clave", SQLite.usuario.Clave);
+                post.put("establecimientoid", SQLite.usuario.sucursal.IdEstablecimiento);
                 post.put("puntoemisionid", SQLite.usuario.sucursal.IdPuntoEmision);
                 post.put("transacciones", listTransacciones);
                 String json = post.toString();
-                Call<JsonObject> call=miInterface.saveTransferencia(post);
+                Call<JsonObject> call = miInterface.saveTransferencia(post);
                 call.enqueue(new Callback<JsonObject>() {
                     @Override
                     public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                        if(!response.isSuccessful()){
-                            Banner.make(rootView,TransferenciaActivity.this,Banner.ERROR,"Código: " + response.code() + " - " + response.message(), Banner.BOTTOM,3000).show();
+                        if (!response.isSuccessful()) {
+                            Banner.make(rootView, TransferenciaActivity.this, Banner.ERROR, "Código: " + response.code() + " - " + response.message(), Banner.BOTTOM, 3000).show();
                             pgCargando.dismiss();
                             return;
                         }
@@ -432,8 +433,8 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
                                 JsonObject obj = response.body();
                                 if (!obj.get("haserror").getAsBoolean()) {
                                     JsonArray jsonTransacciones = obj.getAsJsonArray("transferencia");
-                                    if(jsonTransacciones!=null){
-                                        for(JsonElement ele:jsonTransacciones){
+                                    if (jsonTransacciones != null) {
+                                        for (JsonElement ele : jsonTransacciones) {
                                             JsonObject trans = ele.getAsJsonObject();
                                             //INSERTAR TRANSFERENCIA EN LA BD LOCAL
                                             Sucursal destino = (Sucursal) cbEstablecimientos.getSelectedItem();
@@ -443,9 +444,9 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
                                             mitransferencia.claveacceso = mitransferencia.codigotransaccion;
                                             mitransferencia.longdate = Utils.longDate(mitransferencia.fechadocumento);
 
-                                            if(mitransferencia.Save(false)){
+                                            if (mitransferencia.Save(false)) {
                                                 JsonArray jsonProductos = obj.getAsJsonArray("productos");
-                                                if(jsonProductos!=null) {
+                                                if (jsonProductos != null) {
                                                     int numProd = 0;
                                                     Producto.Delete(SQLite.usuario.sucursal.IdEstablecimiento);
                                                     for (JsonElement pro : jsonProductos) {
@@ -458,9 +459,9 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
                                                         }
                                                     }
                                                     if (numProd == jsonProductos.size())
-                                                        Banner.make(rootView,TransferenciaActivity.this,Banner.SUCCESS,Constants.MSG_PROCESO_COMPLETADO,Banner.BOTTOM,3000).show();
+                                                        Banner.make(rootView, TransferenciaActivity.this, Banner.SUCCESS, Constants.MSG_PROCESO_COMPLETADO, Banner.BOTTOM, 3000).show();
                                                     else
-                                                        Banner.make(rootView,TransferenciaActivity.this,Banner.ERROR,Constants.MSG_PROCESO_NO_COMPLETADO,Banner.BOTTOM,3000).show();
+                                                        Banner.make(rootView, TransferenciaActivity.this, Banner.ERROR, Constants.MSG_PROCESO_NO_COMPLETADO, Banner.BOTTOM, 3000).show();
                                                 }
                                                 toolbar.getMenu().findItem(R.id.option_save).setVisible(false);
                                                 ConsultaImpresion();
@@ -468,13 +469,13 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
                                             }
                                             break;
                                         }
-                                    }else
-                                        Banner.make(rootView,TransferenciaActivity.this, Banner.ERROR, Constants.MSG_DATOS_NO_GUARDADOS,Banner.BOTTOM,3000).show();
+                                    } else
+                                        Banner.make(rootView, TransferenciaActivity.this, Banner.ERROR, Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM, 3000).show();
                                 } else
-                                    Utils.showErrorDialog(TransferenciaActivity.this,"Error",obj.get("message").getAsString());
+                                    Utils.showErrorDialog(TransferenciaActivity.this, "Error", obj.get("message").getAsString());
                             } else
-                                Banner.make(rootView,TransferenciaActivity.this,Banner.ERROR,Constants.MSG_USUARIO_CLAVE_INCORRECTO,Banner.BOTTOM,3000).show();
-                        }catch (JsonParseException ex){
+                                Banner.make(rootView, TransferenciaActivity.this, Banner.ERROR, Constants.MSG_USUARIO_CLAVE_INCORRECTO, Banner.BOTTOM, 3000).show();
+                        } catch (JsonParseException ex) {
                             Log.d(TAG, ex.getMessage());
                         }
                         pgCargando.dismiss();
@@ -482,60 +483,60 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
 
                     @Override
                     public void onFailure(Call<JsonObject> call, Throwable t) {
-                        Utils.showErrorDialog(TransferenciaActivity.this,"Error",t.getMessage());
+                        Utils.showErrorDialog(TransferenciaActivity.this, "Error", t.getMessage());
                         Log.d(TAG, t.getMessage());
                         call.cancel();
                         pgCargando.dismiss();
                     }
                 });
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, "EnviarDatos(): " + e.getMessage());
             pgCargando.dismiss();
         }
     }
-
+    AlertDialog alertDialog = null;
     private void ConsultaImpresion() {
-        try{
+        try {
             AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogTheme);
             View view = LayoutInflater.from(this).inflate(R.layout.layout_confirmation_dialog,
                     (ConstraintLayout) findViewById(R.id.lyDialogContainer));
             builder.setView(view);
             builder.setCancelable(false);
-            ((TextView)view.findViewById(R.id.lblTitle)).setText("Imprimir");
-            ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Desea imprimir este documento?");
-            ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_printer_white);
-            ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
-            ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
-            final AlertDialog alertDialog = builder.create();
+            ((TextView) view.findViewById(R.id.lblTitle)).setText("Imprimir");
+            ((TextView) view.findViewById(R.id.lblMessage)).setText("¿Desea imprimir este documento?");
+            ((ImageView) view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_printer_white);
+            ((Button) view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
+            ((Button) view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
+            alertDialog = builder.create();
             view.findViewById(R.id.btnConfirm).setOnClickListener(v -> {
-                    if (Printer.btsocket == null) {
-                        Utils.showMessage(getApplicationContext(), "Emparejar la impresora...");
-                        Intent BTIntent = new Intent(getApplicationContext(), DeviceList.class);
-                        startActivityForResult(BTIntent, DeviceList.REQUEST_CONNECT_BT);
-                        return;
-                    }else {
-                        imprimirFactura(idtransferencia==0?"* ORIGINAL *":"* REIMPRESIÓN DE DOCUMENTO *", idtransferencia>0);
-                    }
-                    alertDialog.dismiss();
-                });
+                if (Printer.btsocket == null) {
+                    Utils.showMessage(getApplicationContext(), "Emparejar la impresora...");
+                    Intent BTIntent = new Intent(getApplicationContext(), DeviceList.class);
+                    startActivityForResult(BTIntent, DeviceList.REQUEST_CONNECT_BT);
+                    return;
+                } else {
+                    imprimirFactura(idtransferencia == 0 ? "* ORIGINAL *" : "* REIMPRESIÓN DE DOCUMENTO *", idtransferencia > 0);
+                }
+                alertDialog.dismiss();
+            });
 
             view.findViewById(R.id.btnCancel).setOnClickListener(v -> {
-                    if(idtransferencia==0)
-                        LimpiarDatos();
-                    alertDialog.dismiss();
-                });
+                if (idtransferencia == 0)
+                    LimpiarDatos();
+                alertDialog.dismiss();
+            });
 
-            if(alertDialog.getWindow()!=null)
+            if (alertDialog.getWindow() != null)
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
             alertDialog.show();
-        }catch (Exception e){
-            Log.d(TAG, "ConsultaImpresion(): "+ e.getMessage());
+        } catch (Exception e) {
+            Log.d(TAG, "ConsultaImpresion(): " + e.getMessage());
         }
     }
 
     private void LimpiarDatos() {
-        try{
+        try {
             mitransferencia = new Comprobante();
             listTransacciones.clear();
             detalleProductos.clear();
@@ -559,8 +560,8 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
             rbDevolucion.setChecked(false);
             rbTransferencia.setChecked(false);
             toolbar.setSubtitle("");
-        }catch (Exception e){
-            Log.d(TAG, "LimpiarDatos(): "+ e.getMessage());
+        } catch (Exception e) {
+            Log.d(TAG, "LimpiarDatos(): " + e.getMessage());
         }
     }
 
@@ -574,45 +575,45 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
                 @Override
                 public void run() {
                     mitransferencia = new Comprobante();
-                    mitransferencia = Comprobante.get(idtransferencia);
+                    mitransferencia = Comprobante.get(idtransferencia, false);
                     runOnUiThread(() -> {
-                            if (mitransferencia != null) {
-                                rbTransferencia.setChecked(mitransferencia.tipotransaccion.equals("4"));
-                                rbDevolucion.setChecked(mitransferencia.tipotransaccion.equals("20"));
-                                toolbar.setSubtitle("Fecha: " + Utils.fechaMes(mitransferencia.fechadocumento));
-                                rgTipoTransaccion.setEnabled(false);
-                                rbTransferencia.setEnabled(false);
-                                rbDevolucion.setEnabled(false);
-                                cbEstablecimientos.setEnabled(false);
-                                detalleAdapter.visualizacion = true;
-                                detalleProductos.clear();
-                                detalleProductos.addAll(mitransferencia.detalle);
-                                detalleAdapter.detalleComprobante.clear();
-                                detalleAdapter.detalleComprobante.addAll(mitransferencia.detalle);
-                                detalleAdapter.notifyDataSetChanged();
-                                tvObservacion.setText(mitransferencia.observacion);
-                                tvObservacion.setEnabled(false);
-                                lyCombo.setVisibility(View.GONE);
-                                lyDatosInformativos.setVisibility(View.VISIBLE);
-                                lblTransferencia.setText("DATOS INFORMATIVOS");
-                                lblEnvia.setText(mitransferencia.sucursalenvia.split("-")[1]);
-                                lblDocTransferencia.setText(mitransferencia.claveacceso);
-                                lblRecibe.setText(mitransferencia.sucursalrecibe.split("-")[1]);
-                                btnBuscarProducto.setVisibility(View.GONE);
-                            } else {
-                                Banner.make(rootView,TransferenciaActivity.this,Banner.ERROR,"Ocurrió un error al obtener los datos para este documento.", Banner.BOTTOM,3000).show();
-                            }
-                            pbCargando.setVisibility(View.GONE);
-                        });
+                        if (mitransferencia != null) {
+                            rbTransferencia.setChecked(mitransferencia.tipotransaccion.equals("4"));
+                            rbDevolucion.setChecked(mitransferencia.tipotransaccion.equals("20"));
+                            toolbar.setSubtitle("Fecha: " + Utils.fechaMes(mitransferencia.fechadocumento));
+                            rgTipoTransaccion.setEnabled(false);
+                            rbTransferencia.setEnabled(false);
+                            rbDevolucion.setEnabled(false);
+                            cbEstablecimientos.setEnabled(false);
+                            detalleAdapter.visualizacion = true;
+                            detalleProductos.clear();
+                            detalleProductos.addAll(mitransferencia.detalle);
+                            detalleAdapter.detalleComprobante.clear();
+                            detalleAdapter.detalleComprobante.addAll(mitransferencia.detalle);
+                            detalleAdapter.notifyDataSetChanged();
+                            tvObservacion.setText(mitransferencia.observacion);
+                            tvObservacion.setEnabled(false);
+                            lyCombo.setVisibility(View.GONE);
+                            lyDatosInformativos.setVisibility(View.VISIBLE);
+                            lblTransferencia.setText("DATOS INFORMATIVOS");
+                            lblEnvia.setText(mitransferencia.sucursalenvia.split("-")[1]);
+                            lblDocTransferencia.setText(mitransferencia.claveacceso);
+                            lblRecibe.setText(mitransferencia.sucursalrecibe.split("-")[1]);
+                            btnBuscarProducto.setVisibility(View.GONE);
+                        } else {
+                            Banner.make(rootView, TransferenciaActivity.this, Banner.ERROR, "Ocurrió un error al obtener los datos para este documento.", Banner.BOTTOM, 3000).show();
+                        }
+                        pbCargando.setVisibility(View.GONE);
+                    });
                 }
             };
             th.start();
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, "BuscaRecepcion(): " + e.getMessage());
         }
     }
 
-    private boolean imprimirFactura(String strTipo, boolean reimpresion){
+    private boolean imprimirFactura(String strTipo, boolean reimpresion) {
         Printer printer = new Printer(this);
         boolean fImp = true;
         try {
@@ -622,15 +623,15 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
 
                 if (fImp) {
                     try {
-                        int copias = reimpresion?1:2;
-                        for(int i=0;i<copias; i++) {
+                        int copias = reimpresion ? 1 : 2;
+                        for (int i = 0; i < copias; i++) {
                             printer.printUnicode();
                             printer.printCustom(SQLite.usuario.sucursal.NombreComercial, 0, 1);
                             printer.printCustom(SQLite.usuario.sucursal.RazonSocial, 0, 1);
                             printer.printCustom("RUC: ".concat(SQLite.usuario.sucursal.RUC), 0, 1);
                             printer.printCustom(SQLite.usuario.sucursal.Direcion, 0, 1);
                             printer.printCustom("", 0, 1);
-                            printer.printCustom("**"+ (mitransferencia.tipotransaccion.equals("4")?"TRANSFERENCIA":"DEVOLUCION") +" DE INVENTARIO**", 0, 1);
+                            printer.printCustom("**" + (mitransferencia.tipotransaccion.equals("4") ? "TRANSFERENCIA" : "DEVOLUCION") + " DE INVENTARIO**", 0, 1);
                             printer.printCustom("Origen  : ".concat(mitransferencia.sucursalenvia.split("-")[1]), 0, 0);
                             printer.printCustom("N. Doc.: ".concat(mitransferencia.codigotransaccion), 0, 0);
                             printer.printCustom("Destino : ".concat(mitransferencia.sucursalrecibe.split("-")[1]), 0, 0);
@@ -680,13 +681,13 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
                             printer.printCustom(strTipo, 0, 1);
                             printer.printUnicode();
                             printer.printNewLine();
-                            if(i==0 && copias==2)
+                            if (i == 0 && copias == 2)
                                 printer.printCustom("8<----------------------------------------", 0, 1);
                             printer.printNewLine();
                             printer.printNewLine();
                             printer.flush();
                         }
-                        if(!reimpresion)
+                        if (!reimpresion)
                             this.LimpiarDatos();
                     } catch (IOException e) {
                         fImp = false;
@@ -696,7 +697,7 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
                 }
 
             } else fImp = false;
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, "imprimirFactura(): " + e.getMessage());
             fImp = false;
         }
@@ -704,8 +705,8 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
     }
 
     private void crearBottonSheet() {
-        if(btsDialog==null){
-            View view = LayoutInflater.from(this).inflate(R.layout.bottonsheet_message,null);
+        if (btsDialog == null) {
+            View view = LayoutInflater.from(this).inflate(R.layout.bottonsheet_message, null);
             btnPositive = view.findViewById(R.id.btnPositive);
             btnNegative = view.findViewById(R.id.btnNegative);
             lblMessage = view.findViewById(R.id.lblMessage);
@@ -719,14 +720,14 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
         }
     }
 
-    public void showError(String message){
+    public void showError(String message) {
         crearBottonSheet();
         lblMessage.setText(message);
         btnNegative.setVisibility(View.GONE);
         viewSeparator.setVisibility(View.GONE);
         lblTitle.setVisibility(View.GONE);
         tipoAccion = "MESSAGE";
-        if(btsDialog.getWindow()!=null)
+        if (btsDialog.getWindow() != null)
             btsDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
         btsDialog.show();
     }
@@ -742,40 +743,42 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
                     String message = "";
                     for (DetalleComprobante miP : productBusqueda) {
                         boolean band = true;
-                        for(DetalleComprobante miP2: detalleAdapter.detalleComprobante){
-                            if(miP.producto.idproducto.equals(miP2.producto.idproducto)
-                                && miP.numerolote.equals(miP2.numerolote)){
+                        for (DetalleComprobante miP2 : detalleAdapter.detalleComprobante) {
+                            if (miP.producto.idproducto.equals(miP2.producto.idproducto)
+                                    && miP.numerolote.equals(miP2.numerolote)) {
                                 band = false;
-                                message+= "«"+miP.producto.nombreproducto+"» con lote «"+miP.numerolote+"» ya se encuentra agregado.\n";
+                                message += Constants.COMILLA_ABRE + miP.producto.nombreproducto + Constants.COMILLA_CIERRA + " con lote " + Constants.COMILLA_ABRE + miP.numerolote + Constants.COMILLA_CIERRA + " ya se encuentra agregado.\n";
                                 break;
                             }
                         }
-                        if(band)
+                        if (band)
                             detalleAdapter.detalleComprobante.add(miP);
                     }
                     mitransferencia.detalle.clear();
                     mitransferencia.detalle.addAll(detalleAdapter.detalleComprobante);
                     detalleAdapter.notifyDataSetChanged();
-                    if(!message.equals(""))
-                        Utils.showErrorDialog(TransferenciaActivity.this,"Error", message);
+                    if (!message.equals(""))
+                        Utils.showErrorDialog(TransferenciaActivity.this, "Error", message);
                     Log.d(TAG, String.valueOf(detalleAdapter.detalleComprobante.size()));
                     break;
                 case DeviceList.REQUEST_CONNECT_BT:
-                    try{
+                    try {
                         btsocket = DeviceList.getSocket();
-                        if(btsocket!=null) {
-                            Utils.showMessageShort(this,"Imprimiendo comprobante");
-                            imprimirFactura(idtransferencia==0?"* ORIGINAL *": "* REIMPRESIÓN DE DOCUMENTO *",
-                                    idtransferencia>0);
+                        if (btsocket != null) {
+                            Utils.showMessageShort(this, "Imprimiendo comprobante");
+                            imprimirFactura(idtransferencia == 0 ? "* ORIGINAL *" : "* REIMPRESIÓN DE DOCUMENTO *",
+                                    idtransferencia > 0);
+                            if(alertDialog != null)
+                                alertDialog.dismiss();
                             Log.d(TAG, "IMPRESORA SELECCIONADA");
                         }
-                    }catch (Exception e){
-                        Log.d(TAG,e.getMessage());
+                    } catch (Exception e) {
+                        Log.d(TAG, e.getMessage());
                     }
                     break;
                 case REQUEST_BUSQUEDA_TRANSFERENCIA:
-                    idtransferencia = data.getExtras().getInt("idcomprobante",0);
-                    if(idtransferencia>0) {
+                    idtransferencia = data.getExtras().getInt("idcomprobante", 0);
+                    if (idtransferencia > 0) {
                         BuscaTransferencia(idtransferencia);
                         toolbar.getMenu().findItem(R.id.option_reimprimir).setVisible(true);
                         toolbar.getMenu().findItem(R.id.option_save).setVisible(false);
@@ -790,9 +793,9 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_save, menu);
         menu.findItem(R.id.option_newclient).setVisible(false);
-        if(idtransferencia==0) {
+        if (idtransferencia == 0) {
             menu.findItem(R.id.option_reimprimir).setVisible(false);
-        }else{
+        } else {
             menu.findItem(R.id.option_save).setVisible(false);
             menu.findItem(R.id.option_newdocument).setVisible(false);
         }
@@ -801,30 +804,30 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.option_save:
-                if(!SQLite.usuario.VerificaPermiso(this,Constants.TRANSFERENCIA_INVENTARIO, "escritura")){
-                    Banner.make(rootView,TransferenciaActivity.this,Banner.ERROR,"No tiene permisos para registrar transferencias de inventario.", Banner.BOTTOM,3000).show();
+                if (!SQLite.usuario.VerificaPermiso(this, Constants.TRANSFERENCIA_INVENTARIO, "escritura")) {
+                    Banner.make(rootView, TransferenciaActivity.this, Banner.ERROR, "No tiene permisos para registrar transferencias de inventario.", Banner.BOTTOM, 3000).show();
                     break;
                 }
                 AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogTheme);
                 View view = LayoutInflater.from(this).inflate(R.layout.layout_confirmation_dialog,
                         (ConstraintLayout) findViewById(R.id.lyDialogContainer));
                 builder.setView(view);
-                ((TextView)view.findViewById(R.id.lblTitle)).setText("Guardar transferencia");
-                ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Está seguro que desea guardar esta transferencia?");
-                ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_save);
-                ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
-                ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
+                ((TextView) view.findViewById(R.id.lblTitle)).setText("Guardar transferencia");
+                ((TextView) view.findViewById(R.id.lblMessage)).setText("¿Está seguro que desea guardar esta transferencia?");
+                ((ImageView) view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_save);
+                ((Button) view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
+                ((Button) view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
                 final AlertDialog alertDialog = builder.create();
                 view.findViewById(R.id.btnConfirm).setOnClickListener(v -> {
-                        GuardarDatos();
-                        alertDialog.dismiss();
-                    });
+                    GuardarDatos();
+                    alertDialog.dismiss();
+                });
 
                 view.findViewById(R.id.btnCancel).setOnClickListener(v -> alertDialog.dismiss());
 
-                if(alertDialog.getWindow()!=null)
+                if (alertDialog.getWindow() != null)
                     alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
                 alertDialog.show();
                 break;
@@ -838,7 +841,7 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
                 break;
             case R.id.option_listdocument:
                 Intent i = new Intent(this, ListaComprobantesActivity.class);
-                i.putExtra("tipobusqueda","4,20"); //TRANSFERENCIA - DEVOLUCIONES
+                i.putExtra("tipobusqueda", "4,20"); //TRANSFERENCIA - DEVOLUCIONES
                 startActivityForResult(i, REQUEST_BUSQUEDA_TRANSFERENCIA);
                 overridePendingTransition(R.anim.left_in, R.anim.left_out);
                 break;
@@ -857,25 +860,25 @@ public class TransferenciaActivity extends AppCompatActivity implements View.OnC
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if(keyCode == KeyEvent.KEYCODE_BACK){
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogTheme);
             View view = LayoutInflater.from(this).inflate(R.layout.layout_confirmation_dialog,
                     (ConstraintLayout) findViewById(R.id.lyDialogContainer));
             builder.setView(view);
-            ((TextView)view.findViewById(R.id.lblTitle)).setText("Cerrar");
-            ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Desea salir de la ventana de transferencias?");
-            ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_check_white);
-            ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
-            ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
+            ((TextView) view.findViewById(R.id.lblTitle)).setText("Cerrar");
+            ((TextView) view.findViewById(R.id.lblMessage)).setText("¿Desea salir de la ventana de transferencias?");
+            ((ImageView) view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_check_white);
+            ((Button) view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
+            ((Button) view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
             final AlertDialog alertDialog = builder.create();
-            view.findViewById(R.id.btnConfirm).setOnClickListener(v ->{
+            view.findViewById(R.id.btnConfirm).setOnClickListener(v -> {
                 onBackPressed();
                 overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
             });
 
             view.findViewById(R.id.btnCancel).setOnClickListener(v -> alertDialog.dismiss());
 
-            if(alertDialog.getWindow()!=null)
+            if (alertDialog.getWindow() != null)
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
             alertDialog.show();
             return true;

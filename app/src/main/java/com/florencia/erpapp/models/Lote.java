@@ -24,7 +24,7 @@ public class Lote {
     public static SQLiteDatabase sqLiteDatabase;
     public static String TAG = "TAGLOTE";
 
-    public Lote(){
+    public Lote() {
         this.productoid = 0;
         this.numerolote = "";
         this.stock = 0d;
@@ -42,27 +42,27 @@ public class Lote {
                     "values(?, ?, ?, ?, ?)", new String[]{this.productoid.toString(), this.numerolote, this.stock.toString(),
                     this.preciocosto.toString(), this.fechavencimiento, this.longdate.toString(), this.establecimientoid.toString()});
             this.sqLiteDatabase.close();
-            Log.d(TAG,"SAVE LOTE OK");
+            Log.d(TAG, "SAVE LOTE OK");
             return true;
-        } catch (SQLException ex){
+        } catch (SQLException ex) {
             Log.d(TAG, ex.getMessage());
             return false;
         }
     }
 
-    public static boolean InsertMultiple(Integer idproducto, Integer establecimientoid, List<Lote> lotes){
+    public static boolean InsertMultiple(Integer idproducto, Integer establecimientoid, List<Lote> lotes) {
         try {
             ContentValues values;
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
-            sqLiteDatabase.delete("lote","productoid = ? and establecimientoid = ?", new String[]{idproducto.toString(), establecimientoid.toString()});
-            for(Lote lote: lotes) {
+            sqLiteDatabase.delete("lote", "productoid = ? and establecimientoid = ?", new String[]{idproducto.toString(), establecimientoid.toString()});
+            for (Lote lote : lotes) {
                 lote.longdate = Utils.longDate(lote.fechavencimiento);
-                values= new ContentValues();
-                values.put("productoid",lote.productoid);
-                values.put("numerolote",lote.numerolote);
-                values.put("stock",lote.stock);
-                values.put("preciocosto",lote.preciocosto);
-                values.put("fechavencimiento",lote.fechavencimiento);
+                values = new ContentValues();
+                values.put("productoid", lote.productoid);
+                values.put("numerolote", lote.numerolote);
+                values.put("stock", lote.stock);
+                values.put("preciocosto", lote.preciocosto);
+                values.put("fechavencimiento", lote.fechavencimiento);
                 values.put("longdate", lote.longdate);
                 values.put("establecimientoid", lote.establecimientoid);
                 sqLiteDatabase.insert("lote", "", values);
@@ -70,7 +70,7 @@ public class Lote {
             sqLiteDatabase.close();
             Log.d(TAG, "INSERT LOTE OK");
             return true;
-        }catch (SQLiteException e){
+        } catch (SQLiteException e) {
             Log.d(TAG, e.getMessage());
             return false;
         }
@@ -87,28 +87,29 @@ public class Lote {
             Item.fechavencimiento = cursor.getString(4);
             Item.longdate = cursor.getLong(5);
             Item.establecimientoid = cursor.getInt(6);
-        }catch(Exception e){
+        } catch (Exception e) {
             Log.d(TAG, "AsignaDatos(): " + e.getMessage());
-        } finally { }
+        } finally {
+        }
         return Item;
     }
 
-    public static ArrayList<Lote> getAll(Integer idproducto, Integer establecimientoid){
+    public static ArrayList<Lote> getAll(Integer idproducto, Integer establecimientoid) {
         ArrayList<Lote> Items = new ArrayList<>();
         sqLiteDatabase = SQLite.sqlDB.getReadableDatabase();
-        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM lote WHERE productoid = ? and establecimientoid = ? and stock > 0", new String[]{idproducto.toString(), establecimientoid.toString()});
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM lote WHERE productoid = ? and establecimientoid = ? and stock > 0 order by longdate asc, numerolote", new String[]{idproducto.toString(), establecimientoid.toString()});
         Lote Item;
         if (cursor.moveToFirst()) {
             do {
                 Item = AsignaDatos(cursor);
-                if (Item!=null) Items.add(Item);
-            } while(cursor.moveToNext());
+                if (Item != null) Items.add(Item);
+            } while (cursor.moveToNext());
         }
         sqLiteDatabase.close();
         return Items;
     }
 
-    public static Lote get(Integer idproducto, Integer establecimientoid, String numLote){
+    public static Lote get(Integer idproducto, Integer establecimientoid, String numLote) {
         ArrayList<Lote> Items = new ArrayList<>();
         sqLiteDatabase = SQLite.sqlDB.getReadableDatabase();
         Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM lote WHERE productoid = ? and establecimientoid = ? and numerolote = ?", new String[]{idproducto.toString(), establecimientoid.toString(), numLote});
@@ -119,27 +120,27 @@ public class Lote {
         return Item;
     }
 
-    public static boolean Update(String [] where, ContentValues data) {
+    public static boolean Update(String[] where, ContentValues data) {
         try {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
-            sqLiteDatabase.update("lote",data, "productoid = ? and numerolote = ? and establecimientoid = ?",where);
+            sqLiteDatabase.update("lote", data, "productoid = ? and numerolote = ? and establecimientoid = ?", where);
             //sqLiteDatabase.close();
-            Log.d(TAG,"UPDATE 2 LOTE OK");
+            Log.d(TAG, "UPDATE LOTE: "+ (where.length>0?where[1] + " stock: " + data.get("stock").toString() :"") +" OK");
             return true;
-        } catch (SQLException ex){
-            Log.d(TAG,String.valueOf(ex));
+        } catch (SQLException ex) {
+            Log.d(TAG, String.valueOf(ex));
             return false;
         }
     }
 
-    public static boolean Delete(String [] where) {
+    public static boolean Delete(String[] where) {
         try {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
-            sqLiteDatabase.delete("lote", "productoid = ? and numerolote = ? and establecimientoid = ?",where);
+            sqLiteDatabase.delete("lote", "productoid = ? and numerolote = ? and establecimientoid = ?", where);
             sqLiteDatabase.close();
-            Log.d(TAG,"UPDATE 2 LOTE OK");
+            Log.d(TAG, "UPDATE 2 LOTE OK");
             return true;
-        } catch (SQLException ex){
+        } catch (SQLException ex) {
             Log.d(TAG, ex.getMessage());
             return false;
         }
@@ -148,7 +149,7 @@ public class Lote {
     @NonNull
     @Override
     public String toString() {
-        return  " FV: "+ this.fechavencimiento +
+        return " FV: " + this.fechavencimiento +
                 " - S: " + this.stock +
                 " - L: " + this.numerolote;
     }

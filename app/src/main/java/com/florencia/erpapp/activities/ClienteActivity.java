@@ -52,7 +52,7 @@ import java.util.List;
 public class ClienteActivity extends AppCompatActivity implements View.OnFocusChangeListener, View.OnClickListener {
 
     private static String TAG = "TAGCLIENTE_ACTIVITY";
-    Spinner cbTipoDocumento, cbProvincia, cbCanton, cbParroquia;;
+    Spinner cbTipoDocumento, cbProvincia, cbCanton, cbParroquia;
     EditText txtNIP, txtRazonSocial, txtNombreComercial, txtLatitud, txtLongitud, txtDireccion,
             txtFono1, txtFono2, txtCorreo, txtObservacion;
     ImageButton btnObtenerDireccion;
@@ -65,7 +65,7 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
     BottomSheetDialog btsDialog;
     Button btnPositive, btnNegative;
     View viewSeparator;
-    String tipoAccion="";
+    String tipoAccion = "";
     Toolbar toolbar;
     List<Provincia> provincias = new ArrayList<>();
     List<Canton> cantones = new ArrayList<>();
@@ -74,7 +74,8 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
     Canton canActual = new Canton();
     CardView cvInfo;
 
-    public ClienteActivity(){}
+    public ClienteActivity() {
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,80 +89,80 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
         rootView = findViewById(android.R.id.content);
         init();
 
-        if(getIntent().getExtras()!=null){
-            Integer idcliente =  getIntent().getExtras().getInt("idcliente",0);
-            if(idcliente>0){
-                BuscarDatos(idcliente,"");
+        if (getIntent().getExtras() != null) {
+            Integer idcliente = getIntent().getExtras().getInt("idcliente", 0);
+            if (idcliente > 0) {
+                BuscarDatos(idcliente, "");
             }
-            this.isReturn = getIntent().getExtras().getBoolean("nuevo_cliente",false);
+            this.isReturn = getIntent().getExtras().getBoolean("nuevo_cliente", false);
         }
     }
 
-    private void BuscarDatos(Integer id, String nip){
-        try{
-            Thread th = new Thread(){
+    private void BuscarDatos(Integer id, String nip) {
+        try {
+            Thread th = new Thread() {
                 @Override
-                public void run(){
+                public void run() {
                     runOnUiThread(() -> {
-                            if(id>0)
-                                miCliente = Cliente.get(id);
-                            else if(!nip.equals(""))
-                                miCliente = Cliente.get(nip);
+                                if (id > 0)
+                                    miCliente = Cliente.get(id);
+                                else if (!nip.equals(""))
+                                    miCliente = Cliente.get(nip);
 
-                            if(miCliente != null){
+                                if (miCliente != null) {
 
-                                band = true;
-                                Parroquia miparroquia = Parroquia.get(miCliente.parroquiaid);
-                                canActual = Canton.get(miparroquia.cantonid);
-                                provActual = Provincia.get(canActual.provinciaid);
+                                    band = true;
+                                    Parroquia miparroquia = Parroquia.get(miCliente.parroquiaid);
+                                    canActual = Canton.get(miparroquia.cantonid);
+                                    provActual = Provincia.get(canActual.provinciaid);
 
-                                for(Provincia miP:provincias){
-                                    if(provActual.idprovincia.equals(miP.idprovincia)){
-                                        cbProvincia.setSelection(provincias.indexOf(miP));
-                                        break;
-                                    }
-                                }
-                                LlenarComboCantones(provActual.idprovincia, canActual.idcanton);
-                                LlenarComboParroquias(canActual.idcanton, miparroquia.idparroquia);
-
-                                txtNIP.setTag(miCliente.idcliente);
-                                txtNIP.setText(miCliente.nip);
-                                txtRazonSocial.setText(miCliente.razonsocial);
-                                txtNombreComercial.setText(miCliente.nombrecomercial);
-                                txtLatitud.setText(miCliente.lat.toString());
-                                txtLongitud.setText(miCliente.lon.toString());
-                                txtDireccion.setText(miCliente.direccion);
-                                txtFono1.setText(miCliente.fono1);
-                                txtFono2.setText(miCliente.fono2);
-                                txtCorreo.setText(miCliente.email);
-                                txtObservacion.setText(miCliente.observacion);
-                                cvInfo.setVisibility(View.VISIBLE);
-                                String _sInfo = getResources().getString(R.string.textFecha).concat(" ").concat(miCliente.fecharegistro);
-                                _sInfo = _sInfo.concat("<br>").concat(getResources().getString(R.string.textCategoria)).concat("").concat(miCliente.nombrecategoria);
-
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                                    lblInfo.setText(Html.fromHtml(_sInfo, Html.FROM_HTML_MODE_COMPACT));
-                                else
-                                    lblInfo.setText(Html.fromHtml(_sInfo));
-
-                                if(miCliente.tiponip != null){
-                                    for(int i =0; i < cbTipoDocumento.getCount();i++){
-                                        TipoIdentificacion ti = (TipoIdentificacion) cbTipoDocumento.getItemAtPosition(i);
-                                        if(ti.getCodigo().equals(miCliente.tiponip)){
-                                            cbTipoDocumento.setSelection(i,true);
+                                    for (Provincia miP : provincias) {
+                                        if (provActual.idprovincia.equals(miP.idprovincia)) {
+                                            cbProvincia.setSelection(provincias.indexOf(miP));
                                             break;
                                         }
                                     }
-                                }
+                                    LlenarComboCantones(provActual.idprovincia, canActual.idcanton);
+                                    LlenarComboParroquias(canActual.idcanton, miparroquia.idparroquia);
 
-                                toolbar.setTitle("Modificación");
+                                    txtNIP.setTag(miCliente.idcliente);
+                                    txtNIP.setText(miCliente.nip);
+                                    txtRazonSocial.setText(miCliente.razonsocial);
+                                    txtNombreComercial.setText(miCliente.nombrecomercial);
+                                    txtLatitud.setText(miCliente.lat.toString());
+                                    txtLongitud.setText(miCliente.lon.toString());
+                                    txtDireccion.setText(miCliente.direccion);
+                                    txtFono1.setText(miCliente.fono1);
+                                    txtFono2.setText(miCliente.fono2);
+                                    txtCorreo.setText(miCliente.email);
+                                    txtObservacion.setText(miCliente.observacion);
+                                    cvInfo.setVisibility(View.VISIBLE);
+                                    String _sInfo = getResources().getString(R.string.textFecha).concat(" ").concat(miCliente.fecharegistro);
+                                    _sInfo = _sInfo.concat("<br>").concat(getResources().getString(R.string.textCategoria)).concat("").concat(miCliente.nombrecategoria);
+
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                                        lblInfo.setText(Html.fromHtml(_sInfo, Html.FROM_HTML_MODE_COMPACT));
+                                    else
+                                        lblInfo.setText(Html.fromHtml(_sInfo));
+
+                                    if (miCliente.tiponip != null) {
+                                        for (int i = 0; i < cbTipoDocumento.getCount(); i++) {
+                                            TipoIdentificacion ti = (TipoIdentificacion) cbTipoDocumento.getItemAtPosition(i);
+                                            if (ti.getCodigo().equals(miCliente.tiponip)) {
+                                                cbTipoDocumento.setSelection(i, true);
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                    toolbar.setTitle("Modificación");
+                                }
                             }
-                        }
                     );
                 }
             };
             th.start();
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, "BuscarDatos" + e.getMessage());
         }
     }
@@ -196,7 +197,7 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
         }
     }
 
-    void init(){
+    void init() {
         cbTipoDocumento = findViewById(R.id.spTipoDocumento);
         txtNIP = findViewById(R.id.txtNIP);
         txtRazonSocial = findViewById(R.id.txtRazonSocial);
@@ -228,7 +229,7 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
         lblInfoContacto.setOnClickListener(this::onClick);
         lblInfoAdicional.setOnClickListener(this::onClick);
 
-        if(SQLite.gpsTracker==null)
+        if (SQLite.gpsTracker == null)
             SQLite.gpsTracker = new GPSTracker(this);
         if (!SQLite.gpsTracker.checkGPSEnabled())
             SQLite.gpsTracker.showSettingsAlert(ClienteActivity.this);
@@ -236,20 +237,21 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
         ObtenerCoordenadas(false);
 
         LlenarComboProvincias(0);
-        LlenarComboCantones(0,-1);
-        LlenarComboParroquias(0,-1);
+        LlenarComboCantones(0, -1);
+        LlenarComboParroquias(0, -1);
 
         cbProvincia.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if(cbProvincia.getAdapter()!=null) {
-                    Provincia provincia = ((Provincia)cbProvincia.getItemAtPosition(position));
-                    if(provincia.idprovincia!=provActual.idprovincia)
-                        band=false;
-                    if(!band)
-                        LlenarComboCantones(provincia.idprovincia,-1);
+                if (cbProvincia.getAdapter() != null) {
+                    Provincia provincia = ((Provincia) cbProvincia.getItemAtPosition(position));
+                    if (provincia.idprovincia != provActual.idprovincia)
+                        band = false;
+                    if (!band)
+                        LlenarComboCantones(provincia.idprovincia, -1);
                 }
             }
+
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
 
@@ -258,12 +260,13 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
         cbCanton.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if(cbCanton.getAdapter()!=null) {
-                    Canton canton = ((Canton)cbCanton.getItemAtPosition(position));
-                    if(!band)
-                        LlenarComboParroquias(canton.idcanton,-1);
+                if (cbCanton.getAdapter() != null) {
+                    Canton canton = ((Canton) cbCanton.getItemAtPosition(position));
+                    if (!band)
+                        LlenarComboParroquias(canton.idcanton, -1);
                 }
             }
+
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
 
@@ -271,21 +274,21 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
         });
     }
 
-    private void ObtenerCoordenadas(boolean alertar){
+    private void ObtenerCoordenadas(boolean alertar) {
         try {
             if (SQLite.gpsTracker.checkGPSEnabled()) {
                 SQLite.gpsTracker.updateGPSCoordinates();
                 SQLite.gpsTracker.getLastKnownLocation();
                 txtLatitud.setText(String.valueOf(SQLite.gpsTracker.getLatitude()));
                 txtLongitud.setText(String.valueOf(SQLite.gpsTracker.getLongitude()));
-            } else if(alertar)
+            } else if (alertar)
                 SQLite.gpsTracker.showSettingsAlert(ClienteActivity.this);
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, e.getMessage());
         }
     }
 
-    void LlenarTipoNIP(){
+    void LlenarTipoNIP() {
         ArrayList<TipoIdentificacion> tipoIdentificaciones = new ArrayList<>();
         tipoIdentificaciones.add(new TipoIdentificacion("00", "SIN IDENTIFICACIÓN"));
         tipoIdentificaciones.add(new TipoIdentificacion("05", "CÉDULA"));
@@ -295,7 +298,7 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
         ArrayAdapter<TipoIdentificacion> adapter = new ArrayAdapter<TipoIdentificacion>(
                 this, android.R.layout.simple_spinner_item, tipoIdentificaciones);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            cbTipoDocumento.setAdapter(adapter);
+        cbTipoDocumento.setAdapter(adapter);
     }
 
     @Override
@@ -310,28 +313,28 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.option_save:
                 AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogTheme);
                 View view = LayoutInflater.from(this).inflate(R.layout.layout_confirmation_dialog,
                         (ConstraintLayout) findViewById(R.id.lyDialogContainer));
                 builder.setView(view);
-                ((TextView)view.findViewById(R.id.lblTitle)).setText("Guardar cliente");
-                ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Está seguro que desea guardar los datos del cliente?");
-                ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_save);
-                ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
-                ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
+                ((TextView) view.findViewById(R.id.lblTitle)).setText("Guardar cliente");
+                ((TextView) view.findViewById(R.id.lblMessage)).setText("¿Está seguro que desea guardar los datos del cliente?");
+                ((ImageView) view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_save);
+                ((Button) view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
+                ((Button) view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
                 final AlertDialog alertDialog = builder.create();
                 view.findViewById(R.id.btnConfirm).setOnClickListener(
-                    v -> {
-                        GuardarDatos();
-                        alertDialog.dismiss();
-                    }
+                        v -> {
+                            GuardarDatos();
+                            alertDialog.dismiss();
+                        }
                 );
 
                 view.findViewById(R.id.btnCancel).setOnClickListener(v -> alertDialog.dismiss());
 
-                if(alertDialog.getWindow()!=null)
+                if (alertDialog.getWindow() != null)
                     alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
                 alertDialog.show();
                 break;
@@ -344,11 +347,11 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
 
     private void GuardarDatos() {
         try {
-            if(miCliente == null)
+            if (miCliente == null)
                 miCliente = new Cliente();
-            if(!ValidarDatos()) return;
+            if (!ValidarDatos()) return;
 
-            miCliente.tiponip = ((TipoIdentificacion)cbTipoDocumento.getSelectedItem()).getCodigo();
+            miCliente.tiponip = ((TipoIdentificacion) cbTipoDocumento.getSelectedItem()).getCodigo();
             miCliente.nip = txtNIP.getText().toString().trim();
             miCliente.razonsocial = txtRazonSocial.getText().toString().trim();
             miCliente.nombrecomercial = txtNombreComercial.getText().toString().trim();
@@ -366,71 +369,71 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
             miCliente.actualizado = 1;
             miCliente.establecimientoid = SQLite.usuario.sucursal.IdEstablecimiento;
             miCliente.parroquiaid = ((Parroquia) cbParroquia.getSelectedItem()).idparroquia;
-            if(miCliente.idcliente == 0) {
+            if (miCliente.idcliente == 0) {
                 miCliente.fecharegistro = Utils.getDateFormat("yyyy-MM-dd HH:mm:ss");
                 miCliente.longdater = Utils.longDate(Utils.getDateFormat("yyyy-MM-dd"));
             }
             miCliente.fechamodificacion = Utils.getDateFormat("yyyy-MM-dd HH:mm:ss");
             miCliente.longdatem = Utils.longDate(Utils.getDateFormat("yyyy-MM-dd"));
-            if(miCliente.Save()) {
+            if (miCliente.Save()) {
                 Utils.showMessageShort(this, Constants.MSG_DATOS_GUARDADOS);
                 //Banner.make(rootView, this, Banner.SUCCESS, Constants.MSG_DATOS_GUARDADOS, Banner.BOTTOM, 3000).show();
-                if(this.isReturn)
-                    setResult(Activity.RESULT_OK,new Intent().putExtra("idcliente",miCliente.idcliente));
+                if (this.isReturn)
+                    setResult(Activity.RESULT_OK, new Intent().putExtra("idcliente", miCliente.idcliente));
                 onBackPressed();
                 overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
                 //this.LimpiarDatos();
-            }else
-                Banner.make(rootView,this,Banner.ERROR,Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM,3500).show();
+            } else
+                Banner.make(rootView, this, Banner.ERROR, Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM, 3500).show();
 
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, e.getMessage());
-            Utils.showErrorDialog(this,"Error: ", e.getMessage());
+            Utils.showErrorDialog(this, "Error: ", e.getMessage());
         }
     }
 
-    private boolean ValidarDatos() throws Exception{
-        if(miCliente.idcliente==0
-            && !SQLite.usuario.VerificaPermiso(this,Constants.REGISTRO_CLIENTE, "escritura")){
-                Banner.make(rootView, this, Banner.ERROR,"No tiene permisos para registrar nuevos clientes.", Banner.BOTTOM, 3000).show();
-                return false;
-        }else if(miCliente.codigosistema>0
-            && !SQLite.usuario.VerificaPermiso(this,Constants.REGISTRO_CLIENTE, "modificacion")){
-            Banner.make(rootView, this, Banner.ERROR,"No tiene permisos para modificar datos.", Banner.BOTTOM, 3000).show();
-                return false;
-        }
-        if(((TipoIdentificacion)cbTipoDocumento.getSelectedItem()).getCodigo().equals("00")){
-            Banner.make(rootView,this, Banner.ERROR,"Especifique el tipo de identificación.", Banner.BOTTOM, 3000).show();
+    private boolean ValidarDatos() throws Exception {
+        if (miCliente.idcliente == 0
+                && !SQLite.usuario.VerificaPermiso(this, Constants.REGISTRO_CLIENTE, "escritura")) {
+            Banner.make(rootView, this, Banner.ERROR, "No tiene permisos para registrar nuevos clientes.", Banner.BOTTOM, 3000).show();
+            return false;
+        } else if (miCliente.codigosistema > 0
+                && !SQLite.usuario.VerificaPermiso(this, Constants.REGISTRO_CLIENTE, "modificacion")) {
+            Banner.make(rootView, this, Banner.ERROR, "No tiene permisos para modificar datos.", Banner.BOTTOM, 3000).show();
             return false;
         }
-        if(txtNIP.getText().toString().trim().equals("")){
+        if (((TipoIdentificacion) cbTipoDocumento.getSelectedItem()).getCodigo().equals("00")) {
+            Banner.make(rootView, this, Banner.ERROR, "Especifique el tipo de identificación.", Banner.BOTTOM, 3000).show();
+            return false;
+        }
+        if (txtNIP.getText().toString().trim().equals("")) {
             txtNIP.setError("Ingrese una identificación.");
-            Banner.make(rootView,this, Banner.ERROR,"Ingrese una identificación.", Banner.BOTTOM, 3000).show();
+            Banner.make(rootView, this, Banner.ERROR, "Ingrese una identificación.", Banner.BOTTOM, 3000).show();
             return false;
         }
-        if(txtRazonSocial.getText().toString().trim().equals("")){
+        if (txtRazonSocial.getText().toString().trim().equals("")) {
             txtRazonSocial.setError("Ingrese el nombre del cliente.");
-            Banner.make(rootView, this, Banner.ERROR,"Ingrese el nombre del cliente.", Banner.BOTTOM, 3000).show();
+            Banner.make(rootView, this, Banner.ERROR, "Ingrese el nombre del cliente.", Banner.BOTTOM, 3000).show();
             return false;
         }
-        if(txtDireccion.getText().toString().trim().equals("")){
+        if (txtDireccion.getText().toString().trim().equals("")) {
             txtRazonSocial.setError("Ingrese la dirección del cliente.");
-            Banner.make(rootView, this, Banner.ERROR,"Ingrese la dirección del cliente.",Banner.BOTTOM, 3000).show();
+            Banner.make(rootView, this, Banner.ERROR, "Ingrese la dirección del cliente.", Banner.BOTTOM, 3000).show();
             return false;
         }
-        if(txtFono1.getText().toString().trim().equals("") && txtFono2.getText().toString().trim().equals("")){
-            Banner.make(rootView,this,Banner.ERROR,"Especifique al menos un número de contacto.", Banner.BOTTOM, 3000).show();
+        if (txtFono1.getText().toString().trim().equals("") && txtFono2.getText().toString().trim().equals("")) {
+            Banner.make(rootView, this, Banner.ERROR, "Especifique al menos un número de contacto.", Banner.BOTTOM, 3000).show();
             return false;
         }
 
-        if(Double.parseDouble(txtLatitud.getText().toString()) == 0 && Double.parseDouble(txtLongitud.getText().toString()) == 0){
-            Banner.make(rootView,this,Banner.ERROR,"Debe obtener las coordenadas. Verifique si está activado el GPS.", Banner.BOTTOM, 3000).show();
+        if (Double.parseDouble(txtLatitud.getText().toString()) == 0 && Double.parseDouble(txtLongitud.getText().toString()) == 0) {
+            Banner.make(rootView, this, Banner.ERROR, "Debe obtener las coordenadas. Verifique si está activado el GPS.", Banner.BOTTOM, 3000).show();
             return false;
         }
         return true;
     }
 
-    private void LimpiarDatos(){
+    private void LimpiarDatos() {
         try {
             miCliente = new Cliente();
             cbTipoDocumento.setSelection(0, true);
@@ -448,7 +451,7 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
             txtObservacion.setText("");
             toolbar.setTitle("Nuevo Registro");
             cvInfo.setVisibility(View.GONE);
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, "LimpiarDatos(): " + e.getMessage());
         }
     }
@@ -456,7 +459,7 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
     @Override
     public void onResume() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.appbar);
-        String titulo=miCliente == null? "Nuevo registro" : "Modificación";
+        String titulo = miCliente == null ? "Nuevo registro" : "Modificación";
         toolbar.setTitle(titulo);
         toolbar.setTitleTextColor(Color.WHITE);
         //toolbar.setBackgroundColor(getResources().getColor(R.color.colorBlue));
@@ -466,26 +469,26 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if(keyCode == KeyEvent.KEYCODE_BACK){
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogTheme);
             View view = LayoutInflater.from(this).inflate(R.layout.layout_confirmation_dialog,
                     (ConstraintLayout) findViewById(R.id.lyDialogContainer));
             builder.setView(view);
-            ((TextView)view.findViewById(R.id.lblTitle)).setText("Cerrar");
-            ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Desea salir de la ventana de cliente?");
-            ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_check_white);
-            ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
-            ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
+            ((TextView) view.findViewById(R.id.lblTitle)).setText("Cerrar");
+            ((TextView) view.findViewById(R.id.lblMessage)).setText("¿Desea salir de la ventana de cliente?");
+            ((ImageView) view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_check_white);
+            ((Button) view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
+            ((Button) view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
             final AlertDialog alertDialog = builder.create();
             view.findViewById(R.id.btnConfirm).setOnClickListener(v ->
-                {
-                    onBackPressed();
-                    overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
-                });
+            {
+                onBackPressed();
+                overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
+            });
 
             view.findViewById(R.id.btnCancel).setOnClickListener(v -> alertDialog.dismiss());
 
-            if(alertDialog.getWindow()!=null)
+            if (alertDialog.getWindow() != null)
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
             alertDialog.show();
             return true;
@@ -494,8 +497,8 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
     }
 
     private void crearBottonSheet() {
-        if(btsDialog==null){
-            View view = LayoutInflater.from(this).inflate(R.layout.bottonsheet_message,null);
+        if (btsDialog == null) {
+            View view = LayoutInflater.from(this).inflate(R.layout.bottonsheet_message, null);
             btnPositive = view.findViewById(R.id.btnPositive);
             btnNegative = view.findViewById(R.id.btnNegative);
             lblMessage = view.findViewById(R.id.lblMessage);
@@ -509,93 +512,93 @@ public class ClienteActivity extends AppCompatActivity implements View.OnFocusCh
         }
     }
 
-    public void showError(String message){
+    public void showError(String message) {
         crearBottonSheet();
         lblMessage.setText(message);
         btnNegative.setVisibility(View.GONE);
         viewSeparator.setVisibility(View.GONE);
         lblTitle.setVisibility(View.GONE);
         tipoAccion = "MESSAGE";
-        if(btsDialog.getWindow()!=null)
+        if (btsDialog.getWindow() != null)
             btsDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
         btsDialog.show();
     }
 
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
-        try{
-            switch (v.getId()){
+        try {
+            switch (v.getId()) {
                 case R.id.txtNIP:
-                    if(!hasFocus && !txtNIP.getText().toString().trim().equals(""))
-                        BuscarDatos(0,txtNIP.getText().toString().trim());
+                    if (!hasFocus && !txtNIP.getText().toString().trim().equals(""))
+                        BuscarDatos(0, txtNIP.getText().toString().trim());
                     break;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, "onFocusChange(): " + e.getMessage());
         }
     }
 
-    private void LlenarComboProvincias(Integer idprovincia){
-        try{
+    private void LlenarComboProvincias(Integer idprovincia) {
+        try {
             provincias = Provincia.getList();
             ArrayAdapter<Provincia> adapterProvincia = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, provincias);
             adapterProvincia.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             cbProvincia.setAdapter(adapterProvincia);
             int position = 0;
-            for(int i=0; i<provincias.size(); i++){
-                if(provincias.get(i).idprovincia == idprovincia){
+            for (int i = 0; i < provincias.size(); i++) {
+                if (provincias.get(i).idprovincia == idprovincia) {
                     position = i;
                     break;
                 }
             }
-            if(idprovincia>=0)
-                cbProvincia.setSelection(position,true);
-        }catch (Exception e){
-            Log.d(TAG, "LlenarComboProvincias(): " +e.getMessage());
+            if (idprovincia >= 0)
+                cbProvincia.setSelection(position, true);
+        } catch (Exception e) {
+            Log.d(TAG, "LlenarComboProvincias(): " + e.getMessage());
         }
     }
 
-    private void LlenarComboCantones(Integer idprovincia, Integer idcanton){
-        try{
+    private void LlenarComboCantones(Integer idprovincia, Integer idcanton) {
+        try {
             cantones.clear();
             cantones = Canton.getList(idprovincia);
             ArrayAdapter<Canton> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, cantones);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             cbCanton.setAdapter(adapter);
             int position = 0;
-            for(int i=0; i<cantones.size(); i++){
-                if(cantones.get(i).idcanton.equals(idcanton)){
+            for (int i = 0; i < cantones.size(); i++) {
+                if (cantones.get(i).idcanton.equals(idcanton)) {
                     position = i;
                     break;
                 }
             }
-            if(idcanton>=0)
+            if (idcanton >= 0)
                 cbCanton.setSelection(position, true);
-        }catch (Exception e){
-            Log.d(TAG, "LlenarComboCantones(): " +e.getMessage());
+        } catch (Exception e) {
+            Log.d(TAG, "LlenarComboCantones(): " + e.getMessage());
         }
     }
 
-    private void LlenarComboParroquias(Integer idcanton, Integer idparroquia){
-        try{
+    private void LlenarComboParroquias(Integer idcanton, Integer idparroquia) {
+        try {
             parroquias.clear();
             parroquias = Parroquia.getList(idcanton);
             ArrayAdapter<Parroquia> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, parroquias);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             cbParroquia.setAdapter(adapter);
             int position = 0;
-            for(int i=0; i<parroquias.size(); i++){
-                if(parroquias.get(i).idparroquia.equals(idparroquia)){
+            for (int i = 0; i < parroquias.size(); i++) {
+                if (parroquias.get(i).idparroquia.equals(idparroquia)) {
                     position = i;
                     break;
                 }
             }
-            if(idparroquia>=0) {
+            if (idparroquia >= 0) {
                 cbParroquia.setSelection(position, true);
                 //band = false;
             }
-        }catch (Exception e){
-            Log.d(TAG, "LlenarComboProvincias(): " +e.getMessage());
+        } catch (Exception e) {
+            Log.d(TAG, "LlenarComboProvincias(): " + e.getMessage());
         }
     }
 }

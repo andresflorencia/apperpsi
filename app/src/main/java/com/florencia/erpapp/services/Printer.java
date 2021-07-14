@@ -18,8 +18,8 @@ public class Printer {
     public static BluetoothSocket btsocket;
     private static OutputStream outputStream;
 
-    public Printer(Activity activity){
-        if(btsocket != null) {
+    public Printer(Activity activity) {
+        if (btsocket != null) {
             OutputStream opstream = null;
             try {
                 opstream = btsocket.getOutputStream();
@@ -44,17 +44,16 @@ public class Printer {
 
     public void flush() throws IOException {
         outputStream.flush();
-        outputStream.close();
     }
 
     public void printCustom(String msg, int size, int align) throws IOException {
         //Print config "mode"
-        byte[] cc = new byte[]{0x1B,0x21,0x03};  // 0- normal size text
+        byte[] cc = new byte[]{0x1B, 0x21, 0x03};  // 0- normal size text
         //byte[] cc1 = new byte[]{0x1B,0x21,0x00};  // 0- normal size text
-        byte[] bb = new byte[]{0x1B,0x21,0x08};  // 1- only bold text
-        byte[] bb2 = new byte[]{0x1B,0x21,0x20}; // 2- bold with medium text
-        byte[] bb3 = new byte[]{0x1B,0x21,0x10}; // 3- bold with large text
-        switch (size){
+        byte[] bb = new byte[]{0x1B, 0x21, 0x08};  // 1- only bold text
+        byte[] bb2 = new byte[]{0x1B, 0x21, 0x20}; // 2- bold with medium text
+        byte[] bb3 = new byte[]{0x1B, 0x21, 0x10}; // 3- bold with large text
+        switch (size) {
             case 0:
                 outputStream.write(cc);
                 break;
@@ -69,7 +68,7 @@ public class Printer {
                 break;
         }
 
-        switch (align){
+        switch (align) {
             case 0:
                 //left align
                 outputStream.write(PrinterCommands.ESC_ALIGN_LEFT);
@@ -89,12 +88,12 @@ public class Printer {
 
     public void printCustom(byte[] msg, int size, int align) throws IOException {
         //Print config "mode"
-        byte[] cc = new byte[]{0x1B,0x21,0x03};  // 0- normal size text
+        byte[] cc = new byte[]{0x1B, 0x21, 0x03};  // 0- normal size text
         //byte[] cc1 = new byte[]{0x1B,0x21,0x00};  // 0- normal size text
-        byte[] bb = new byte[]{0x1B,0x21,0x08};  // 1- only bold text
-        byte[] bb2 = new byte[]{0x1B,0x21,0x20}; // 2- bold with medium text
-        byte[] bb3 = new byte[]{0x1B,0x21,0x10}; // 3- bold with large text
-        switch (size){
+        byte[] bb = new byte[]{0x1B, 0x21, 0x08};  // 1- only bold text
+        byte[] bb2 = new byte[]{0x1B, 0x21, 0x20}; // 2- bold with medium text
+        byte[] bb3 = new byte[]{0x1B, 0x21, 0x10}; // 3- bold with large text
+        switch (size) {
             case 0:
                 outputStream.write(cc);
                 break;
@@ -109,7 +108,7 @@ public class Printer {
                 break;
         }
 
-        switch (align){
+        switch (align) {
             case 0:
                 //left align
                 outputStream.write(PrinterCommands.ESC_ALIGN_LEFT);
@@ -129,12 +128,12 @@ public class Printer {
 
     public void print(String msg, int size, int align) throws IOException {
         //Print config "mode"
-        byte[] cc = new byte[]{0x1B,0x21,0x03};  // 0- normal size text
+        byte[] cc = new byte[]{0x1B, 0x21, 0x03};  // 0- normal size text
         //byte[] cc1 = new byte[]{0x1B,0x21,0x00};  // 0- normal size text
-        byte[] bb = new byte[]{0x1B,0x21,0x08};  // 1- only bold text
-        byte[] bb2 = new byte[]{0x1B,0x21,0x20}; // 2- bold with medium text
-        byte[] bb3 = new byte[]{0x1B,0x21,0x10}; // 3- bold with large text
-        switch (size){
+        byte[] bb = new byte[]{0x1B, 0x21, 0x08};  // 1- only bold text
+        byte[] bb2 = new byte[]{0x1B, 0x21, 0x20}; // 2- bold with medium text
+        byte[] bb3 = new byte[]{0x1B, 0x21, 0x10}; // 3- bold with large text
+        switch (size) {
             case 0:
                 outputStream.write(cc);
                 break;
@@ -148,7 +147,7 @@ public class Printer {
                 outputStream.write(bb3);
                 break;
         }
-        switch (align){
+        switch (align) {
             case 0:
                 //left align
                 outputStream.write(PrinterCommands.ESC_ALIGN_LEFT);
@@ -169,11 +168,11 @@ public class Printer {
     public void printPhoto(Activity activity, int img) throws IOException {
         Bitmap bmp = BitmapFactory.decodeResource(activity.getResources(),
                 img);
-        if(bmp!=null){
+        if (bmp != null) {
             byte[] command = Utils.decodeBitmap(bmp);
             outputStream.write(PrinterCommands.ESC_ALIGN_CENTER);
             printText(command);
-        }else{
+        } else {
             Log.e("Print Photo error", "the file isn't exists");
         }
     }
@@ -191,7 +190,7 @@ public class Printer {
     }
 
     public static void resetPrint() {
-        try{
+        try {
             outputStream.write(PrinterCommands.ESC_FONT_COLOR_DEFAULT);
             outputStream.write(PrinterCommands.FS_FONT_ALIGN);
             outputStream.write(PrinterCommands.ESC_ALIGN_LEFT);
@@ -215,9 +214,9 @@ public class Printer {
         return true;
     }
 
-    public void printArray (Data[] pV, int size, int align) throws IOException {
-        String str="";
-        for (Data item: pV){
+    public void printArray(Data[] pV, int size, int align) throws IOException {
+        String str = "";
+        for (Data item : pV) {
             str = str.concat(" " + item.toString());
         }
         this.printCustom(str, size, align);
@@ -225,8 +224,8 @@ public class Printer {
 
 
     public String leftRightAlign(String str1, String str2) {
-        String ans = str1 +str2;
-        if(ans.length() <31){
+        String ans = str1 + str2;
+        if (ans.length() < 31) {
             int n = (31 - str1.length() + str2.length());
             ans = str1 + new String(new char[n]).replace("\0", " ") + str2;
         }
@@ -235,7 +234,7 @@ public class Printer {
 
     public String leftRightAlign2(String str1) {
         String ans = str1;
-        if(ans.length() <31){
+        if (ans.length() < 31) {
             int n = (31 - str1.length());
             ans = str1 + new String(new char[n]).replace("\0", " ");
         }
@@ -244,28 +243,30 @@ public class Printer {
 
     public String[] getDateTime() {
         final Calendar c = Calendar.getInstance();
-        String dateTime [] = new String[3];
-        dateTime[0] = String.valueOf(c.get(Calendar.DAY_OF_MONTH)) +"/"+ String.valueOf(c.get(Calendar.MONTH) + 1) +"/"+ String.valueOf(c.get(Calendar.YEAR));
-        dateTime[1] = String.valueOf(c.get(Calendar.HOUR_OF_DAY)) +":"+ String.valueOf(c.get(Calendar.MINUTE));
+        String dateTime[] = new String[3];
+        dateTime[0] = String.valueOf(c.get(Calendar.DAY_OF_MONTH)) + "/" + String.valueOf(c.get(Calendar.MONTH) + 1) + "/" + String.valueOf(c.get(Calendar.YEAR));
+        dateTime[1] = String.valueOf(c.get(Calendar.HOUR_OF_DAY)) + ":" + String.valueOf(c.get(Calendar.MINUTE));
         return dateTime;
     }
 
-    public static String getFecha(){
+    public static String getFecha() {
         final Calendar c = Calendar.getInstance();
-        return String.valueOf(c.get(Calendar.YEAR)) +"-"+ String.format("%02d",c.get(Calendar.MONTH) + 1) +"-"+ String.format("%02d", c.get(Calendar.DAY_OF_MONTH)) + " " + String.format("%02d",c.get(Calendar.HOUR_OF_DAY)) +":"+ String.format("%02d",c.get(Calendar.MINUTE)) + ":" + String.format("%02d",c.get(Calendar.SECOND));
+        return String.valueOf(c.get(Calendar.YEAR)) + "-" + String.format("%02d", c.get(Calendar.MONTH) + 1) + "-" + String.format("%02d", c.get(Calendar.DAY_OF_MONTH)) + " " + String.format("%02d", c.get(Calendar.HOUR_OF_DAY)) + ":" + String.format("%02d", c.get(Calendar.MINUTE)) + ":" + String.format("%02d", c.get(Calendar.SECOND));
     }
+
     public String[] getDateTime2() {
         final Calendar c = Calendar.getInstance();
-        String dateTime [] = new String[1];
-        dateTime[0] = String.valueOf(c.get(Calendar.DAY_OF_MONTH)) +"/"+ String.valueOf(c.get(Calendar.MONTH) + 1) +"/"+ String.valueOf(c.get(Calendar.YEAR));
+        String dateTime[] = new String[1];
+        dateTime[0] = String.valueOf(c.get(Calendar.DAY_OF_MONTH)) + "/" + String.valueOf(c.get(Calendar.MONTH) + 1) + "/" + String.valueOf(c.get(Calendar.YEAR));
 //        dateTime[1] = String.valueOf(c.get(Calendar.HOUR_OF_DAY)) +":"+ String.valueOf(c.get(Calendar.MINUTE));
         return dateTime;
     }
 
-    public static byte[] stringABytes(String s){
-        byte[] cad = new byte[s.length()]; int i = 0;
-        for(char c: s.toCharArray()){
-            switch (c){
+    public static byte[] stringABytes(String s) {
+        byte[] cad = new byte[s.length()];
+        int i = 0;
+        for (char c : s.toCharArray()) {
+            switch (c) {
                 case 'á':
                     cad[i] = -96;
                     break;
@@ -318,13 +319,14 @@ public class Printer {
         public String Valor;
         public int Align;
 
-        public Data(int Ancho, String Valor, int Align){
+        public Data(int Ancho, String Valor, int Align) {
             this.Ancho = Ancho;
             this.Valor = Valor;
             this.Align = Align;
         }
+
         @Override
-        public String toString(){
+        public String toString() {
             String str;
             if (Valor.length() < Ancho)
                 if (Align == 0)

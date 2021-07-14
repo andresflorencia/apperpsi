@@ -19,14 +19,14 @@ public class Canton {
     public static SQLiteDatabase sqLiteDatabase;
     public static final String TAG = "TAGPROVINCIA";
 
-    public Canton(){
+    public Canton() {
         this.idcanton = 0;
         this.nombrecanton = "";
         this.provinciaid = 0;
     }
 
     public static Canton get(Integer codigo) {
-        Canton canton=null;
+        Canton canton = null;
         try {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
             Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM canton where idcanton = ?", new String[]{codigo.toString()});
@@ -55,7 +55,7 @@ public class Canton {
                 do {
                     canton = Canton.AsignaDatos(cursor);
                     if (canton != null) lista.add(canton);
-                }while (cursor.moveToNext());
+                } while (cursor.moveToNext());
             }
             cursor.close();
             sqLiteDatabase.close();
@@ -69,14 +69,14 @@ public class Canton {
     public static boolean SaveLista(List<Canton> cantones) {
         try {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
-            for (Canton item:cantones) {
+            for (Canton item : cantones) {
                 sqLiteDatabase.execSQL("INSERT OR REPLACE INTO " +
                                 "canton(idcanton, nombrecanton, provinciaid)" +
                                 "values(?, ?, ?)",
                         new String[]{item.idcanton.toString(), item.nombrecanton, item.provinciaid.toString()});
             }
             sqLiteDatabase.close();
-            Log.d(TAG,"Guardó lista cantones");
+            Log.d(TAG, "Guardó lista cantones");
             return true;
         } catch (Exception ex) {
             ex.printStackTrace();

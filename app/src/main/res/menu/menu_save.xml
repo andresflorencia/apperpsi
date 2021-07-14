@@ -1,24 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:id="@+id/option_save"
-        android:title="Guardar"
+    <item
+        android:id="@+id/option_save"
         android:icon="@drawable/ic_save"
+        android:title="Guardar"
         app:showAsAction="collapseActionView|always" />
-    <item android:id="@+id/option_reimprimir"
-        android:title="Imprimir"
+    <item
+        android:id="@+id/option_reimprimir"
         android:icon="@drawable/ic_printer_white"
+        android:title="Imprimir"
         app:showAsAction="collapseActionView|always" />
-    <item android:id="@+id/option_newdocument"
+    <item
+        android:id="@+id/option_newdocument"
+        android:icon="@drawable/ic_note_add"
         android:title="Nuevo Comprobante"
-        android:icon="@drawable/ic_note_add"
         app:showAsAction="ifRoom" />
-    <item android:id="@+id/option_listdocument"
-        android:title="Buscar Comprobante"
+    <item
+        android:id="@+id/option_listdocument"
         android:icon="@drawable/ic_list_document"
+        android:title="Buscar Comprobante"
         app:showAsAction="ifRoom" />
-    <item android:id="@+id/option_newclient"
-        android:title="Nuevo Cliente"
+    <item
+        android:id="@+id/option_newclient"
         android:icon="@drawable/ic_note_add"
+        android:title="Nuevo Cliente"
         app:showAsAction="ifRoom" />
 </menu>

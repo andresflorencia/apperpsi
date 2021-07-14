@@ -27,7 +27,7 @@ public interface IUsuario {
     @FormUrlEncoded
     @POST("registramovil")
     Call<JsonObject> IniciarSesion(@Field("usuario") String user, @Field("clave") String clave,
-                                    @Field("phone") String phone);
+                                   @Field("phone") String phone);
 
     @POST("getlastversion")
     Call<JsonObject> getLastVersion();
@@ -39,7 +39,7 @@ public interface IUsuario {
     Call<ResponseBody> downloadApk(@Url String url);
 
     @POST("loadubicacion")
-    Call<JsonObject> loadUbicacion(@Body Map<String,Object> ubicaciones);
+    Call<JsonObject> loadUbicacion(@Body Map<String, Object> ubicaciones);
 
     @FormUrlEncoded
     @POST("getpermisos")

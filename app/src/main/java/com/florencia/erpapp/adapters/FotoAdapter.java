@@ -24,14 +24,14 @@ import com.florencia.erpapp.models.Foto;
 
 import java.util.List;
 
-public class FotoAdapter extends RecyclerView.Adapter<FotoAdapter.ImageViewHolder>{
+public class FotoAdapter extends RecyclerView.Adapter<FotoAdapter.ImageViewHolder> {
 
     public static final String TAG = "TAGFOTO_ADAPTER";
 
     public List<Foto> listFoto;
     private Activity activity;
 
-    public FotoAdapter(Activity activity, List<Foto> listFoto){
+    public FotoAdapter(Activity activity, List<Foto> listFoto) {
         this.activity = activity;
         this.listFoto = listFoto;
     }
@@ -53,57 +53,58 @@ public class FotoAdapter extends RecyclerView.Adapter<FotoAdapter.ImageViewHolde
     public int getItemCount() {
         return listFoto.size();
     }
+
     class ImageViewHolder extends RecyclerView.ViewHolder {
 
         ImageButton btnDelete;
         ImageView imgFoto;
         CardView cvFoto;
 
-        ImageViewHolder(@NonNull View itemView){
+        ImageViewHolder(@NonNull View itemView) {
             super(itemView);
             btnDelete = itemView.findViewById(R.id.btnDelete);
             imgFoto = itemView.findViewById(R.id.imgFoto);
             cvFoto = itemView.findViewById(R.id.cvFoto);
         }
 
-        void bindImage(final Foto foto){
-            if(foto.bitmap!=null)
+        void bindImage(final Foto foto) {
+            if (foto.bitmap != null)
                 imgFoto.setImageBitmap(foto.bitmap);
-            else if(foto.uriFoto!=null)
+            else if (foto.uriFoto != null)
                 imgFoto.setImageURI(foto.uriFoto);
 
             btnDelete.setOnClickListener(v -> EliminaFoto(getAdapterPosition()));
 
         }
 
-        void EliminaFoto(int position){
-            try{
+        void EliminaFoto(int position) {
+            try {
                 AlertDialog.Builder builder = new AlertDialog.Builder(activity, R.style.AlertDialogTheme);
                 View view = LayoutInflater.from(activity).inflate(R.layout.layout_confirmation_dialog,
                         (ConstraintLayout) activity.findViewById(R.id.lyDialogContainer));
                 builder.setView(view);
-                ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_delete2);
-                ((TextView)view.findViewById(R.id.lblTitle)).setText("Eliminar foto");
-                ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Está seguro que desea eliminar esta foto?");
-                ((Button)view.findViewById(R.id.btnConfirm)).setText("Si");
-                ((Button)view.findViewById(R.id.btnCancel)).setText("Cancelar");
+                ((ImageView) view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_delete2);
+                ((TextView) view.findViewById(R.id.lblTitle)).setText("Eliminar foto");
+                ((TextView) view.findViewById(R.id.lblMessage)).setText("¿Está seguro que desea eliminar esta foto?");
+                ((Button) view.findViewById(R.id.btnConfirm)).setText("Si");
+                ((Button) view.findViewById(R.id.btnCancel)).setText("Cancelar");
 
                 final AlertDialog alertDialog = builder.create();
                 view.findViewById(R.id.btnConfirm).setOnClickListener(v -> {
-                            listFoto.remove(getAdapterPosition());
-                            notifyDataSetChanged();
-                            ((DepositoActivity) activity).btnCargaDocumento.setVisibility(View.VISIBLE);
-                            alertDialog.dismiss();
-                        });
+                    listFoto.remove(getAdapterPosition());
+                    notifyDataSetChanged();
+                    ((DepositoActivity) activity).btnCargaDocumento.setVisibility(View.VISIBLE);
+                    alertDialog.dismiss();
+                });
 
                 view.findViewById(R.id.btnCancel).setOnClickListener(v -> alertDialog.dismiss());
 
                 alertDialog.setCancelable(false);
-                if(alertDialog.getWindow()!=null)
+                if (alertDialog.getWindow() != null)
                     alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
                 alertDialog.show();
-            }catch (Exception e){
-                Log.d(TAG,"EliminaFoto(): " + e.getMessage());
+            } catch (Exception e) {
+                Log.d(TAG, "EliminaFoto(): " + e.getMessage());
             }
         }
     }

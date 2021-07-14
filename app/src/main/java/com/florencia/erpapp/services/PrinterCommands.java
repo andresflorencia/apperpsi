@@ -37,20 +37,20 @@ public class PrinterCommands {
     public static byte[] TRANSMIT_DLE_ERROR_STATUS = {0x10, 0x04, 0x03};
     public static byte[] TRANSMIT_DLE_ROLL_PAPER_SENSOR_STATUS = {0x10, 0x04, 0x04};
 
-    public static final byte[] ESC_FONT_COLOR_DEFAULT = new byte[] { 0x1B, 'r',0x00 };
-    public static final byte[] FS_FONT_ALIGN = new byte[] { 0x1C, 0x21, 1, 0x1B,
-            0x21, 1 };
-    public static final byte[] ESC_ALIGN_LEFT = new byte[] { 0x1b, 'a', 0x00 };
-    public static final byte[] ESC_ALIGN_RIGHT = new byte[] { 0x1b, 'a', 0x02 };
-    public static final byte[] ESC_ALIGN_CENTER = new byte[] { 0x1b, 'a', 0x01 };
-    public static final byte[] ESC_CANCEL_BOLD = new byte[] { 0x1B, 0x45, 0 };
+    public static final byte[] ESC_FONT_COLOR_DEFAULT = new byte[]{0x1B, 'r', 0x00};
+    public static final byte[] FS_FONT_ALIGN = new byte[]{0x1C, 0x21, 1, 0x1B,
+            0x21, 1};
+    public static final byte[] ESC_ALIGN_LEFT = new byte[]{0x1b, 'a', 0x00};
+    public static final byte[] ESC_ALIGN_RIGHT = new byte[]{0x1b, 'a', 0x02};
+    public static final byte[] ESC_ALIGN_CENTER = new byte[]{0x1b, 'a', 0x01};
+    public static final byte[] ESC_CANCEL_BOLD = new byte[]{0x1B, 0x45, 0};
 
 
     /*********************************************/
-    public static final byte[] ESC_HORIZONTAL_CENTERS = new byte[] { 0x1B, 0x44, 20, 28, 00};
-    public static final byte[] ESC_CANCLE_HORIZONTAL_CENTERS = new byte[] { 0x1B, 0x44, 00 };
+    public static final byte[] ESC_HORIZONTAL_CENTERS = new byte[]{0x1B, 0x44, 20, 28, 00};
+    public static final byte[] ESC_CANCLE_HORIZONTAL_CENTERS = new byte[]{0x1B, 0x44, 00};
     /*********************************************/
 
-    public static final byte[] ESC_ENTER = new byte[] { 0x1B, 0x4A, 0x40 };
-    public static final byte[] PRINTE_TEST = new byte[] { 0x1D, 0x28, 0x41 };
+    public static final byte[] ESC_ENTER = new byte[]{0x1B, 0x4A, 0x40};
+    public static final byte[] PRINTE_TEST = new byte[]{0x1D, 0x28, 0x41};
 }

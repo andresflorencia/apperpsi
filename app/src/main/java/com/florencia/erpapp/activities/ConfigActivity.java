@@ -41,6 +41,7 @@ public class ConfigActivity extends AppCompatActivity {
     EditText txtURLBase;
     CheckBox ckSSL;
     private OkHttpClient okHttpClient;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,7 +63,7 @@ public class ConfigActivity extends AppCompatActivity {
         txtURLBase = findViewById(R.id.txtUrlBase);
         ckSSL = findViewById(R.id.ckSSL);
 
-        if(SQLite.configuracion!=null){
+        if (SQLite.configuracion != null) {
             txtURLBase.setText(SQLite.configuracion.urlbase);
             ckSSL.setChecked(SQLite.configuracion.hasSSL);
         }
@@ -81,7 +82,7 @@ public class ConfigActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.option_save:
                 ValidarDatos();
                 break;
@@ -90,15 +91,15 @@ public class ConfigActivity extends AppCompatActivity {
     }
 
     private void ValidarDatos() {
-        try{
-            if(txtURLBase.getText().toString().trim().equals("")){
-                Banner.make(rootView,this,Banner.ERROR, "Debe especificar la URL válida.",Banner.BOTTOM, 3000).show();
+        try {
+            if (txtURLBase.getText().toString().trim().equals("")) {
+                Banner.make(rootView, this, Banner.ERROR, "Debe especificar la URL válida.", Banner.BOTTOM, 3000).show();
                 txtURLBase.requestFocus();
                 return;
-            }else {//if(!Utils.isOnlineNet(txtURLBase.getText().toString().trim())){
-                String url_temp = (ckSSL.isChecked()?Constants.HTTPs:Constants.HTTP)
+            } else {//if(!Utils.isOnlineNet(txtURLBase.getText().toString().trim())){
+                String url_temp = (ckSSL.isChecked() ? Constants.HTTPs : Constants.HTTP)
                         + txtURLBase.getText().toString().trim()
-                        + (ckSSL.isChecked()?"":"/erpproduccion")
+                        + (ckSSL.isChecked() ? "" : "/erpproduccion")
                         + Constants.ENDPOINT;
                 Gson gson = new GsonBuilder()
                         .setLenient()
@@ -115,20 +116,20 @@ public class ConfigActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(Call<String> call, Response<String> response) {
                         if (!response.isSuccessful()) {
-                            Banner.make(rootView,ConfigActivity.this,Banner.ERROR, "No es posible conectar con la URL ingresada. Verifique su conexión.",Banner.BOTTOM, 3000).show();
+                            Banner.make(rootView, ConfigActivity.this, Banner.ERROR, "No es posible conectar con la URL ingresada. Verifique su conexión.", Banner.BOTTOM, 3000).show();
                             return;
                         }
                         try {
                             if (response.body() != null) {
                                 String resp = response.body();
-                                if(resp.equalsIgnoreCase("OK"))
+                                if (resp.equalsIgnoreCase("OK"))
                                     GuardarDatos();
                                 else
-                                    Banner.make(rootView,ConfigActivity.this,Banner.ERROR, "No es posible conectar con la URL ingresada. Verifique su conexión.",Banner.BOTTOM, 3000).show();
-                            }else
-                                Banner.make(rootView,ConfigActivity.this,Banner.ERROR, "No es posible conectar con la URL ingresada. Verifique su conexión.",Banner.BOTTOM, 3000).show();
+                                    Banner.make(rootView, ConfigActivity.this, Banner.ERROR, "No es posible conectar con la URL ingresada. Verifique su conexión.", Banner.BOTTOM, 3000).show();
+                            } else
+                                Banner.make(rootView, ConfigActivity.this, Banner.ERROR, "No es posible conectar con la URL ingresada. Verifique su conexión.", Banner.BOTTOM, 3000).show();
                         } catch (Exception e) {
-                            Banner.make(rootView,ConfigActivity.this,Banner.ERROR, "No es posible conectar con la URL ingresada. Verifique su conexión.",Banner.BOTTOM, 3000).show();
+                            Banner.make(rootView, ConfigActivity.this, Banner.ERROR, "No es posible conectar con la URL ingresada. Verifique su conexión.", Banner.BOTTOM, 3000).show();
                             Log.d(TAG, e.getMessage());
                         }
                     }
@@ -136,39 +137,39 @@ public class ConfigActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(Call<String> call, Throwable t) {
                         Log.d(TAG, t.getMessage());
-                        Banner.make(rootView,ConfigActivity.this,Banner.ERROR, "No es posible conectar con la URL ingresada. Verifique su conexión.",Banner.BOTTOM, 3000).show();
+                        Banner.make(rootView, ConfigActivity.this, Banner.ERROR, "No es posible conectar con la URL ingresada. Verifique su conexión.", Banner.BOTTOM, 3000).show();
                         call.cancel();
                     }
                 });
             }
 
-        }catch (Exception e){
-            Banner.make(rootView,this,Banner.ERROR, "No es posible conectar con la URL ingresada. Verifique su conexión.",Banner.BOTTOM, 3000).show();
+        } catch (Exception e) {
+            Banner.make(rootView, this, Banner.ERROR, "No es posible conectar con la URL ingresada. Verifique su conexión.", Banner.BOTTOM, 3000).show();
             Log.d(TAG, "ValidarDatos(): " + e.getMessage());
         }
     }
 
-    private void GuardarDatos(){
-        try{
+    private void GuardarDatos() {
+        try {
             Configuracion newConfig = new Configuracion();
             newConfig.urlbase = txtURLBase.getText().toString().trim();
             newConfig.hasSSL = ckSSL.isChecked();
-            newConfig.url_ws = (newConfig.hasSSL?Constants.HTTPs:Constants.HTTP)
+            newConfig.url_ws = (newConfig.hasSSL ? Constants.HTTPs : Constants.HTTP)
                     + newConfig.urlbase
-                    + (SQLite.configuracion.hasSSL?"":"/erpproduccion")
+                    + (SQLite.configuracion.hasSSL ? "" : "/erpproduccion")
                     + Constants.ENDPOINT;
-            if(newConfig.Save()){
+            if (newConfig.Save()) {
                 SQLite.configuracion = newConfig;
                 //Utils.showSuccessDialog(this, "Configuración",Constants.MSG_DATOS_GUARDADOS,true,false);
                 //Banner.make(rootView, ConfigActivity.this, Banner.SUCCESS, Constants.MSG_DATOS_GUARDADOS, Banner.BOTTOM,2000).show();
                 Utils.showMessage(ConfigActivity.this, Constants.MSG_DATOS_GUARDADOS);
                 onBackPressed();
                 overridePendingTransition(R.anim.right_in, R.anim.right_out);
-            }else{
+            } else {
                 //Utils.showErrorDialog(this, "Error",Constants.MSG_DATOS_NO_GUARDADOS);
-                Banner.make(rootView, this, Banner.ERROR, Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM,3000).show();
+                Banner.make(rootView, this, Banner.ERROR, Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM, 3000).show();
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, "GuardarDatos(): " + e.getMessage());
         }
     }

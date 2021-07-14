@@ -2,6 +2,7 @@ package com.florencia.erpapp.fragments;
 
 import android.app.DatePickerDialog;
 import android.app.PendingIntent;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -33,6 +34,7 @@ import com.florencia.erpapp.MainActivity;
 import com.florencia.erpapp.R;
 import com.florencia.erpapp.adapters.ResumenAdapter;
 import com.florencia.erpapp.interfaces.IUsuario;
+import com.florencia.erpapp.models.VersionApp;
 import com.florencia.erpapp.services.SQLite;
 import com.florencia.erpapp.utils.Constants;
 import com.florencia.erpapp.utils.Utils;
@@ -98,7 +100,7 @@ public class PrincipalFragment extends Fragment implements View.OnClickListener,
 
         String fecha = Utils.getDateFormat("yyyy-MM-dd");
         String[] fecA = fecha.split("-");
-        btnFecha.setText(fecA[2] + "-" + Utils.getMes(Integer.valueOf(fecA[1])-1,true) + "-" + fecA[0]);
+        btnFecha.setText(fecA[2] + "-" + Utils.getMes(Integer.valueOf(fecA[1]) - 1, true) + "-" + fecA[0]);
         btnFecha.setTag(fecha);
 
         lblVersion.setText("v".concat(BuildConfig.VERSION_NAME));
@@ -128,16 +130,16 @@ public class PrincipalFragment extends Fragment implements View.OnClickListener,
         day = Integer.valueOf(fecha[2]);
         month = Integer.valueOf(fecha[1]) - 1;
         year = Integer.valueOf(fecha[0]);
-        dtpDialog = new DatePickerDialog(getContext(), (v, y, m, d)-> {
-                String dia = (d >= 0 && d < 10 ? "0" + (d) : String.valueOf(d));
-                String mes = (m >= 0 && m < 10 ? "0" + (m + 1) : String.valueOf(m + 1));
+        dtpDialog = new DatePickerDialog(getContext(), (v, y, m, d) -> {
+            String dia = (d >= 0 && d < 10 ? "0" + (d) : String.valueOf(d));
+            String mes = (m >= 0 && m < 10 ? "0" + (m + 1) : String.valueOf(m + 1));
 
-                String mitextoU = y + "-" + mes + "-" + dia;
-                btnFecha.setTag(mitextoU);
-                btnFecha.setText(dia + "-" + Utils.getMes(m, true) + "-" + y);
-                BuscaResumen(mitextoU);
-            }
-        , year, month, day);
+            String mitextoU = y + "-" + mes + "-" + dia;
+            btnFecha.setTag(mitextoU);
+            btnFecha.setText(dia + "-" + Utils.getMes(m, true) + "-" + y);
+            BuscaResumen(mitextoU);
+        }
+                , year, month, day);
         dtpDialog.show();
     }
 
@@ -173,8 +175,11 @@ public class PrincipalFragment extends Fragment implements View.OnClickListener,
                 case R.id.lblUpdate:
                     //progressBar.setVisibility(View.VISIBLE);
                     //new DownloadFile2().execute(SQLite.configuracion.url_ws.concat(Constants.URL_DOWNLOAD_APK), "erpv_" + SQLite.newversion + ".apk",
-                      //      getActivity().getExternalFilesDir(null).toString());
-                    Utils.DescargaApk(v.getContext(), SQLite.linkdescarga);
+                    //      getActivity().getExternalFilesDir(null).toString());
+                    ContentValues cv = new ContentValues();
+                    cv.put("instalada", "t");
+                    //VersionApp.Update(SQLite.version.newversion, cv);
+                    Utils.DescargaApk(v.getContext(), SQLite.version.link);
                     /*Log.d(TAG,"PATH(): " + getActivity().getExternalFilesDir(null).toString());
                     new DownloadFile().execute(SQLite.configuracion.url_ws.concat(Constants.URL_DOWNLOAD_APK), "erp-realese.apk",
                             getActivity().getExternalFilesDir(null).toString());
@@ -190,9 +195,9 @@ public class PrincipalFragment extends Fragment implements View.OnClickListener,
 
     @Override
     public boolean onLongClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.lblUpdate:
-                return Utils.CopyToClipboard(v.getContext(), SQLite.linkdescarga);
+                return Utils.CopyToClipboard(v.getContext(), SQLite.version.link);
         }
         return false;
     }
@@ -217,7 +222,7 @@ public class PrincipalFragment extends Fragment implements View.OnClickListener,
     private static final int PICK_PDF_FILE = 2;
 
     public void openFile(Uri pickerInitialUri) {
-        Log.d(TAG,pickerInitialUri.toString());
+        Log.d(TAG, pickerInitialUri.toString());
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -228,7 +233,8 @@ public class PrincipalFragment extends Fragment implements View.OnClickListener,
 
         startActivity(intent);
     }
-    public void openFolder(Uri pickerInitialUri){
+
+    public void openFolder(Uri pickerInitialUri) {
         //Uri selectedUri = Uri.parse("file://" + Environment.getExternalStorageDirectory() + "/tuCarpeta");
         try {
             Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -237,13 +243,12 @@ public class PrincipalFragment extends Fragment implements View.OnClickListener,
             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
             startActivity(intent);//Intent.createChooser(intent, "Open folder"));
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, e.getMessage());
         }
     }
 
-    public static boolean installPackage(Context context, InputStream in, String packageName)
-            throws IOException {
+    public static boolean installPackage(Context context, InputStream in, String packageName) throws IOException {
         PackageInstaller packageInstaller = context.getPackageManager().getPackageInstaller();
         PackageInstaller.SessionParams params = new PackageInstaller.SessionParams(
                 PackageInstaller.SessionParams.MODE_FULL_INSTALL);
@@ -280,7 +285,7 @@ public class PrincipalFragment extends Fragment implements View.OnClickListener,
             String newFecha = Utils.CambiarFecha(btnFecha.getTag().toString().trim(),
                     Calendar.DAY_OF_YEAR, operador);
             String[] newF = newFecha.split("-");
-            btnFecha.setText(newF[2] + "-" + Utils.getMes(Integer.valueOf( newF[1])-1,true) + "-" + newF[0] );
+            btnFecha.setText(newF[2] + "-" + Utils.getMes(Integer.valueOf(newF[1]) - 1, true) + "-" + newF[0]);
             btnFecha.setTag(newFecha);
             BuscaResumen(newFecha);
         } catch (Exception e) {
@@ -312,12 +317,12 @@ public class PrincipalFragment extends Fragment implements View.OnClickListener,
                     .build();
             IUsuario miInterface = retrofit.create(IUsuario.class);
 
-            Call<JsonObject> call = null;
-            call = miInterface.getLastVersion();
+            Call<JsonObject> call = miInterface.getLastVersion();
             call.enqueue(new Callback<JsonObject>() {
                 @Override
                 public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                     if (!response.isSuccessful()) {
+                        confirmaVersion();
                         return;
                     }
                     try {
@@ -325,17 +330,20 @@ public class PrincipalFragment extends Fragment implements View.OnClickListener,
                             JsonObject obj = response.body();
                             if (obj.has("versionapp")) {
                                 if (!obj.get("versionapp").getAsString().equals(BuildConfig.VERSION_NAME)) {
-                                    SQLite.newversion = obj.get("versionapp").getAsString();
-                                    SQLite.linkdescarga = obj.get("linkapp").getAsString();
-                                    lblUpdate.setVisibility(View.VISIBLE);
-                                    lblVersion.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_END);
-                                    lblUpdate.setText(Html.fromHtml(getResources().getString(R.string.update)));
-                                    ((MainActivity) getActivity()).ShowModalUpdate(SQLite.linkdescarga);
+                                    SQLite.version.newversion = obj.get("versionapp").getAsString();
+                                    SQLite.version.link = obj.get("linkapp").getAsString();
+                                    SQLite.version.requerida = obj.get("requerida").getAsString();
+                                    SQLite.version.instalada = "f";
+                                    VersionApp.Save(SQLite.version);
+
+                                    confirmaVersion();
                                 }
                             }
-                        }
+                        }else
+                            confirmaVersion();
                     } catch (Exception e) {
                         Log.d(TAG, e.getMessage());
+                        confirmaVersion();
                     }
                 }
 
@@ -343,18 +351,35 @@ public class PrincipalFragment extends Fragment implements View.OnClickListener,
                 public void onFailure(Call<JsonObject> call, Throwable t) {
                     Log.d(TAG, t.getMessage());
                     call.cancel();
+                    confirmaVersion();
                 }
             });
         } catch (Exception e) {
+            Log.d(TAG, e.getMessage());
+            confirmaVersion();
+        }
+    }
+
+    public void confirmaVersion(){
+        try{
+            if(!SQLite.version.version.equals(SQLite.version.newversion) && SQLite.version.instalada.equals("f")) {
+                lblUpdate.setVisibility(View.VISIBLE);
+                lblVersion.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_END);
+                lblUpdate.setText(Html.fromHtml(getResources().getString(R.string.update)));
+                if (SQLite.version.requerida.equals("t"))
+                    ((MainActivity) getActivity()).ShowModalUpdate(SQLite.version.link);
+            }
+        }catch (Exception e){
             Log.d(TAG, e.getMessage());
         }
     }
 
     public class DownloadFile2 extends AsyncTask<String, Integer, Boolean> {
 
-        private static final int  MEGABYTE = 2048 * 2048;
+        private static final int MEGABYTE = 2048 * 2048;
         private String ruta = "";
         File pdfFile, folder;
+
         @Override
         protected Boolean doInBackground(String... strings) {
             String fileUrl = strings[0];   // -> http://maven.apache.org/maven-1.x/maven.pdf
@@ -363,7 +388,7 @@ public class PrincipalFragment extends Fragment implements View.OnClickListener,
             folder = new File(extStorageDirectory, Environment.DIRECTORY_DOWNLOADS);
             folder.mkdir();
             pdfFile = new File(folder, fileName);
-            Log.d(TAG,"");
+            Log.d(TAG, "");
             try {
                 pdfFile.createNewFile();
             } catch (IOException e) {
@@ -373,7 +398,7 @@ public class PrincipalFragment extends Fragment implements View.OnClickListener,
 
             try {
                 URL url = new URL(fileUrl);
-                HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
                 urlConnection.setDoOutput(true);
                 urlConnection.connect();
@@ -387,7 +412,7 @@ public class PrincipalFragment extends Fragment implements View.OnClickListener,
                 //progressBar.setProgress(0);
                 int i = 1;
                 //installPackage(getContext(),inputStream,Constants.ACTION_INSTALL_COMPLETE);
-                while((bufferLength = inputStream.read(buffer))>0 ){
+                while ((bufferLength = inputStream.read(buffer)) > 0) {
                     fileOutputStream.write(buffer, 0, bufferLength);
                     publishProgress(i, totalSize);
                     i++;
@@ -397,13 +422,13 @@ public class PrincipalFragment extends Fragment implements View.OnClickListener,
                 Log.d("TAGDOWN", "Archivo descargado");
                 return true;
             } catch (FileNotFoundException e) {
-                Log.d("TAGDOWN", "NotFound(): "+ e.getMessage());
+                Log.d("TAGDOWN", "NotFound(): " + e.getMessage());
                 e.printStackTrace();
             } catch (MalformedURLException e) {
-                Log.d("TAGDOWN", "Malformed(): "+ e.getMessage());
+                Log.d("TAGDOWN", "Malformed(): " + e.getMessage());
                 e.printStackTrace();
             } catch (IOException e) {
-                Log.d("TAGDOWN", "IO(): "+ e.getMessage());
+                Log.d("TAGDOWN", "IO(): " + e.getMessage());
                 e.printStackTrace();
             }
             return false;
@@ -413,24 +438,24 @@ public class PrincipalFragment extends Fragment implements View.OnClickListener,
 
         @Override
         protected void onProgressUpdate(Integer... values) {
-            if(values[0]<=1)
-                progressBar.setMax((values[1]/2048));
+            if (values[0] <= 1)
+                progressBar.setMax((values[1] / 2048));
             progressBar.setProgress(values[0]);
         }
 
         @Override
         protected void onPostExecute(Boolean result) {
-            if(result) {
+            if (result) {
                 progressBar.setVisibility(View.GONE);
                 Snackbar.make(view, "Se descargó un archivo. ", Snackbar.LENGTH_INDEFINITE)
                         .setActionTextColor(Color.WHITE)
                         .setAction("Instalar", v -> {
-                                Log.d(TAG, "Pulsada acción snackbar!: " + folder.getAbsolutePath());
-                                //File ar = new File(folder, "image.jpg");
-                                Uri photoURI = FileProvider.getUriForFile(view.getContext(), view.getContext().getApplicationContext().getPackageName() + ".provider", pdfFile);
-                                openFolder(Uri.parse("content://"+photoURI.toString()));
-                                //installPackage(view.getContext(), pdfFile.)
-                            }).show();
+                            Log.d(TAG, "Pulsada acción snackbar!: " + folder.getAbsolutePath());
+                            //File ar = new File(folder, "image.jpg");
+                            Uri photoURI = FileProvider.getUriForFile(view.getContext(), view.getContext().getApplicationContext().getPackageName() + ".provider", pdfFile);
+                            openFolder(Uri.parse("content://" + photoURI.toString()));
+                            //installPackage(view.getContext(), pdfFile.)
+                        }).show();
             }
         }
 

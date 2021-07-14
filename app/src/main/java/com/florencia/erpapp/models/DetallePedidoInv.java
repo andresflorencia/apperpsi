@@ -19,7 +19,7 @@ public class DetallePedidoInv {
     public static String TAG = "TAGDETALLE_PEDIDOINV";
     public static SQLiteDatabase sqLiteDatabase;
 
-    public DetallePedidoInv(){
+    public DetallePedidoInv() {
         this.pedidoid = 0;
         this.orden = 0;
         this.usuarioid = 0;
@@ -44,7 +44,7 @@ public class DetallePedidoInv {
                 } while (cursor.moveToNext());
             }
             sqLiteDatabase.close();
-        }catch (SQLiteException e){
+        } catch (SQLiteException e) {
             Log.d(TAG, "getDetalle(): " + e.getMessage());
         }
         return Items;
@@ -63,7 +63,7 @@ public class DetallePedidoInv {
             Item.usuarioid = cursor.getInt(6);
             Item.codigoproducto = cursor.getString(7);
             Item.nombreproducto = cursor.getString(8);
-            if(Item.producto == null){
+            if (Item.producto == null) {
                 Item.producto = new Producto();
                 Item.producto.idproducto = cursor.getInt(2);
                 Item.producto.codigoproducto = Item.codigoproducto;

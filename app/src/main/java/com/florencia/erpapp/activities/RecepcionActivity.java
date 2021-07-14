@@ -69,7 +69,8 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.florencia.erpapp.services.Printer.btsocket;
-public class RecepcionActivity extends AppCompatActivity implements View.OnClickListener{
+
+public class RecepcionActivity extends AppCompatActivity implements View.OnClickListener {
     private static final int REQUEST_BUSQUEDA_RECEPCION = 1;
     private static String TAG = "TAGRECEPCION_ACT";
     Spinner cbTransferencias;
@@ -86,8 +87,8 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
     ImageButton btnRefresh;
     TextView lblObservacion;
     EditText tvObservacion;
-    Integer idrecepcion=0;
-    List<Comprobante> listTransacciones= new ArrayList<>();
+    Integer idrecepcion = 0;
+    List<Comprobante> listTransacciones = new ArrayList<>();
     LinearLayout lyCombo, lyDatosInformativos, lyProductos;
     TextView lblTransferencia, lblEnvia, lblRecibe, lblDocTransferencia, lblDocRecepcion, lblProducto;
 
@@ -95,7 +96,7 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
     BottomSheetDialog btsDialog;
     Button btnPositive, btnNegative;
     View viewSeparator, rootView;
-    String tipoAccion="";
+    String tipoAccion = "";
     Retrofit retrofit;
 
     @Override
@@ -115,14 +116,14 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 try {
                     mitransferencia = listTransferencias.get(position);
-                    if(mitransferencia.codigosistema>0) {
+                    if (mitransferencia.codigosistema > 0) {
                         BuscarDetalleTransferencia(mitransferencia.codigosistema, view.getContext());
-                        Log.d(TAG,mitransferencia.codigotransaccion);
-                    }else if(idrecepcion.equals(0)){
+                        Log.d(TAG, mitransferencia.codigotransaccion);
+                    } else if (idrecepcion.equals(0)) {
                         detalleAdapter.detalleComprobante.clear();
                         detalleAdapter.notifyDataSetChanged();
                     }
-                }catch (Exception e){
+                } catch (Exception e) {
                     Log.d(TAG, "cbTransferencia(): " + e.getMessage());
                 }
             }
@@ -134,7 +135,7 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
         });
     }
 
-    private void init(){
+    private void init() {
         cbTransferencias = findViewById(R.id.cbTransferencias);
         rvDetalleProducto = findViewById(R.id.rvDetalleProductos);
         pbCargando = findViewById(R.id.pbCargando);
@@ -169,7 +170,7 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
                 .client(okHttpClient)
                 .build();
 
-        detalleAdapter = new DetalleRecepcionAdapter(this,detalleProductos,"",false, "8,23");
+        detalleAdapter = new DetalleRecepcionAdapter(this, detalleProductos, "", false, "8,23");
         rvDetalleProducto.setAdapter(detalleAdapter);
 
         btnRefresh.setOnClickListener(this::onClick);
@@ -177,25 +178,26 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
         lblTransferencia.setOnClickListener(this::onClick);
         lblProducto.setOnClickListener(this::onClick);
 
-        if(getIntent().getExtras()!=null)
-            idrecepcion = getIntent().getExtras().getInt("idcomprobante",0);
+        if (getIntent().getExtras() != null)
+            idrecepcion = getIntent().getExtras().getInt("idcomprobante", 0);
 
         LlenarTransferencias(this);
 
-        if(idrecepcion>0)
+        if (idrecepcion > 0)
             BuscaRecepcion(idrecepcion);
     }
+
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.btnRefresh:
                 LlenarTransferencias(v.getContext());
                 break;
             case R.id.lblObservacion:
-                Utils.EfectoLayout(tvObservacion,lblObservacion);
+                Utils.EfectoLayout(tvObservacion, lblObservacion);
                 break;
             case R.id.btnPositive:
-                if(tipoAccion.equals("MESSAGE")) {
+                if (tipoAccion.equals("MESSAGE")) {
                     btnNegative.setVisibility(View.VISIBLE);
                     viewSeparator.setVisibility(View.VISIBLE);
                     lblTitle.setVisibility(View.VISIBLE);
@@ -206,7 +208,7 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
                 btsDialog.dismiss();
                 break;
             case R.id.lblTransferencia:
-                if(idrecepcion>0)
+                if (idrecepcion > 0)
                     Utils.EfectoLayout(lyDatosInformativos, lblTransferencia);
                 else
                     Utils.EfectoLayout(lyCombo, lblTransferencia);
@@ -218,7 +220,7 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
     }
 
     private void LlenarTransferencias(Context context) {
-        try{
+        try {
             /*if(!Utils.isOnlineNet(SQLite.configuracion.urlbase)) {
                 Banner.make(rootView,this,Banner.ERROR,Constants.MSG_COMPROBAR_CONEXION_INTERNET, Banner.BOTTOM, 3000).show();
                 return;
@@ -233,11 +235,11 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
 
             IComprobante miInterface = retrofit.create(IComprobante.class);
 
-            Call<JsonObject> call = miInterface.getTransferencias(SQLite.usuario.Usuario,SQLite.usuario.Clave,SQLite.usuario.sucursal.IdEstablecimiento);
+            Call<JsonObject> call = miInterface.getTransferencias(SQLite.usuario.Usuario, SQLite.usuario.Clave, SQLite.usuario.sucursal.IdEstablecimiento, 0);
             call.enqueue(new Callback<JsonObject>() {
                 @Override
                 public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                    if(!response.isSuccessful()){
+                    if (!response.isSuccessful()) {
                         showError("Código error: " + response.code());
                         pbCargando.setVisibility(View.GONE);
                         btnRefresh.setVisibility(View.VISIBLE);
@@ -249,10 +251,10 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
                             cbTransferencias.setAdapter(null);
                             if (!obj.get("haserror").getAsBoolean()) {
                                 JsonArray jsonTransferencias = obj.getAsJsonArray("transferencias");
-                                if(jsonTransferencias!=null){
+                                if (jsonTransferencias != null) {
                                     listTransferencias.clear();
                                     Comprobante mitransfer = new Comprobante();
-                                    mitransfer.codigotransaccion="Escoja una transferencia";
+                                    mitransfer.codigotransaccion = "Escoja una transferencia";
                                     listTransferencias.add(mitransfer);
                                     for (JsonElement ele : jsonTransferencias) {
                                         JsonObject trans = ele.getAsJsonObject();
@@ -264,15 +266,15 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
                                     }
                                     spinnerAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, listTransferencias);
                                     cbTransferencias.setAdapter(spinnerAdapter);
-                                    cbTransferencias.setSelection(0,true);
+                                    cbTransferencias.setSelection(0, true);
                                 }
-                            }else
-                                Banner.make(rootView,RecepcionActivity.this,Banner.ERROR, obj.get("message").getAsString(),Banner.BOTTOM,2000).show();
-                        }else
-                            Banner.make(rootView,RecepcionActivity.this,Banner.ERROR,"Error al cargar los datos.",Banner.BOTTOM,2500).show();
+                            } else
+                                Banner.make(rootView, RecepcionActivity.this, Banner.ERROR, obj.get("message").getAsString(), Banner.BOTTOM, 2000).show();
+                        } else
+                            Banner.make(rootView, RecepcionActivity.this, Banner.ERROR, "Error al cargar los datos.", Banner.BOTTOM, 2500).show();
 
-                    }catch (Exception e){
-                        Log.d(TAG,"onResponse(): " + e.getMessage());
+                    } catch (Exception e) {
+                        Log.d(TAG, "onResponse(): " + e.getMessage());
                     }
                     pbCargando.setVisibility(View.GONE);
                     btnRefresh.setVisibility(View.VISIBLE);
@@ -280,14 +282,14 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
 
                 @Override
                 public void onFailure(Call<JsonObject> call, Throwable t) {
-                    Utils.showErrorDialog(RecepcionActivity.this,"Error",t.getMessage());
+                    Utils.showErrorDialog(RecepcionActivity.this, "Error", t.getMessage());
                     Log.d(TAG, "onFailure(): " + t.getMessage());
                     call.cancel();
                     pbCargando.setVisibility(View.GONE);
                     btnRefresh.setVisibility(View.VISIBLE);
                 }
             });
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, "LlenarTransferencias(): " + e.getMessage());
             pbCargando.setVisibility(View.GONE);
             btnRefresh.setVisibility(View.VISIBLE);
@@ -295,7 +297,7 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
     }
 
     private void BuscarDetalleTransferencia(Integer idtransaccion, Context context) {
-        try{
+        try {
             /*if(!Utils.isOnlineNet(SQLite.configuracion.urlbase)) {
                 Banner.make(rootView,RecepcionActivity.this,Banner.ERROR,Constants.MSG_COMPROBAR_CONEXION_INTERNET, Banner.BOTTOM,3000).show();
                 return;
@@ -313,12 +315,11 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
 
             IComprobante miInterface = retrofit.create(IComprobante.class);
 
-            Call<JsonObject> call=null;
-            call=miInterface.getDetalleTransferencia(idtransaccion);
+            Call<JsonObject> call = miInterface.getDetalleTransferencia(idtransaccion);
             call.enqueue(new Callback<JsonObject>() {
                 @Override
                 public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                    if(!response.isSuccessful()){
+                    if (!response.isSuccessful()) {
                         showError("Error Código: " + response.code());
                         pbCargando.setVisibility(View.GONE);
                         btnRefresh.setVisibility(View.VISIBLE);
@@ -329,7 +330,7 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
                             JsonObject obj = response.body();
                             if (!obj.get("haserror").getAsBoolean()) {
                                 JsonArray jsonTransferencias = obj.getAsJsonArray("detalle");
-                                if(jsonTransferencias!=null){
+                                if (jsonTransferencias != null) {
                                     detalleProductos.clear();
                                     detalleAdapter.detalleComprobante.clear();
                                     DetalleComprobante midetalle;
@@ -337,28 +338,28 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
                                         JsonObject trans = ele.getAsJsonObject();
                                         midetalle = new DetalleComprobante();
                                         midetalle.producto.idproducto = trans.get("productoid").getAsInt();
-                                        midetalle.producto.nombreproducto = trans.has("nombreproducto")? trans.get("nombreproducto").getAsString():"";
-                                        midetalle.producto.codigoproducto = trans.has("codigoproducto")?trans.get("codigoproducto").getAsString():"";
-                                        midetalle.numerolote = trans.has("numerolote")? trans.get("numerolote").getAsString():"";
-                                        midetalle.fechavencimiento = trans.has("fechavencimiento")? trans.get("fechavencimiento").getAsString():"1900-01-01";
-                                        midetalle.preciocosto = trans.has("preciocosto")? trans.get("preciocosto").getAsDouble():0;
-                                        midetalle.cantidad = trans.has("cantidad")?trans.get("cantidad").getAsDouble():0;
-                                        midetalle.marquetas = trans.has("marquetas")?trans.get("marquetas").getAsDouble():0;
+                                        midetalle.producto.nombreproducto = trans.has("nombreproducto") ? trans.get("nombreproducto").getAsString() : "";
+                                        midetalle.producto.codigoproducto = trans.has("codigoproducto") ? trans.get("codigoproducto").getAsString() : "";
+                                        midetalle.numerolote = trans.has("numerolote") ? trans.get("numerolote").getAsString() : "";
+                                        midetalle.fechavencimiento = trans.has("fechavencimiento") ? trans.get("fechavencimiento").getAsString() : "1900-01-01";
+                                        midetalle.preciocosto = trans.has("preciocosto") ? trans.get("preciocosto").getAsDouble() : 0;
+                                        midetalle.cantidad = trans.has("cantidad") ? trans.get("cantidad").getAsDouble() : 0;
+                                        midetalle.marquetas = trans.has("marquetas") ? trans.get("marquetas").getAsDouble() : 0;
                                         detalleProductos.add(midetalle);
-                                        Log.d(TAG,midetalle.producto.nombreproducto);
+                                        Log.d(TAG, midetalle.producto.nombreproducto);
                                     }
                                     //detalleAdapter.detalleComprobante.addAll(detalleProductos);
                                     mitransferencia.detalle.addAll(detalleProductos);
                                     //mirecepcion.detalle.addAll(detalleProductos);
                                     detalleAdapter.notifyDataSetChanged();
                                 }
-                            }else
-                                Utils.showErrorDialog(RecepcionActivity.this,"Error", obj.get("message").getAsString());
-                        }else
-                            Banner.make(rootView,RecepcionActivity.this,Banner.ERROR,"Error al cargar los datos.", Banner.BOTTOM,3000).show();
+                            } else
+                                Utils.showErrorDialog(RecepcionActivity.this, "Error", obj.get("message").getAsString());
+                        } else
+                            Banner.make(rootView, RecepcionActivity.this, Banner.ERROR, "Error al cargar los datos.", Banner.BOTTOM, 3000).show();
 
-                    }catch (Exception e){
-                        Log.d(TAG,"onResponse(): " + e.getMessage());
+                    } catch (Exception e) {
+                        Log.d(TAG, "onResponse(): " + e.getMessage());
                     }
                     pbCargando.setVisibility(View.GONE);
                     btnRefresh.setVisibility(View.VISIBLE);
@@ -366,14 +367,14 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
 
                 @Override
                 public void onFailure(Call<JsonObject> call, Throwable t) {
-                    Utils.showErrorDialog(RecepcionActivity.this,"Error",t.getMessage());
+                    Utils.showErrorDialog(RecepcionActivity.this, "Error", t.getMessage());
                     Log.d(TAG, "onFailure(): " + t.getMessage());
                     call.cancel();
                     pbCargando.setVisibility(View.GONE);
                     btnRefresh.setVisibility(View.VISIBLE);
                 }
             });
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, "BuscarDetalleTransferencia(): " + e.getMessage());
             pbCargando.setVisibility(View.GONE);
             btnRefresh.setVisibility(View.VISIBLE);
@@ -385,9 +386,9 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_save, menu);
         menu.findItem(R.id.option_newclient).setVisible(false);
-        if(idrecepcion==0) {
+        if (idrecepcion == 0) {
             menu.findItem(R.id.option_reimprimir).setVisible(false);
-        }else{
+        } else {
             menu.findItem(R.id.option_save).setVisible(false);
             menu.findItem(R.id.option_newdocument).setVisible(false);
         }
@@ -396,30 +397,30 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.option_save:
-                if(!SQLite.usuario.VerificaPermiso(this,Constants.RECEPCION_INVENTARIO, "escritura")){
-                    Banner.make(rootView,RecepcionActivity.this,Banner.ERROR,"No tiene permisos para registrar recepciones de inventario.", Banner.BOTTOM,3000).show();
+                if (!SQLite.usuario.VerificaPermiso(this, Constants.RECEPCION_INVENTARIO, "escritura")) {
+                    Banner.make(rootView, RecepcionActivity.this, Banner.ERROR, "No tiene permisos para registrar recepciones de inventario.", Banner.BOTTOM, 3000).show();
                     break;
                 }
                 AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogTheme);
                 View view = LayoutInflater.from(this).inflate(R.layout.layout_confirmation_dialog,
                         (ConstraintLayout) findViewById(R.id.lyDialogContainer));
                 builder.setView(view);
-                ((TextView)view.findViewById(R.id.lblTitle)).setText("Guardar recepción");
-                ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Está seguro que desea recibir esta transferencia?");
-                ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_save);
-                ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
-                ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
+                ((TextView) view.findViewById(R.id.lblTitle)).setText("Guardar recepción");
+                ((TextView) view.findViewById(R.id.lblMessage)).setText("¿Está seguro que desea recibir esta transferencia?");
+                ((ImageView) view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_save);
+                ((Button) view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
+                ((Button) view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
                 final AlertDialog alertDialog = builder.create();
                 view.findViewById(R.id.btnConfirm).setOnClickListener(v -> {
-                        GuardarDatos();
-                        alertDialog.dismiss();
-                    });
+                    GuardarDatos();
+                    alertDialog.dismiss();
+                });
 
                 view.findViewById(R.id.btnCancel).setOnClickListener(v -> alertDialog.dismiss());
 
-                if(alertDialog.getWindow()!=null)
+                if (alertDialog.getWindow() != null)
                     alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
                 alertDialog.show();
                 break;
@@ -444,7 +445,7 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
                 break;
             case R.id.option_listdocument:
                 Intent i = new Intent(this, ListaComprobantesActivity.class);
-                i.putExtra("tipobusqueda","8,23"); //RECEPCION - RECEPDEVOLUCION
+                i.putExtra("tipobusqueda", "8,23"); //RECEPCION - RECEPDEVOLUCION
                 startActivityForResult(i, REQUEST_BUSQUEDA_RECEPCION);
                 overridePendingTransition(R.anim.left_in, R.anim.left_out);
                 break;
@@ -453,12 +454,12 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
     }
 
     private void GuardarDatos() {
-        try{
-            if(!ValidarDatos()) return;
+        try {
+            if (!ValidarDatos()) return;
 
             listTransacciones.clear();
             String tiptransaccion = listTransferencias.get(cbTransferencias.getSelectedItemPosition()).tipotransaccion;
-            mitransferencia.tipotransaccion = tiptransaccion.equals("21")?"22":"7";
+            mitransferencia.tipotransaccion = tiptransaccion.equals("21") ? "22" : "7";
             mitransferencia.total = 0d;
             mitransferencia.codigoestablecimiento = SQLite.usuario.sucursal.CodigoEstablecimiento;
             mitransferencia.observacion = tvObservacion.getText().toString().trim();
@@ -470,19 +471,19 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
             SQLite.gpsTracker.getLastKnownLocation();
             mitransferencia.lat = SQLite.gpsTracker.getLatitude();
             mitransferencia.lon = SQLite.gpsTracker.getLongitude();
-            if(mitransferencia.lat == null)
+            if (mitransferencia.lat == null)
                 mitransferencia.lat = 0d;
-            if(mitransferencia.lon == null)
+            if (mitransferencia.lon == null)
                 mitransferencia.lon = 0d;
 
-            for(DetalleComprobante midetalle:mitransferencia.detalle)
+            for (DetalleComprobante midetalle : mitransferencia.detalle)
                 mitransferencia.total += midetalle.Subtotalcosto();
             mitransferencia.subtotal = mitransferencia.total;
 
             listTransacciones.add(mitransferencia);
 
             mirecepcion = new Comprobante();
-            mirecepcion.tipotransaccion = tiptransaccion.equals("21")?"23":"8";
+            mirecepcion.tipotransaccion = tiptransaccion.equals("21") ? "23" : "8";
             mirecepcion.codigosistema = mitransferencia.codigosistema;
             mirecepcion.total = 0d;
             mirecepcion.codigoestablecimiento = SQLite.usuario.sucursal.CodigoEstablecimiento;
@@ -501,18 +502,18 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
             listTransacciones.add(mirecepcion);
 
             EnviarDatos(this, tiptransaccion);
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, "GuardarDatos(): " + e.getMessage());
         }
     }
 
     private void EnviarDatos(Context context, String tipotrans) {
-        try{
+        try {
             /*if(!Utils.isOnlineNet(SQLite.configuracion.urlbase)){
                 showError(Constants.MSG_COMPROBAR_CONEXION_INTERNET);
                 return;
             }*/
-            if(listTransacciones.size()>0){
+            if (listTransacciones.size() > 0) {
                 pgCargando.setTitle("Guardando recepción");
                 pgCargando.setMessage("Espere un momento...");
                 pgCargando.setCancelable(false);
@@ -520,20 +521,20 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
 
                 IComprobante miInterface = retrofit.create(IComprobante.class);
 
-                Map<String,Object> post = new HashMap<>();
-                post.put("usuario",SQLite.usuario.Usuario);
-                post.put("clave",SQLite.usuario.Clave);
+                Map<String, Object> post = new HashMap<>();
+                post.put("usuario", SQLite.usuario.Usuario);
+                post.put("clave", SQLite.usuario.Clave);
                 post.put("codigotransferencia", mitransferencia.codigotransaccion);
                 post.put("puntoemisionid", SQLite.usuario.sucursal.IdPuntoEmision);
                 post.put("transacciones", listTransacciones);
                 post.put("tipotransferencia", tipotrans);
                 String json = post.toString();
-                Call<JsonObject> call=null;
-                call=miInterface.saveRecepcion(post);
+                Call<JsonObject> call = null;
+                call = miInterface.saveRecepcion(post);
                 call.enqueue(new Callback<JsonObject>() {
                     @Override
                     public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                        if(!response.isSuccessful()){
+                        if (!response.isSuccessful()) {
                             showError("Error código:" + response.code());
                             pgCargando.dismiss();
                             return;
@@ -544,8 +545,8 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
                                 JsonObject obj = response.body();
                                 if (!obj.get("haserror").getAsBoolean()) {
                                     JsonArray jsonTransacciones = obj.getAsJsonArray("transferencia");
-                                    if(jsonTransacciones!=null){
-                                        for(JsonElement ele:jsonTransacciones){
+                                    if (jsonTransacciones != null) {
+                                        for (JsonElement ele : jsonTransacciones) {
                                             JsonObject trans = ele.getAsJsonObject();
                                             //INSERTAR RECEPCION EN LA BD LOCAL
                                             mirecepcion.codigosistema = trans.get("codigosistema").getAsInt();
@@ -555,9 +556,9 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
                                             mirecepcion.claveacceso = mitransferencia.codigotransaccion;
                                             mirecepcion.longdate = Utils.longDate(mirecepcion.fechadocumento);
 
-                                            if(mirecepcion.Save(false)){
+                                            if (mirecepcion.Save(false)) {
                                                 JsonArray jsonProductos = obj.getAsJsonArray("productos");
-                                                if(jsonProductos!=null) {
+                                                if (jsonProductos != null) {
                                                     int numProd = 0;
                                                     Producto.Delete(SQLite.usuario.sucursal.IdEstablecimiento);
                                                     for (JsonElement pro : jsonProductos) {
@@ -570,9 +571,9 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
                                                         }
                                                     }
                                                     if (numProd == jsonProductos.size())
-                                                        Banner.make(rootView,RecepcionActivity.this,Banner.SUCCESS,Constants.MSG_PROCESO_COMPLETADO, Banner.BOTTOM,3000).show();
+                                                        Banner.make(rootView, RecepcionActivity.this, Banner.SUCCESS, Constants.MSG_PROCESO_COMPLETADO, Banner.BOTTOM, 3000).show();
                                                     else
-                                                        Banner.make(rootView,RecepcionActivity.this,Banner.ERROR,Constants.MSG_PROCESO_NO_COMPLETADO, Banner.BOTTOM,3500).show();
+                                                        Banner.make(rootView, RecepcionActivity.this, Banner.ERROR, Constants.MSG_PROCESO_NO_COMPLETADO, Banner.BOTTOM, 3500).show();
                                                 }
                                                 toolbar.getMenu().findItem(R.id.option_save).setVisible(false);
                                                 ConsultaImpresion();
@@ -583,11 +584,11 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
                                     }
 
                                 } else
-                                    Utils.showErrorDialog(RecepcionActivity.this,"Error",obj.get("message").getAsString());
+                                    Utils.showErrorDialog(RecepcionActivity.this, "Error", obj.get("message").getAsString());
                             } else {
-                                Banner.make(rootView,RecepcionActivity.this,Banner.ERROR,Constants.MSG_USUARIO_CLAVE_INCORRECTO, Banner.BOTTOM,3000).show();
+                                Banner.make(rootView, RecepcionActivity.this, Banner.ERROR, Constants.MSG_USUARIO_CLAVE_INCORRECTO, Banner.BOTTOM, 3000).show();
                             }
-                        }catch (JsonParseException ex){
+                        } catch (JsonParseException ex) {
                             Log.d(TAG, ex.getMessage());
                         }
                         pgCargando.dismiss();
@@ -595,60 +596,61 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
 
                     @Override
                     public void onFailure(Call<JsonObject> call, Throwable t) {
-                        Utils.showErrorDialog(RecepcionActivity.this,"Error",t.getMessage());
+                        Utils.showErrorDialog(RecepcionActivity.this, "Error", t.getMessage());
                         Log.d(TAG, t.getMessage());
                         pgCargando.dismiss();
                     }
                 });
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, "EnviarDatos(): " + e.getMessage());
             pgCargando.dismiss();
         }
     }
 
+    AlertDialog alertDialog = null;
     private void ConsultaImpresion() {
-        try{
+        try {
             AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogTheme);
             View view = LayoutInflater.from(this).inflate(R.layout.layout_confirmation_dialog,
                     (ConstraintLayout) findViewById(R.id.lyDialogContainer));
             builder.setView(view);
             builder.setCancelable(false);
-            ((TextView)view.findViewById(R.id.lblTitle)).setText("Imprimir");
-            ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Desea imprimir este documento?");
-            ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_save);
-            ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
-            ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
-            final AlertDialog alertDialog = builder.create();
+            ((TextView) view.findViewById(R.id.lblTitle)).setText("Imprimir");
+            ((TextView) view.findViewById(R.id.lblMessage)).setText("¿Desea imprimir este documento?");
+            ((ImageView) view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_save);
+            ((Button) view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
+            ((Button) view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
+            alertDialog = builder.create();
             view.findViewById(R.id.btnConfirm).setOnClickListener(
-                v -> {
-                    if (Printer.btsocket == null) {
-                        Utils.showMessage(getApplicationContext(), "Emparejar la impresora...");
-                        Intent BTIntent = new Intent(getApplicationContext(), DeviceList.class);
-                        startActivityForResult(BTIntent, DeviceList.REQUEST_CONNECT_BT);
-                        return;
-                    }else {
-                        imprimirFactura(idrecepcion==0?"* ORIGINAL *":"* REIMPRESIÓN DE RECEPCIÓN *", idrecepcion>0);
-                    }
-                    alertDialog.dismiss();
-                });
+                    v -> {
+                        if (Printer.btsocket == null) {
+                            Utils.showMessage(getApplicationContext(), "Emparejar la impresora...");
+                            Intent BTIntent = new Intent(getApplicationContext(), DeviceList.class);
+                            startActivityForResult(BTIntent, DeviceList.REQUEST_CONNECT_BT);
+                            return;
+                        } else {
+                            imprimirFactura(idrecepcion == 0 ? "* ORIGINAL *" : "* REIMPRESIÓN DE RECEPCIÓN *", idrecepcion > 0);
+                        }
+                        alertDialog.dismiss();
+                    });
 
             view.findViewById(R.id.btnCancel).setOnClickListener(v -> {
-                    if(idrecepcion==0)
-                        LimpiarDatos();
-                    alertDialog.dismiss();
-                });
+                if (idrecepcion == 0)
+                    LimpiarDatos();
+                alertDialog.dismiss();
+            });
 
-            if(alertDialog.getWindow()!=null)
+            if (alertDialog.getWindow() != null)
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
             alertDialog.show();
-        }catch (Exception e){
-            Log.d(TAG, "ConsultaImpresion(): "+ e.getMessage());
+        } catch (Exception e) {
+            Log.d(TAG, "ConsultaImpresion(): " + e.getMessage());
         }
     }
 
     private void LimpiarDatos() {
-        try{
+        try {
             mitransferencia = new Comprobante();
             mirecepcion = new Comprobante();
             listTransferencias.clear();
@@ -668,33 +670,33 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
             toolbar.setSubtitle("");
             toolbar.getMenu().findItem(R.id.option_save).setVisible(true);
             LlenarTransferencias(this);
-        }catch (Exception e){
-            Log.d(TAG, "LimpiarDatos(): "+ e.getMessage());
+        } catch (Exception e) {
+            Log.d(TAG, "LimpiarDatos(): " + e.getMessage());
         }
     }
 
-    private boolean ValidarDatos(){
-        try{
-            if(cbTransferencias.getAdapter()==null){
-                Banner.make(rootView,RecepcionActivity.this,Banner.ERROR,"No hay datos para guardar.", Banner.BOTTOM,3000).show();
+    private boolean ValidarDatos() {
+        try {
+            if (cbTransferencias.getAdapter() == null) {
+                Banner.make(rootView, RecepcionActivity.this, Banner.ERROR, "No hay datos para guardar.", Banner.BOTTOM, 3000).show();
                 return false;
             }
-            if(cbTransferencias.getSelectedItemPosition()==0){
-                Banner.make(rootView,RecepcionActivity.this,Banner.ERROR,"Escoja la tranferencia/devolución a recibir.", Banner.BOTTOM,3000).show();
+            if (cbTransferencias.getSelectedItemPosition() == 0) {
+                Banner.make(rootView, RecepcionActivity.this, Banner.ERROR, "Escoja la tranferencia/devolución a recibir.", Banner.BOTTOM, 3000).show();
                 return false;
             }
-            if(detalleAdapter.detalleComprobante.size()==0){
-                Banner.make(rootView,RecepcionActivity.this,Banner.ERROR,"No hay productos por recibir en la transferencia seleccionada.",Banner.BOTTOM,3000).show();
+            if (detalleAdapter.detalleComprobante.size() == 0) {
+                Banner.make(rootView, RecepcionActivity.this, Banner.ERROR, "No hay productos por recibir en la transferencia seleccionada.", Banner.BOTTOM, 3000).show();
                 return false;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, "ValidarDatos(): " + e.getMessage());
             return false;
         }
         return true;
     }
 
-    private boolean imprimirFactura(String strTipo, boolean reimpresion){
+    private boolean imprimirFactura(String strTipo, boolean reimpresion) {
         Printer printer = new Printer(this);
         boolean fImp = true;
         try {
@@ -704,15 +706,15 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
 
                 if (fImp) {
                     try {
-                        int copias = reimpresion?1:2;
-                        for(int i=0;i<copias; i++) {
+                        int copias = reimpresion ? 1 : 2;
+                        for (int i = 0; i < copias; i++) {
                             printer.printUnicode();
                             printer.printCustom(SQLite.usuario.sucursal.NombreComercial, 0, 1);
                             printer.printCustom(SQLite.usuario.sucursal.RazonSocial, 0, 1);
                             printer.printCustom("RUC: ".concat(SQLite.usuario.sucursal.RUC), 0, 1);
                             printer.printCustom(SQLite.usuario.sucursal.Direcion, 0, 1);
                             printer.printCustom("", 0, 1);
-                            printer.printCustom("**RECEPCION"+ (mirecepcion.tipotransaccion.equals("22")?" POR DEVOLUCION":"") +" DE INVENTARIO**", 0, 1);
+                            printer.printCustom("**RECEPCION" + (mirecepcion.tipotransaccion.equals("22") ? " POR DEVOLUCION" : "") + " DE INVENTARIO**", 0, 1);
                             printer.printCustom("Envia  : ".concat(mirecepcion.sucursalenvia.split("-")[1]), 0, 0);
                             printer.printCustom("N. Doc.: ".concat(mirecepcion.claveacceso), 0, 0);
                             printer.printCustom("Recibe : ".concat(mirecepcion.sucursalrecibe.split("-")[1]), 0, 0);
@@ -754,13 +756,13 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
                             printer.printCustom(strTipo, 0, 1);
                             printer.printUnicode();
                             printer.printNewLine();
-                            if(i==0 && copias==2)
+                            if (i == 0 && copias == 2)
                                 printer.printCustom("8<----------------------------------------", 0, 1);
                             printer.printNewLine();
                             printer.printNewLine();
                             printer.flush();
                         }
-                        if(!reimpresion)
+                        if (!reimpresion)
                             this.LimpiarDatos();
                     } catch (IOException e) {
                         fImp = false;
@@ -770,7 +772,7 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
                 }
 
             } else fImp = false;
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, e.getMessage());
             fImp = false;
         }
@@ -783,24 +785,26 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case REQUEST_BUSQUEDA_RECEPCION:
-                    idrecepcion = data.getExtras().getInt("idcomprobante",0);
-                    if(idrecepcion>0) {
+                    idrecepcion = data.getExtras().getInt("idcomprobante", 0);
+                    if (idrecepcion > 0) {
                         BuscaRecepcion(idrecepcion);
                         toolbar.getMenu().findItem(R.id.option_reimprimir).setVisible(true);
                         toolbar.getMenu().findItem(R.id.option_save).setVisible(false);
                     }
                     break;
                 case DeviceList.REQUEST_CONNECT_BT:
-                    try{
+                    try {
                         btsocket = DeviceList.getSocket();
-                        if(btsocket!=null) {
-                            Utils.showMessageShort(this,"Imprimiendo comprobante");
-                            imprimirFactura(idrecepcion==0?"* ORIGINAL *": "* REIMPRESIÓN DE DOCUMENTO *",
-                                    idrecepcion>0);
+                        if (btsocket != null) {
+                            Utils.showMessageShort(this, "Imprimiendo comprobante");
+                            imprimirFactura(idrecepcion == 0 ? "* ORIGINAL *" : "* REIMPRESIÓN DE DOCUMENTO *",
+                                    idrecepcion > 0);
+                            if(alertDialog != null)
+                                alertDialog.dismiss();
                             Log.d(TAG, "IMPRESORA SELECCIONADA");
                         }
-                    }catch (Exception e){
-                        Log.d(TAG,e.getMessage());
+                    } catch (Exception e) {
+                        Log.d(TAG, e.getMessage());
                     }
                     break;
             }
@@ -817,35 +821,35 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
                 @Override
                 public void run() {
                     mirecepcion = new Comprobante();
-                    mirecepcion = Comprobante.get(idrecepcion);
+                    mirecepcion = Comprobante.get(idrecepcion, false);
                     runOnUiThread(() -> {
-                            if (mirecepcion != null) {
-                                toolbar.setSubtitle("Fecha: " + Utils.fechaMes(mirecepcion.fechadocumento));
-                                cbTransferencias.setEnabled(false);
-                                detalleAdapter.visualizacion = true;
-                                detalleProductos.clear();
-                                detalleProductos.addAll(mirecepcion.detalle);
-                                detalleAdapter.detalleComprobante.clear();
-                                detalleAdapter.detalleComprobante.addAll(mirecepcion.detalle);
-                                detalleAdapter.notifyDataSetChanged();
-                                tvObservacion.setText(mirecepcion.observacion);
-                                tvObservacion.setEnabled(false);
-                                lyCombo.setVisibility(View.GONE);
-                                lyDatosInformativos.setVisibility(View.VISIBLE);
-                                lblTransferencia.setText("DATOS INFORMATIVOS");
-                                lblEnvia.setText(mirecepcion.sucursalenvia.split("-")[1]);
-                                lblDocTransferencia.setText(mirecepcion.claveacceso);
-                                lblRecibe.setText(mirecepcion.sucursalrecibe.split("-")[1]);
-                                lblDocRecepcion.setText(mirecepcion.codigotransaccion);
-                            } else {
-                                Banner.make(rootView,RecepcionActivity.this,Banner.ERROR,"Ocurrió un error al obtener los datos para este documento.",Banner.BOTTOM,3000).show();
-                            }
-                            pbCargando.setVisibility(View.GONE);
-                        });
+                        if (mirecepcion != null) {
+                            toolbar.setSubtitle("Fecha: " + Utils.fechaMes(mirecepcion.fechadocumento));
+                            cbTransferencias.setEnabled(false);
+                            detalleAdapter.visualizacion = true;
+                            detalleProductos.clear();
+                            detalleProductos.addAll(mirecepcion.detalle);
+                            detalleAdapter.detalleComprobante.clear();
+                            detalleAdapter.detalleComprobante.addAll(mirecepcion.detalle);
+                            detalleAdapter.notifyDataSetChanged();
+                            tvObservacion.setText(mirecepcion.observacion);
+                            tvObservacion.setEnabled(false);
+                            lyCombo.setVisibility(View.GONE);
+                            lyDatosInformativos.setVisibility(View.VISIBLE);
+                            lblTransferencia.setText("DATOS INFORMATIVOS");
+                            lblEnvia.setText(mirecepcion.sucursalenvia.split("-")[1]);
+                            lblDocTransferencia.setText(mirecepcion.claveacceso);
+                            lblRecibe.setText(mirecepcion.sucursalrecibe.split("-")[1]);
+                            lblDocRecepcion.setText(mirecepcion.codigotransaccion);
+                        } else {
+                            Banner.make(rootView, RecepcionActivity.this, Banner.ERROR, "Ocurrió un error al obtener los datos para este documento.", Banner.BOTTOM, 3000).show();
+                        }
+                        pbCargando.setVisibility(View.GONE);
+                    });
                 }
             };
             th.start();
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, "BuscaRecepcion(): " + e.getMessage());
         }
     }
@@ -861,25 +865,25 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if(keyCode == KeyEvent.KEYCODE_BACK){
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogTheme);
             View view = LayoutInflater.from(this).inflate(R.layout.layout_confirmation_dialog,
                     (ConstraintLayout) findViewById(R.id.lyDialogContainer));
             builder.setView(view);
-            ((TextView)view.findViewById(R.id.lblTitle)).setText("Cerrar");
-            ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Desea salir de la ventana de recepción?");
-            ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_check_white);
-            ((Button)view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
-            ((Button)view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
+            ((TextView) view.findViewById(R.id.lblTitle)).setText("Cerrar");
+            ((TextView) view.findViewById(R.id.lblMessage)).setText("¿Desea salir de la ventana de recepción?");
+            ((ImageView) view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_check_white);
+            ((Button) view.findViewById(R.id.btnCancel)).setText(getResources().getString(R.string.Cancel));
+            ((Button) view.findViewById(R.id.btnConfirm)).setText(getResources().getString(R.string.Confirm));
             final AlertDialog alertDialog = builder.create();
             view.findViewById(R.id.btnConfirm).setOnClickListener(v -> {
                 onBackPressed();
                 overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
             });
 
-            view.findViewById(R.id.btnCancel).setOnClickListener(v ->alertDialog.dismiss());
+            view.findViewById(R.id.btnCancel).setOnClickListener(v -> alertDialog.dismiss());
 
-            if(alertDialog.getWindow()!=null)
+            if (alertDialog.getWindow() != null)
                 alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
             alertDialog.show();
             return true;
@@ -888,8 +892,8 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
     }
 
     private void crearBottonSheet() {
-        if(btsDialog==null){
-            View view = LayoutInflater.from(this).inflate(R.layout.bottonsheet_message,null);
+        if (btsDialog == null) {
+            View view = LayoutInflater.from(this).inflate(R.layout.bottonsheet_message, null);
             btnPositive = view.findViewById(R.id.btnPositive);
             btnNegative = view.findViewById(R.id.btnNegative);
             lblMessage = view.findViewById(R.id.lblMessage);
@@ -903,14 +907,14 @@ public class RecepcionActivity extends AppCompatActivity implements View.OnClick
         }
     }
 
-    public void showError(String message){
+    public void showError(String message) {
         crearBottonSheet();
         lblMessage.setText(message);
         btnNegative.setVisibility(View.GONE);
         viewSeparator.setVisibility(View.GONE);
         lblTitle.setVisibility(View.GONE);
         tipoAccion = "MESSAGE";
-        if(btsDialog.getWindow()!=null)
+        if (btsDialog.getWindow() != null)
             btsDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
         btsDialog.show();
     }

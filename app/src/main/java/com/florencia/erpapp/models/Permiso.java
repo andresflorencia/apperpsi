@@ -11,8 +11,7 @@ import com.florencia.erpapp.services.SQLite;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Permiso
-{
+public class Permiso {
     public String nombreopcion;
     public Integer perfilid;
     public Integer opcionid;
@@ -25,8 +24,8 @@ public class Permiso
 
     public static SQLiteDatabase sqLiteDatabase;
     public static final String TAG = "TAGPERMISO";
-    
-    public Permiso(){
+
+    public Permiso() {
         this.nombreopcion = "";
         this.perfilid = 0;
         this.opcionid = 0;
@@ -48,12 +47,12 @@ public class Permiso
                 do {
                     permiso = Permiso.AsignaDatos(cursor);
                     if (permiso != null) lista.add(permiso);
-                }while (cursor.moveToNext());
+                } while (cursor.moveToNext());
             }
             cursor.close();
             sqLiteDatabase.close();
         } catch (Exception ec) {
-            Log.d(TAG,ec.getMessage());
+            Log.d(TAG, ec.getMessage());
             ec.printStackTrace();
         }
         return lista;
@@ -63,16 +62,16 @@ public class Permiso
         try {
             Delete(permisos.get(0).perfilid);
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
-            for (Permiso item:permisos) {
+            for (Permiso item : permisos) {
                 sqLiteDatabase.execSQL("INSERT OR REPLACE INTO " +
                                 "permiso(nombreopcion, perfilid, opcionid, permisoescritura, permisoimpresion, permisomodificacion, " +
                                 "permisoborrar, permisosubirarchivo, rutaopcion)" +
                                 "values(?, ?, ?, ?, ?, ?, ?, ?, ?)",
                         new String[]{item.nombreopcion, item.perfilid.toString(), item.opcionid.toString(),
-                                item.permisoescritura,item.permisoimpresion, item.permisomodificacion, item.permisoborrar, item.permisosubirarchivo, item.rutaopcion});
+                                item.permisoescritura, item.permisoimpresion, item.permisomodificacion, item.permisoborrar, item.permisosubirarchivo, item.rutaopcion});
             }
             sqLiteDatabase.close();
-            Log.d(TAG,"Guardó lista permisos");
+            Log.d(TAG, "Guardó lista permisos");
             return true;
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -103,11 +102,11 @@ public class Permiso
     public static boolean Delete(Integer idperfil) {
         try {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
-            sqLiteDatabase.delete("permiso","perfilid = ?",new String[]{idperfil.toString()});
+            sqLiteDatabase.delete("permiso", "perfilid = ?", new String[]{idperfil.toString()});
             //sqLiteDatabase.close();
-            Log.d(TAG,"DELETE PERMISOS OK");
+            Log.d(TAG, "DELETE PERMISOS OK");
             return true;
-        } catch (SQLException ex){
+        } catch (SQLException ex) {
             Log.d(TAG, "Delete(): " + ex.getMessage());
             return false;
         }

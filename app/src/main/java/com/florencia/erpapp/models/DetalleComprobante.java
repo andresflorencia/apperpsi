@@ -20,9 +20,9 @@ public class DetalleComprobante {
     public static SQLiteDatabase sqLiteDatabase;
     public static String TAG = "TAGDETALLECOMPROBANTE";
 
-    public DetalleComprobante(){
-        this.comprobanteid =0;
-        this.linea =0;
+    public DetalleComprobante() {
+        this.comprobanteid = 0;
+        this.linea = 0;
         this.producto = new Producto();
         this.cantidad = 0d;
         this.total = 0d;
@@ -40,41 +40,48 @@ public class DetalleComprobante {
         this.marquetas = 0d;
     }
 
-    public Double Subtotal(){
-        Double retorno= 0d;
-        try{
-            retorno =this.cantidad * this.precio;
-        }catch (Exception e){
+    public Double Subtotal() {
+        Double retorno = 0d;
+        try {
+            retorno = this.cantidad * this.precio;
+        } catch (Exception e) {
             Log.d(TAG, e.getMessage());
         }
         return retorno;
     }
 
-    public Double Subtotalcosto(){
-        Double retorno= 0d;
-        try{
-            retorno =this.cantidad * this.preciocosto;
-        }catch (Exception e){
+    public Double Subtotalcosto() {
+        Double retorno = 0d;
+        try {
+            retorno = this.cantidad * this.preciocosto;
+        } catch (Exception e) {
             Log.d(TAG, e.getMessage());
         }
         return retorno;
     }
 
-    public Double Subtotaliva(){
-        Double retorno= 0d;
-        try{
-            retorno =this.cantidad * (this.precio +(this.precio * this.producto.porcentajeiva/100));
-        }catch (Exception e){
+    public Double Subtotaliva() {
+        Double retorno = 0d;
+        try {
+            retorno = this.cantidad * (this.precio + (this.precio * this.producto.porcentajeiva / 100));
+        } catch (Exception e) {
             Log.d(TAG, e.getMessage());
         }
         return retorno;
     }
 
-    public static List<DetalleComprobante> getDetalle(Integer idComprobante) {
+    public static List<DetalleComprobante> getDetalle(Integer idComprobante, boolean agrupaDetalle) {
         List<DetalleComprobante> Items = new ArrayList<>();
         try {
+            String SELECT = "SELECT * FROM detallecomprobante WHERE comprobanteid = ? ORDER BY productoid DESC";
+            if(agrupaDetalle) {
+                SELECT = "SELECT comprobanteid, 0 as linea, productoid, sum(cantidad) as cantidad, 0 total, " +
+                        "precio, '' numerolote, '' fechavencimiento, 0 stock, 0 preciocosto, precioreferencia, valoriva, valorice," +
+                        "descuento, codigoproducto, nombreproducto, marquetas " +
+                        "FROM detallecomprobante WHERE comprobanteid = ? GROUP BY productoid";
+            }
             sqLiteDatabase = SQLite.sqlDB.getReadableDatabase();
-            Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM detallecomprobante WHERE comprobanteid = ?", new String[]{idComprobante.toString()});
+            Cursor cursor = sqLiteDatabase.rawQuery(SELECT, new String[]{idComprobante.toString()});
             DetalleComprobante midetalle;
             if (cursor.moveToFirst()) {
                 do {
@@ -83,7 +90,7 @@ public class DetalleComprobante {
                 } while (cursor.moveToNext());
             }
             sqLiteDatabase.close();
-        }catch (SQLiteException e){
+        } catch (SQLiteException e) {
             Log.d(TAG, "getDetalle(): " + e.getMessage());
         }
         return Items;
@@ -110,11 +117,11 @@ public class DetalleComprobante {
             Item.codigoproducto = cursor.getString(14);
             Item.nombreproducto = cursor.getString(15);
             Item.marquetas = cursor.getDouble(16);
-            if(Item.producto == null){
+            if (Item.producto == null) {
                 Item.producto = new Producto();
                 Item.producto.codigoproducto = Item.codigoproducto;
                 Item.producto.nombreproducto = Item.nombreproducto;
-                Item.producto.iva = Item.valoriva>0?1:0;
+                Item.producto.iva = Item.valoriva > 0 ? 1 : 0;
             }
         } catch (Exception ec) {
             Log.d(TAG, "AsignaDatos(): " + ec.getMessage());
@@ -124,7 +131,7 @@ public class DetalleComprobante {
         return Item;
     }
 
-    public Double getPrecio(String categoria){
+    public Double getPrecio(String categoria) {
         try {
             this.precio = this.producto.getPrecio(categoria);
             Double ptemp = this.precio;//GUARDAMOS EL PRECIO DE LA CATEGORIA
@@ -139,14 +146,14 @@ public class DetalleComprobante {
             //SI PRECIO DE CATEGORIA ES MENOR AL PRECIO DE ALGUNA REGLAPRECIO, CONSERVAMOS EL DE LA CATEGORIA
             if (ptemp < this.precio)
                 this.precio = ptemp;
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, "getPrecio(): " + e.getMessage());
         }
         return this.precio;
     }
 
     public Double getPrecio(List<Regla> reglas, List<PrecioCategoria> categorias,
-                            String categcliente, Double cantidad, Double precio_act, boolean credito){
+                            String categcliente, Double cantidad, Double precio_act, boolean credito) {
         try {
             this.precio = precio_act;
             Double precioregla = 0d;
@@ -162,10 +169,10 @@ public class DetalleComprobante {
             }
             PrecioCategoria categ_temp = null;
             Double pvpNormal = 0d;
-            for (PrecioCategoria cat: categorias) {
-                if(cat.categoriaid == 0)
+            for (PrecioCategoria cat : categorias) {
+                if (cat.categoriaid == 0)
                     pvpNormal = cat.valor;
-                if(cat.categoriaid == Integer.valueOf(categcliente)){
+                if (cat.categoriaid == Integer.valueOf(categcliente)) {
                     precio_act = cat.valor;
                     categ_temp = cat;
                 }
@@ -175,14 +182,14 @@ public class DetalleComprobante {
             if (this.precio > precio_act)
                 this.precio = precio_act;
 
-            if(categ_temp != null){
-                if(precioregla == 0 || categ_temp.prioridad.equalsIgnoreCase("t")
-                        || (categ_temp.aplicacredito.equalsIgnoreCase("t") && credito))
+            if (categ_temp != null) {
+                if (precioregla == 0 || categ_temp.prioridad.equalsIgnoreCase("t")
+                        || (categ_temp.aplicacredito.equalsIgnoreCase("t") && credito && this.precio > categ_temp.valor))
                     this.precio = categ_temp.valor;
-                if(categ_temp.aplicacredito.equalsIgnoreCase("f") && credito)
-                    this.precio = pvpNormal>precioregla && precioregla>0 ? precioregla : pvpNormal;
+                if (categ_temp.aplicacredito.equalsIgnoreCase("f") && credito)
+                    this.precio = pvpNormal > precioregla && precioregla > 0 ? precioregla : pvpNormal;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, "getPrecio2(): " + e.getMessage());
         }
         return this.precio;

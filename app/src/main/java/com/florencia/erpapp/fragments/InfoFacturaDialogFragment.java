@@ -66,6 +66,7 @@ public class InfoFacturaDialogFragment extends AppCompatDialogFragment {
     Activity activity;
 
     public static String TAG = "TAGFACTURAFRAGMENT";
+
     public InfoFacturaDialogFragment(Activity activity) {
         this.activity = activity;
     }
@@ -95,21 +96,25 @@ public class InfoFacturaDialogFragment extends AppCompatDialogFragment {
         lblLeyenda = view.findViewById(R.id.txtLeyenda);
         lblEmpresa = view.findViewById(R.id.lblEmpresa);
 
+        File miFile = new File(activity.getExternalMediaDirs()[0], Constants.FOLDER_FILES);
+        if (!miFile.exists())
+            miFile.mkdirs();
+
         ExternalDirectory = activity.getExternalMediaDirs()[0] + File.separator + Constants.FOLDER_FILES;
 
         String datosEmpresa = "";
         datosEmpresa = SQLite.usuario.sucursal.NombreComercial.concat("\n")
-                        .concat(SQLite.usuario.sucursal.RazonSocial).concat("\n")
-                        .concat("RUC: ".concat(SQLite.usuario.sucursal.RUC)).concat("\n")
-                        .concat(SQLite.usuario.sucursal.Direcion);
+                .concat(SQLite.usuario.sucursal.RazonSocial).concat("\n")
+                .concat("RUC: ".concat(SQLite.usuario.sucursal.RUC)).concat("\n")
+                .concat(SQLite.usuario.sucursal.Direcion);
 
         lblEmpresa.setText(datosEmpresa);
 
-        if(!getArguments().isEmpty()) {
-            int id = getArguments().getInt("id",0);
-            tipotransaccion = getArguments().getString("tipobusqueda","");
-            if(id>0) {
-                switch (tipotransaccion){
+        if (!getArguments().isEmpty()) {
+            int id = getArguments().getInt("id", 0);
+            tipotransaccion = getArguments().getString("tipobusqueda", "");
+            if (id > 0) {
+                switch (tipotransaccion) {
                     case "01":
                     case "PR":
                         lyLotes.setVisibility(View.VISIBLE);
@@ -138,100 +143,105 @@ public class InfoFacturaDialogFragment extends AppCompatDialogFragment {
                     Html.fromHtml(
                             "<strong>Usuario: </strong> " + SQLite.usuario.RazonSocial +
                                     "           <strong>Generado: </strong> " + Utils.getDateFormat("yyyy-MM-dd HH:mm:ss")
-            ,Html.FROM_HTML_MODE_COMPACT));
-        }else{
+                            , Html.FROM_HTML_MODE_COMPACT));
+        } else {
             lblLeyenda.setText(
                     Html.fromHtml(
                             "<strong>Usuario: </strong> " + SQLite.usuario.RazonSocial +
                                     "           <strong>Generado: </strong> " + Utils.getDateFormat("yyyy-MM-dd HH:mm:ss")));
         }
 
-        if(getDialog().getWindow()!=null)
+        if (getDialog().getWindow() != null)
             getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(0));
         return view;
     }
 
     private void BuscarDatosFactura(int id) {
-        try{
-            Thread th = new Thread(){
+        try {
+            Thread th = new Thread() {
                 @Override
-                public void run(){
+                public void run() {
                     pbCargando.setVisibility(View.VISIBLE);
-                    comprobante = Comprobante.get(id);
+                    comprobante = Comprobante.get(id, true);
                     getActivity().runOnUiThread(
-                        () -> {
-                            if(comprobante != null){
-                                txtNumFactura.setText(comprobante.codigotransaccion);
-                                String textLeft = "", textRight = "";
+                            () -> {
+                                if (comprobante != null) {
+                                    txtNumFactura.setText(comprobante.codigotransaccion);
+                                    String textLeft = "", textRight = "";
 
-                                textLeft = textLeft.concat("Cliente:\n")
-                                        .concat("CI/RUC:\n")
-                                        .concat((comprobante.tipotransaccion.equals("PR")?"Proforma":"Recibo") + " #:\n")
-                                        .concat("Fecha:\n")
-                                        .concat("Estado:\n")
-                                        .concat("Forma Pago:\n")
-                                        .concat("ID:");
+                                    textLeft = textLeft.concat("Cliente:\n")
+                                            .concat("CI/RUC:\n")
+                                            .concat((comprobante.tipotransaccion.equals("PR") ? "Proforma" : "Recibo") + " #:\n")
+                                            .concat("Fecha:\n")
+                                            .concat("Estado:\n")
+                                            .concat("Forma Pago:\n")
+                                            .concat("ID:");
 
-                                textRight = textRight.concat(comprobante.cliente.razonsocial).concat("\n")
-                                        .concat(comprobante.cliente.nip).concat("\n")
-                                        .concat(comprobante.codigotransaccion).concat("\n")
-                                        .concat(comprobante.fechacelular).concat("\n")
-                                        .concat(comprobante.estado == 0 && comprobante.codigosistema == 0?"No sincronizado":"Sincronizado").concat("\n")
-                                        .concat(comprobante.formapago==0?"Crédito":"Efectivo").concat("\n")
-                                        .concat(comprobante.idcomprobante.toString()).concat("\n");
+                                    textRight = textRight.concat(comprobante.cliente.razonsocial).concat("\n")
+                                            .concat(comprobante.cliente.nip).concat("\n")
+                                            .concat(comprobante.codigotransaccion).concat("\n")
+                                            .concat(comprobante.fechacelular).concat("\n")
+                                            .concat(comprobante.estado == 0 && comprobante.codigosistema == 0 ? "No sincronizado" : "Sincronizado").concat("\n")
+                                            .concat(comprobante.formapago == 0 ? "Crédito" : "Efectivo").concat("\n")
+                                            .concat(comprobante.idcomprobante.toString()).concat("\n");
 
-                                txtInfoLeft.setText(textLeft);
-                                txtInfoRight.setText(textRight);
+                                    txtInfoLeft.setText(textLeft);
+                                    txtInfoRight.setText(textRight);
 
-                                for(DetalleComprobante detalle:comprobante.detalle) {
-                                    lblCant.setText(lblCant.getText().toString().concat(detalle.cantidad.toString()).concat("\n"));
-                                    lblDetalle.setText(lblDetalle.getText().toString().concat((detalle.producto.porcentajeiva>0?"** ":"")+ detalle.producto.nombreproducto).concat("\n"));
-                                    lblPUnit.setText(lblPUnit.getText().toString().concat(Utils.FormatoMoneda(detalle.precio,2)).concat("\n"));
-                                    lblSubtotal.setText(lblSubtotal.getText().toString().concat(Utils.FormatoMoneda(detalle.Subtotal(),2)).concat("\n"));
+                                    //lblDetalle.setBackground(getResources().getDrawable(R.drawable.bg_btn_gps));
+                                    for (DetalleComprobante detalle : comprobante.detalle) {
+                                        lblCant.setText(lblCant.getText().toString().concat(detalle.cantidad.toString()).concat("\n"));
+                                        lblDetalle.setText(lblDetalle.getText().toString().concat(
+                                                (detalle.producto.porcentajeiva > 0 ? "** " : "")
+                                                        + (detalle.producto.nombreproducto.length() > 25
+                                                        ? detalle.producto.nombreproducto.substring(0, 20) + "..." + detalle.producto.nombreproducto.substring(detalle.producto.nombreproducto.length() - 5)
+                                                        : detalle.producto.nombreproducto)).concat("\n"));
+                                        lblPUnit.setText(lblPUnit.getText().toString().concat(Utils.FormatoMoneda(detalle.precio, 2)).concat("\n"));
+                                        lblSubtotal.setText(lblSubtotal.getText().toString().concat(Utils.FormatoMoneda(detalle.Subtotal(), 2)).concat("\n"));
+                                    }
+
+                                    lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("SUBTOTAL 0%\n"));
+                                    lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("SUBTOTAL 12%\n"));
+                                    lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("IVA 12%\n"));
+                                    lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("TOTAL\n"));
+
+                                    lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda(comprobante.subtotal, 2).concat("\n")));
+                                    lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda(comprobante.subtotaliva, 2).concat("\n")));
+                                    lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda((comprobante.total - comprobante.subtotal - comprobante.subtotaliva), 2).concat("\n")));
+                                    lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda(comprobante.total, 2).concat("\n")));
+
+                                    lblLeyenda.setVisibility(View.VISIBLE);
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                        lblLeyenda.setText(Html.fromHtml((comprobante.tipotransaccion.equals("PR") ? getResources().getString(R.string.leyendaProforma) : getResources().getString(R.string.leyendaFactura))
+                                                        + "<br><strong>Vendedor: </strong> " + SQLite.usuario.RazonSocial + "           <strong>Generado: </strong> " + Utils.getDateFormat("yyyy-MM-dd HH:mm:ss"),
+                                                Html.FROM_HTML_MODE_COMPACT));
+                                    } else {
+                                        lblLeyenda.setText(Html.fromHtml((comprobante.tipotransaccion.equals("PR") ? getResources().getString(R.string.leyendaProforma) : getResources().getString(R.string.leyendaFactura))
+                                                + "<br><strong>Vendedor: </strong> " + SQLite.usuario.RazonSocial + "           <strong>Generado: </strong> " + Utils.getDateFormat("yyyy-MM-dd HH:mm:ss")
+                                        ));
+                                    }
+                                    pbCargando.setVisibility(View.GONE);
                                 }
-
-                                lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("SUBTOTAL 0%\n"));
-                                lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("SUBTOTAL 12%\n"));
-                                lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("IVA 12%\n"));
-                                lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("TOTAL\n"));
-
-                                lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda(comprobante.subtotal,2).concat("\n")));
-                                lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda(comprobante.subtotaliva,2).concat("\n")));
-                                lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda((comprobante.total -comprobante.subtotal - comprobante.subtotaliva),2).concat("\n")));
-                                lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda(comprobante.total,2).concat("\n")));
-
-                                lblLeyenda.setVisibility(View.VISIBLE);
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                    lblLeyenda.setText(Html.fromHtml((comprobante.tipotransaccion.equals("PR")?getResources().getString(R.string.leyendaProforma):getResources().getString(R.string.leyendaFactura))
-                                                    + "<br><strong>Vendedor: </strong> " + SQLite.usuario.RazonSocial + "           <strong>Generado: </strong> " + Utils.getDateFormat("yyyy-MM-dd HH:mm:ss"),
-                                            Html.FROM_HTML_MODE_COMPACT));
-                                }else {
-                                    lblLeyenda.setText(Html.fromHtml((comprobante.tipotransaccion.equals("PR")?getResources().getString(R.string.leyendaProforma):getResources().getString(R.string.leyendaFactura))
-                                                    + "<br><strong>Vendedor: </strong> " + SQLite.usuario.RazonSocial + "           <strong>Generado: </strong> " + Utils.getDateFormat("yyyy-MM-dd HH:mm:ss")
-                                    ));
-                                }
-                                pbCargando.setVisibility(View.GONE);
                             }
-                        }
                     );
                 }
             };
             th.start();
-        }catch (Exception e){
+        } catch (Exception e) {
             pbCargando.setVisibility(View.GONE);
             Log.d(TAG, e.getMessage());
         }
     }
 
     private void BuscarDatosPedido(int id) {
-        try{
-            Thread th = new Thread(){
+        try {
+            Thread th = new Thread() {
                 @Override
-                public void run(){
+                public void run() {
                     pbCargando.setVisibility(View.VISIBLE);
                     pedido = Pedido.get(id);
                     getActivity().runOnUiThread(() -> {
-                                if(pedido != null){
+                                if (pedido != null) {
                                     txtNumFactura.setText(pedido.secuencialpedido);
                                     String textLeft = "", textRight = "";
 
@@ -250,17 +260,21 @@ public class InfoFacturaDialogFragment extends AppCompatDialogFragment {
                                             .concat(pedido.secuencialsistema).concat("\n")
                                             .concat(pedido.fechacelular).concat("\n")
                                             .concat(pedido.fechapedido).concat("\n")
-                                            .concat(pedido.estado >= 0 && pedido.codigosistema == 0?"No sincronizado":"Sincronizado").concat("\n")
+                                            .concat(pedido.estado >= 0 && pedido.codigosistema == 0 ? "No sincronizado" : "Sincronizado").concat("\n")
                                             .concat(pedido.observacion);
 
                                     txtInfoLeft.setText(textLeft);
                                     txtInfoRight.setText(textRight);
 
-                                    for(DetallePedido detalle:pedido.detalle) {
+                                    for (DetallePedido detalle : pedido.detalle) {
                                         lblCant.setText(lblCant.getText().toString().concat(detalle.cantidad.toString()).concat("\n"));
-                                        lblDetalle.setText(lblDetalle.getText().toString().concat((detalle.producto.porcentajeiva>0?"** ":"")+ detalle.producto.nombreproducto).concat("\n"));
-                                        lblPUnit.setText(lblPUnit.getText().toString().concat(Utils.FormatoMoneda(detalle.precio,2)).concat("\n"));
-                                        lblSubtotal.setText(lblSubtotal.getText().toString().concat(Utils.FormatoMoneda(detalle.Subtotal(),2)).concat("\n"));
+                                        lblDetalle.setText(lblDetalle.getText().toString().concat(
+                                                (detalle.producto.porcentajeiva > 0 ? "** " : "")
+                                                        + (detalle.producto.nombreproducto.length() > 25
+                                                        ? detalle.producto.nombreproducto.substring(0, 20) + "..." + detalle.producto.nombreproducto.substring(detalle.producto.nombreproducto.length() - 5)
+                                                        : detalle.producto.nombreproducto)).concat("\n"));
+                                        lblPUnit.setText(lblPUnit.getText().toString().concat(Utils.FormatoMoneda(detalle.precio, 2)).concat("\n"));
+                                        lblSubtotal.setText(lblSubtotal.getText().toString().concat(Utils.FormatoMoneda(detalle.Subtotal(), 2)).concat("\n"));
                                     }
 
                                     lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("SUBTOTAL 0%\n"));
@@ -268,10 +282,10 @@ public class InfoFacturaDialogFragment extends AppCompatDialogFragment {
                                     lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("IVA 12%\n"));
                                     lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("TOTAL\n"));
 
-                                    lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda(pedido.subtotal,2).concat("\n")));
-                                    lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda(pedido.subtotaliva,2).concat("\n")));
-                                    lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda((pedido.total - pedido.subtotal - pedido.subtotaliva),2).concat("\n")));
-                                    lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda(pedido.total,2).concat("\n")));
+                                    lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda(pedido.subtotal, 2).concat("\n")));
+                                    lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda(pedido.subtotaliva, 2).concat("\n")));
+                                    lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda((pedido.total - pedido.subtotal - pedido.subtotaliva), 2).concat("\n")));
+                                    lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda(pedido.total, 2).concat("\n")));
                                 }
                                 pbCargando.setVisibility(View.GONE);
                             }
@@ -279,21 +293,21 @@ public class InfoFacturaDialogFragment extends AppCompatDialogFragment {
                 }
             };
             th.start();
-        }catch (Exception e){
+        } catch (Exception e) {
             pbCargando.setVisibility(View.GONE);
             Log.d(TAG, e.getMessage());
         }
     }
 
     private void BuscarDatosDeposito(int id) {
-        try{
-            Thread th = new Thread(){
+        try {
+            Thread th = new Thread() {
                 @Override
-                public void run(){
+                public void run() {
                     pbCargando.setVisibility(View.VISIBLE);
                     ingreso = Ingreso.get(id);
                     getActivity().runOnUiThread(() -> {
-                                if(ingreso != null){
+                                if (ingreso != null) {
                                     txtNumFactura.setText(ingreso.secuencialdocumento);
                                     String textLeft = "", textRight = "";
 
@@ -315,19 +329,19 @@ public class InfoFacturaDialogFragment extends AppCompatDialogFragment {
                                             .concat(ingreso.secuencialdocumento).concat("\n")
                                             .concat(ingreso.fechadiario).concat("\n")
                                             .concat(ingreso.detalle.get(0).fechadocumento).concat("\n")
-                                            .concat(ingreso.detalle.get(0).tipodocumento==4?"Depósito":"Transferencia").concat("\n")
-                                            .concat(ingreso.detalle.get(0).entidadfinanciera.nombrecatalogo+(ingreso.detalle.get(0).tipodecuenta.equals("A")?" - Ahorro":" - Corriente")).concat("\n")
+                                            .concat(ingreso.detalle.get(0).tipodocumento == 4 ? "Depósito" : "Transferencia").concat("\n")
+                                            .concat(ingreso.detalle.get(0).entidadfinanciera.nombrecatalogo + (ingreso.detalle.get(0).tipodecuenta.equals("A") ? " - Ahorro" : " - Corriente")).concat("\n")
                                             .concat(ingreso.detalle.get(0).numerodocumentoreferencia).concat("\n")
-                                            .concat(Utils.FormatoMoneda(ingreso.totalingreso,2)).concat("\n")
+                                            .concat(Utils.FormatoMoneda(ingreso.totalingreso, 2)).concat("\n")
                                             .concat(ingreso.fechacelular).concat("\n")
-                                            .concat(ingreso.estado >= 0 && ingreso.codigosistema == 0?"No sincronizado":"Sincronizado").concat("\n")
+                                            .concat(ingreso.estado >= 0 && ingreso.codigosistema == 0 ? "No sincronizado" : "Sincronizado").concat("\n")
                                             .concat(ingreso.observacion);
 
                                     txtInfoLeft.setText(textLeft);
                                     txtInfoRight.setText(textRight);
 
-                                    if(ingreso.fotos != null && ingreso.fotos.size()>0) {
-                                        for(int i = 0; i<ingreso.fotos.size(); i++){
+                                    if (ingreso.fotos != null && ingreso.fotos.size() > 0) {
+                                        for (int i = 0; i < ingreso.fotos.size(); i++) {
                                             try {
                                                 File miFile = new File(ExternalDirectory, ingreso.fotos.get(i).name);
                                                 Uri path = Uri.fromFile(miFile);
@@ -350,7 +364,7 @@ public class InfoFacturaDialogFragment extends AppCompatDialogFragment {
                 }
             };
             th.start();
-        }catch (Exception e){
+        } catch (Exception e) {
             pbCargando.setVisibility(View.GONE);
             Log.d(TAG, e.getMessage());
         }
@@ -368,15 +382,24 @@ public class InfoFacturaDialogFragment extends AppCompatDialogFragment {
             cvContent.setDrawingCacheEnabled(false);
 
             String nameimg = "";
-            switch (tipotransaccion){
+            String numberphone = "";
+            switch (tipotransaccion) {
                 case "01":
                     nameimg = "FAC-" + comprobante.codigotransaccion + ".png";
+                    if (comprobante.cliente.fono1.length() > 0)
+                        numberphone = comprobante.cliente.fono1;
+                    else if (comprobante.cliente.fono2.length() > 0)
+                        numberphone = comprobante.cliente.fono2;
                     break;
                 case "PC":
                     nameimg = "PED-" + pedido.secuencialpedido + ".png";
+                    if (pedido.cliente.fono1.length() > 0)
+                        numberphone = pedido.cliente.fono1;
+                    else if (pedido.cliente.fono2.length() > 0)
+                        numberphone = pedido.cliente.fono2;
                     break;
                 case "DE":
-                    nameimg = "DEV-" + ingreso.secuencialdocumento + ".png";
+                    nameimg = "DEP-" + ingreso.secuencialdocumento + ".png";
                     break;
             }
 
@@ -390,15 +413,16 @@ public class InfoFacturaDialogFragment extends AppCompatDialogFragment {
             Utils.showMessage(getContext(), "Generando imagen, espere un momento...");
 
             String ni = nameimg;
+            final String number = numberphone;
             Handler handler = new Handler();
-            handler.postDelayed(()->{
+            handler.postDelayed(() -> {
                 btnCerrar.setVisibility(View.VISIBLE);
                 btnShareW.setVisibility(View.VISIBLE);
                 btnShare.setVisibility(View.VISIBLE);
-                if(other)
+                if (other)
                     sendImage(imageFile);
                 else
-                    sendImageWhatsApp("", ni);
+                    sendImageWhatsApp(number, ni);
             }, 3000);
 
         } catch (Throwable e) {
@@ -415,7 +439,7 @@ public class InfoFacturaDialogFragment extends AppCompatDialogFragment {
             intent.setType("text/plain");
             intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(ExternalDirectory + File.separator + nombreImagen));
             intent.putExtra(Intent.EXTRA_TEXT,
-                    tipotransaccion.equals("01")?getResources().getString(R.string.leyendaFactura2):"Comprobante generado desde SI Movil");
+                    tipotransaccion.equals("01") ? getResources().getString(R.string.leyendaFactura2) : "Comprobante generado desde SI Móvil");
             intent.putExtra("jid", phoneNumber + "@s.whatsapp.net"); //numero telefonico sin prefijo "+"!
             intent.setPackage("com.whatsapp");
             startActivity(intent);
@@ -426,8 +450,8 @@ public class InfoFacturaDialogFragment extends AppCompatDialogFragment {
     }
 
     //PERMITE COMPARTIR IMAGEN MEDIANTE APLICACIONES MULTIMEDIA
-    private void sendImage(File fileImage){
-        try{
+    private void sendImage(File fileImage) {
+        try {
             String PACKAGE_NAME = BuildConfig.APPLICATION_ID + ".services.GenericFileProvider";
 
             Uri contentUri = FileProvider.getUriForFile(getContext(), PACKAGE_NAME, fileImage);
@@ -440,11 +464,11 @@ public class InfoFacturaDialogFragment extends AppCompatDialogFragment {
                 shareIntent.setDataAndType(contentUri, getContext().getContentResolver().getType(contentUri));
                 shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
                 shareIntent.putExtra(Intent.EXTRA_TEXT,
-                        tipotransaccion.equals("01")?getResources().getString(R.string.leyendaFactura2):"Comprobante generado desde SI Movil");
+                        tipotransaccion.equals("01") ? getResources().getString(R.string.leyendaFactura2) : "Comprobante generado desde SI Movil");
                 startActivity(Intent.createChooser(shareIntent, "Elige una aplicación:"));
 
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, e.getMessage());
         }
     }

@@ -17,13 +17,18 @@ import com.florencia.erpapp.R;
 
 public class SplashScreenActivity extends Activity {
     TextView lblVersion;
+
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
         Window window = getWindow();
         window.setFormat(PixelFormat.RGBA_8888);
     }
-    /** Called when the activity is first created. */
+
+    /**
+     * Called when the activity is first created.
+     */
     Thread splashTread;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,10 +37,11 @@ public class SplashScreenActivity extends Activity {
         lblVersion.setText("v".concat(BuildConfig.VERSION_NAME));
         StartAnimations();
     }
+
     private void StartAnimations() {
         Animation anim = AnimationUtils.loadAnimation(this, R.anim.alpha);
         anim.reset();
-        CoordinatorLayout l=(CoordinatorLayout) findViewById(R.id.lin_lay);
+        CoordinatorLayout l = (CoordinatorLayout) findViewById(R.id.lin_lay);
         l.clearAnimation();
         l.startAnimation(anim);
 

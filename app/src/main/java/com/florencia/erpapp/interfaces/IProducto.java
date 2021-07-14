@@ -11,5 +11,5 @@ public interface IProducto {
     @FormUrlEncoded
     @POST("wsproducto")
     Call<JsonObject> GetProductos(@Field("usuario") String user, @Field("clave") String clave,
-                                   @Field("establecimientoid") Integer establecimiento);
+                                  @Field("establecimientoid") Integer establecimiento);
 }

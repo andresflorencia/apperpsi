@@ -2,21 +2,25 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/option_date_init"
+    <item
+        android:id="@+id/option_date_init"
+        android:icon="@drawable/ic_date_white"
         android:title="Fecha inicio"
-        android:icon="@drawable/ic_date_white"
-        app:showAsAction="collapseActionView|always"/>
-    <item android:id="@+id/option_separator"
-        android:title="-"
+        app:showAsAction="collapseActionView|always" />
+    <item
+        android:id="@+id/option_separator"
+        android:enabled="false"
         android:icon="@drawable/ic_remove_white"
-        app:showAsAction="collapseActionView|always"
-        android:enabled="false"/>
-    <item android:id="@+id/option_date_end"
-        android:title="Fecha fin"
+        android:title="-"
+        app:showAsAction="collapseActionView|always" />
+    <item
+        android:id="@+id/option_date_end"
         android:icon="@drawable/ic_date_white"
-        app:showAsAction="collapseActionView|always"/>
-    <item android:id="@+id/option_delete"
-        android:title="Eliminar registros"
+        android:title="Fecha fin"
+        app:showAsAction="collapseActionView|always" />
+    <item
+        android:id="@+id/option_delete"
         android:icon="@drawable/ic_delete_white"
-        app:showAsAction="collapseActionView|always"/>
+        android:title="Eliminar registros"
+        app:showAsAction="collapseActionView|always" />
 </menu>

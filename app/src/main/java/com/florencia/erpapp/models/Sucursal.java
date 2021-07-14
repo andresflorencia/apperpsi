@@ -18,16 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Sucursal {
-    public String IdSucursal;
-    public String RUC;
-    public String RazonSocial;
-    public String NombreComercial;
-    public String NombreSucursal;
-    public String Direcion;
-    public String CodigoEstablecimiento;
-    public String PuntoEmision;
-    public String Ambiente;
-    public String SucursalPadreID;
+    public String IdSucursal, RUC, RazonSocial, NombreComercial, NombreSucursal, Direcion, CodigoEstablecimiento,
+            PuntoEmision, Ambiente, SucursalPadreID;
     public Integer IdEstablecimiento, IdPuntoEmision, periodo, mesactual, usuarioid;
 
     public static SQLiteDatabase sqLiteDatabase;
@@ -44,21 +36,21 @@ public class Sucursal {
         this.PuntoEmision = "";
         this.Ambiente = "";
         this.SucursalPadreID = "";
-        this.IdEstablecimiento=0;
-        this.IdPuntoEmision =0;
+        this.IdEstablecimiento = 0;
+        this.IdPuntoEmision = 0;
         this.periodo = 0;
         this.mesactual = 0;
         this.usuarioid = 0;
     }
 
-    public boolean Guardar(){
+    public boolean Guardar() {
         try {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
             sqLiteDatabase.execSQL("INSERT OR REPLACE INTO " +
                     "sucursal(idsucursal, ruc, razonsocial, nombrecomercial, nombresucursal, direccion, codigoestablecimiento, " +
                     "puntoemision, ambiente, idestablecimiento, idpuntoemision, periodo, mesactual, usuarioid) " +
                     "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", new String[]{this.IdSucursal, this.RUC, this.RazonSocial, this.NombreComercial, this.NombreSucursal, this.Direcion, this.CodigoEstablecimiento,
-                    this.PuntoEmision, this.Ambiente, this.IdEstablecimiento.toString() , this.IdPuntoEmision.toString(),
+                    this.PuntoEmision, this.Ambiente, this.IdEstablecimiento.toString(), this.IdPuntoEmision.toString(),
                     this.periodo.toString(), this.mesactual.toString(), this.usuarioid.toString()});
             sqLiteDatabase.close();
             return true;
@@ -68,36 +60,36 @@ public class Sucursal {
         }
     }
 
-    public static boolean Delete (Integer id){
+    public static boolean Delete(Integer id) {
         try {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
-            sqLiteDatabase.delete("sucursal","idestablecimiento = ?",new String[]{id.toString()});
+            sqLiteDatabase.delete("sucursal", "idestablecimiento = ?", new String[]{id.toString()});
             sqLiteDatabase.close();
-            Log.d(TAG,"DELETE SUCURSAL OK");
+            Log.d(TAG, "DELETE SUCURSAL OK");
             return true;
-        } catch (SQLException ex){
+        } catch (SQLException ex) {
             Log.d(TAG, "Delete(): " + ex.getMessage());
             return false;
         }
     }
 
-    public static boolean DeleteByUser (Integer idusuario){
+    public static boolean DeleteByUser(Integer idusuario) {
         try {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
-            sqLiteDatabase.delete("sucursal","usuarioid = ?",new String[]{idusuario.toString()});
+            sqLiteDatabase.delete("sucursal", "usuarioid = ?", new String[]{idusuario.toString()});
             sqLiteDatabase.close();
-            Log.d(TAG,"DELETE SUCURSAL OK");
+            Log.d(TAG, "DELETE SUCURSAL OK");
             return true;
-        } catch (SQLException ex){
+        } catch (SQLException ex) {
             Log.d(TAG, "Delete(): " + ex.getMessage());
             return false;
         }
     }
 
-    static public Sucursal getSucursal(String cod){
+    static public Sucursal getSucursal(String cod) {
         Sucursal Item = null;
         sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
-        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM sucursal WHERE idestablecimiento = ?", new String[] { cod });
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM sucursal WHERE idestablecimiento = ?", new String[]{cod});
         if (cursor.moveToFirst()) {
             Item = AsignaDatos(cursor);
         }
@@ -106,25 +98,24 @@ public class Sucursal {
         return Item;
     }
 
-    static public List<Sucursal> getSucursales(Integer idusuario){
+    static public List<Sucursal> getSucursales(Integer idusuario) {
         List<Sucursal> retorno = new ArrayList<>();
         Sucursal Item = null;
         sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
         Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM sucursal WHERE usuarioid = ?",
-                new String[] { idusuario.toString() });
+                new String[]{idusuario.toString()});
         if (cursor.moveToFirst()) {
             do {
                 Item = AsignaDatos(cursor);
                 retorno.add(Item);
-            }while (cursor.moveToNext());
+            } while (cursor.moveToNext());
         }
         cursor.close();
         sqLiteDatabase.close();
         return retorno;
     }
 
-    private static Sucursal AsignaDatos(Cursor cursor)
-    {
+    private static Sucursal AsignaDatos(Cursor cursor) {
         Sucursal Item = new Sucursal();
         Item.IdSucursal = cursor.getString(0);
         Item.RUC = cursor.getString(1);
@@ -159,14 +150,14 @@ public class Sucursal {
                 Item.IdEstablecimiento = object.get("idestablecimiento").getAsInt();
                 Item.IdPuntoEmision = object.get("idpuntoemision").getAsInt();
                 Item.NombreSucursal = object.get("nombreestablecimiento").getAsString();
-                Item.periodo =  object.has("periodo")? object.get("periodo").getAsInt():0;
-                Item.mesactual =  object.has("mesactual")? object.get("mesactual").getAsInt():0;
-                Item.usuarioid =  object.has("usuarioid")? object.get("usuarioid").getAsInt():0;
+                Item.periodo = object.has("periodo") ? object.get("periodo").getAsInt() : 0;
+                Item.mesactual = object.has("mesactual") ? object.get("mesactual").getAsInt() : 0;
+                Item.usuarioid = object.has("usuarioid") ? object.get("usuarioid").getAsInt() : 0;
                 Sucursal.Delete(Item.IdEstablecimiento);
-                if(Item.Guardar() && object.has("s01"))
+                if (Item.Guardar() && object.has("s01"))
                     Item.actualizasecuencial(object.get("s01").getAsInt(), "01");
             }
-        }catch (JsonParseException e){
+        } catch (JsonParseException e) {
             Log.d(TAG, "AsignaDatos(): " + e.getMessage());
         }
         return Item;

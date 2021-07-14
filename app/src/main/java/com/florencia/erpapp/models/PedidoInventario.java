@@ -22,7 +22,7 @@ public class PedidoInventario {
     public static String TAG = "TAGPEDIDOINV";
     public static SQLiteDatabase sqLiteDatabase;
 
-    public PedidoInventario(){
+    public PedidoInventario() {
         this.idpedido = 0;
         this.codigosistema = 0;
         this.establecimientoid = 0;
@@ -43,11 +43,11 @@ public class PedidoInventario {
     public static boolean Update(Integer idpedido, ContentValues values) {
         try {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
-            sqLiteDatabase.update("pedidoinv",values, "idpedido = ?",new String[]{idpedido.toString()});
+            sqLiteDatabase.update("pedidoinv", values, "idpedido = ?", new String[]{idpedido.toString()});
             sqLiteDatabase.close();
-            Log.d(TAG,"UPDATE PEDIDOINV OK");
+            Log.d(TAG, "UPDATE PEDIDOINV OK");
             return true;
-        } catch (SQLException ex){
+        } catch (SQLException ex) {
             Log.d(TAG, "Update(): " + String.valueOf(ex));
             return false;
         }
@@ -58,9 +58,9 @@ public class PedidoInventario {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
             sqLiteDatabase.execSQL("INSERT OR REPLACE INTO " +
                             "pedidoinv(idpedido, codigosistema, establecimientoid, usuarioid, diasabastecimiento, estadomovil, " +
-                                "secuencial, codigopedido, fecharegistro, fechahora, estado, observacion, longdate, tipotransaccion) " +
+                            "secuencial, codigopedido, fecharegistro, fechahora, estado, observacion, longdate, tipotransaccion) " +
                             "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                    new String[]{this.idpedido == 0?null:this.idpedido.toString(), this.codigosistema.toString(), this.establecimientoid.toString(), this.usuarioid.toString(),
+                    new String[]{this.idpedido == 0 ? null : this.idpedido.toString(), this.codigosistema.toString(), this.establecimientoid.toString(), this.usuarioid.toString(),
                             this.diasabastecimiento.toString(), this.estadomovil.toString(), this.secuencial.toString(), this.codigopedido,
                             this.fecharegistro, this.fechahora, this.estado, this.observacion, this.longdate.toString(), this.tipotransaccion});
             if (this.idpedido == 0)
@@ -68,7 +68,7 @@ public class PedidoInventario {
             else
                 sqLiteDatabase.execSQL("DELETE FROM detallepedidoinv WHERE pedidoid = ?", new String[]{String.valueOf(this.idpedido)});
             sqLiteDatabase.close();
-            Log.d(TAG,"GUARDO ENCABEZADO - ID: " + this.idpedido);
+            Log.d(TAG, "GUARDO ENCABEZADO - ID: " + this.idpedido);
             return this.SaveDetalle(this.idpedido);
         } catch (SQLException ex) {
             Log.d(TAG, "Save(): " + ex.getMessage());
@@ -79,12 +79,12 @@ public class PedidoInventario {
     private boolean SaveDetalle(Integer idpedido) {
         try {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
-            for (int i =0; i<this.detalle.size(); i++) {
+            for (int i = 0; i < this.detalle.size(); i++) {
                 sqLiteDatabase.execSQL("INSERT OR REPLACE INTO " +
                                 "detallepedidoinv(pedidoid, orden, productoid, cantidadpedida, cantidadautorizada, " +
                                 "stockactual, usuarioid, codigoproducto, nombreproducto) " +
                                 "values(?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                        new String[]{idpedido.toString(), String.valueOf(i+1), detalle.get(i).producto.idproducto.toString(), detalle.get(i).cantidadpedida.toString(),
+                        new String[]{idpedido.toString(), String.valueOf(i + 1), detalle.get(i).producto.idproducto.toString(), detalle.get(i).cantidadpedida.toString(),
                                 detalle.get(i).cantidadautorizada.toString(), detalle.get(i).stockactual.toString(), String.valueOf(SQLite.usuario.IdUsuario),
                                 detalle.get(i).producto.codigoproducto, detalle.get(i).producto.nombreproducto});
 
@@ -92,7 +92,7 @@ public class PedidoInventario {
             }
             this.actualizasecuencial();
             sqLiteDatabase.close();
-            Log.d(TAG,"Guardó detalle comprobante");
+            Log.d(TAG, "Guardó detalle comprobante");
             return true;
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -108,7 +108,7 @@ public class PedidoInventario {
             Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM pedidoinv WHERE idpedido = ?", new String[]{idpedido.toString()});
             if (cursor.moveToFirst()) Item = PedidoInventario.AsignaDatos(cursor);
             sqLiteDatabase.close();
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, "get(): " + e.getMessage());
         }
         return Item;
@@ -121,11 +121,11 @@ public class PedidoInventario {
             String WHERE = "usuarioid = ? and establecimientoid = ? and estadomovil not in (-1) ";
             listparams.add(idUser.toString());
             listparams.add(establecimientoid.toString());
-            if(!fechadesde.equals("")) {
+            if (!fechadesde.equals("")) {
                 WHERE += " and longdate >= ?";
                 listparams.add(String.valueOf(Utils.longDate(fechadesde)));
             }
-            if(!fechahasta.equals("")) {
+            if (!fechahasta.equals("")) {
                 WHERE += " and longdate <= ?";
                 listparams.add(String.valueOf(Utils.longDate(fechahasta)));
             }
@@ -138,13 +138,13 @@ public class PedidoInventario {
             if (cursor.moveToFirst()) {
                 do {
                     Item = PedidoInventario.AsignaDatos(cursor);
-                    if(Item!=null) Items.add(Item);
+                    if (Item != null) Items.add(Item);
                 } while (cursor.moveToNext());
             }
             cursor.close();
             sqLiteDatabase.close();
             Log.d(TAG, "NUMERO COMPROBANTES: " + Items.size());
-        }catch (SQLiteException e){
+        } catch (SQLiteException e) {
             Log.d(TAG, "getByUsuario(): " + e.getMessage());
         }
         return Items;
@@ -159,42 +159,42 @@ public class PedidoInventario {
             if (cursor.moveToFirst()) {
                 do {
                     Item = PedidoInventario.AsignaDatos(cursor);
-                    if(Item!=null) Items.add(Item);
+                    if (Item != null) Items.add(Item);
                 } while (cursor.moveToNext());
             }
             cursor.close();
             sqLiteDatabase.close();
             Log.d(TAG, "NUMERO COMPROBANTES PS: " + Items.size());
-        }catch (SQLiteException e){
+        } catch (SQLiteException e) {
             Log.d(TAG, "getPorSincronizar(): " + e.getMessage());
         }
         return Items;
     }
 
-    public static int Delete(Integer id, String fechadesde, String fechahasta, Integer primeros, boolean soloSincronizados){
+    public static int Delete(Integer id, String fechadesde, String fechahasta, Integer primeros, boolean soloSincronizados) {
         int retorno = 0;
-        try{
+        try {
             List<String> listParams = new ArrayList<>();
             String WHERE = "";
-            if(id>0) {
+            if (id > 0) {
                 WHERE = "idpedido = ?";
                 listParams.add(id.toString());
             }
-            if(!fechadesde.trim().equals("")){
-                WHERE = (WHERE.trim().equals("")?"":" AND ") + "longdate >= ?";
+            if (!fechadesde.trim().equals("")) {
+                WHERE = (WHERE.trim().equals("") ? "" : " AND ") + "longdate >= ?";
                 listParams.add(String.valueOf(Utils.longDate(fechadesde)));
             }
-            if(!fechahasta.trim().equals("")){
-                WHERE = (WHERE.trim().equals("")?"":" AND ") + "longdate <= ?";
+            if (!fechahasta.trim().equals("")) {
+                WHERE = (WHERE.trim().equals("") ? "" : " AND ") + "longdate <= ?";
                 listParams.add(String.valueOf(Utils.longDate(fechadesde)));
             }
-            if(soloSincronizados)
-                WHERE += (WHERE.trim().equals("")?"":" AND ") + "codigosistema > 0";
+            if (soloSincronizados)
+                WHERE += (WHERE.trim().equals("") ? "" : " AND ") + "codigosistema > 0";
             String[] params = new String[listParams.size()];
             sqLiteDatabase = SQLite.sqlDB.getReadableDatabase();
             retorno = sqLiteDatabase.delete("pedidoinv", WHERE, listParams.toArray(params));
             Log.d(TAG, "Registros eliminados: " + retorno);
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, "Delete(): " + e.getMessage());
             retorno = 0;
         }
@@ -228,15 +228,15 @@ public class PedidoInventario {
         return Item;
     }
 
-    public String getCodigoTransaccion(){
-        String codigo ="";
+    public String getCodigoTransaccion() {
+        String codigo = "";
         try {
             this.secuencial = ultimosecuencial();
             codigo = SQLite.usuario.sucursal.periodo.toString() + SQLite.usuario.sucursal.mesactual +
                     "-PED-" + SQLite.usuario.sucursal.IdSucursal + "-" + String.format("%04d", this.secuencial);
             this.codigopedido = codigo;
             Log.d(TAG, codigo);
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, "getCodigoTransaccion(): " + e.getMessage());
         }
         return codigo;

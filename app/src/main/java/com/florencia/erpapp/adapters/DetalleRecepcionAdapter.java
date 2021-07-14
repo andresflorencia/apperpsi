@@ -28,7 +28,7 @@ import com.shasin.notificationbanner.Banner;
 
 import java.util.List;
 
-public class DetalleRecepcionAdapter extends RecyclerView.Adapter<DetalleRecepcionAdapter.ProductoViewHolder>{
+public class DetalleRecepcionAdapter extends RecyclerView.Adapter<DetalleRecepcionAdapter.ProductoViewHolder> {
 
     private static String TAG = "TAGDETALLERECEP_ADAPTER";
     public List<DetalleComprobante> detalleComprobante;
@@ -40,7 +40,7 @@ public class DetalleRecepcionAdapter extends RecyclerView.Adapter<DetalleRecepci
     public DetalleRecepcionAdapter(Activity activity, List<DetalleComprobante> detalleComprobante, String categoria, boolean visualizacion, String tipotransaccion) {
         this.detalleComprobante = detalleComprobante;
         this.activity = activity;
-        this.categoria = categoria.equals("")?"0":categoria;
+        this.categoria = categoria.equals("") ? "0" : categoria;
         this.visualizacion = visualizacion;
         this.tipotransaccion = tipotransaccion;
         this.rootView = activity.findViewById(android.R.id.content);
@@ -58,18 +58,19 @@ public class DetalleRecepcionAdapter extends RecyclerView.Adapter<DetalleRecepci
     public void onBindViewHolder(@NonNull ProductoViewHolder holder, int position) {
         holder.bindProducto(detalleComprobante.get(position));
     }
+
     @Override
     public int getItemCount() {
         return detalleComprobante.size();
     }
 
 
-    class ProductoViewHolder extends RecyclerView.ViewHolder{
+    class ProductoViewHolder extends RecyclerView.ViewHolder {
 
         TextView tvNombreProducto, tvLote, tvCantidad, tvFechaVencimiento;
         ImageButton btnDelete;
 
-        ProductoViewHolder(@NonNull View itemView){
+        ProductoViewHolder(@NonNull View itemView) {
             super(itemView);
             tvNombreProducto = itemView.findViewById(R.id.tv_NombreProducto);
             tvLote = itemView.findViewById(R.id.tvLote);
@@ -78,57 +79,59 @@ public class DetalleRecepcionAdapter extends RecyclerView.Adapter<DetalleRecepci
             btnDelete = itemView.findViewById(R.id.btnDeleteProducto);
         }
 
-        void bindProducto(final DetalleComprobante detalle){
+        void bindProducto(final DetalleComprobante detalle) {
 
             try {
                 tvNombreProducto.setText(detalle.producto.codigoproducto + " - " + detalle.producto.nombreproducto);
                 tvLote.setText(detalle.numerolote);
                 tvFechaVencimiento.setText(detalle.fechavencimiento);
-                tvCantidad.setText(Utils.RoundDecimal(detalle.cantidad,2).toString());
+                tvCantidad.setText(Utils.RoundDecimal(detalle.cantidad, 2).toString());
                 tvCantidad.setInputType(InputType.TYPE_CLASS_PHONE);
                 tvCantidad.setSelectAllOnFocus(true);
-                if(tipotransaccion.equals("4,20") || tipotransaccion.equals("20,4")) {
+                if (tipotransaccion.equals("4,20") || tipotransaccion.equals("20,4")) {
                     tvCantidad.setEnabled(!visualizacion);
-                    btnDelete.setVisibility(visualizacion?View.GONE:View.VISIBLE);
-                }else{
+                    btnDelete.setVisibility(visualizacion ? View.GONE : View.VISIBLE);
+                } else {
                     tvCantidad.setEnabled(false);
                     btnDelete.setVisibility(View.GONE);
                 }
 
                 btnDelete.setOnClickListener(v -> {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(activity, R.style.AlertDialogTheme);
-                        View view = LayoutInflater.from(activity).inflate(R.layout.layout_warning_dialog,
-                                (ConstraintLayout) activity.findViewById(R.id.lyDialogContainer));
-                        builder.setView(view);
-                        ((TextView)view.findViewById(R.id.lblTitle)).setText(detalleComprobante.get(getAdapterPosition()).producto.nombreproducto);
-                        ((TextView)view.findViewById(R.id.lblMessage)).setText("¿Está seguro que desea eliminar este ítem?");
-                        ((ImageView)view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_delete2);
-                        ((Button)view.findViewById(R.id.btnCancel)).setText(activity.getResources().getString(R.string.Cancel));
-                        ((Button)view.findViewById(R.id.btnYes)).setText(activity.getResources().getString(R.string.Confirm));
-                        final AlertDialog alertDialog = builder.create();
-                        view.findViewById(R.id.btnYes).setOnClickListener(vi -> {
-                                detalleComprobante.remove(getAdapterPosition());
-                                notifyDataSetChanged();
-                                Banner.make(rootView,activity,Banner.INFO,"Ítem eliminado de la lista.", Banner.BOTTOM,2000).show();
-                                alertDialog.dismiss();
-                            });
-
-                        view.findViewById(R.id.btnCancel).setOnClickListener(vi -> alertDialog.dismiss());
-
-                        if(alertDialog.getWindow()!=null)
-                            alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
-                        alertDialog.show();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(activity, R.style.AlertDialogTheme);
+                    View view = LayoutInflater.from(activity).inflate(R.layout.layout_warning_dialog,
+                            (ConstraintLayout) activity.findViewById(R.id.lyDialogContainer));
+                    builder.setView(view);
+                    ((TextView) view.findViewById(R.id.lblTitle)).setText(detalleComprobante.get(getAdapterPosition()).producto.nombreproducto);
+                    ((TextView) view.findViewById(R.id.lblMessage)).setText("¿Está seguro que desea eliminar este ítem?");
+                    ((ImageView) view.findViewById(R.id.imgIcon)).setImageResource(R.drawable.ic_delete2);
+                    ((Button) view.findViewById(R.id.btnCancel)).setText(activity.getResources().getString(R.string.Cancel));
+                    ((Button) view.findViewById(R.id.btnYes)).setText(activity.getResources().getString(R.string.Confirm));
+                    final AlertDialog alertDialog = builder.create();
+                    view.findViewById(R.id.btnYes).setOnClickListener(vi -> {
+                        detalleComprobante.remove(getAdapterPosition());
+                        notifyDataSetChanged();
+                        Banner.make(rootView, activity, Banner.INFO, "Ítem eliminado de la lista.", Banner.BOTTOM, 2000).show();
+                        alertDialog.dismiss();
                     });
+
+                    view.findViewById(R.id.btnCancel).setOnClickListener(vi -> alertDialog.dismiss());
+
+                    if (alertDialog.getWindow() != null)
+                        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
+                    alertDialog.show();
+                });
 
                 tvCantidad.addTextChangedListener(new TextWatcher() {
                     @Override
                     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
                     }
+
                     @Override
                     public void onTextChanged(CharSequence s, int start, int before, int count) {
 
                     }
+
                     @Override
                     public void afterTextChanged(Editable s) {
                         try {
@@ -138,10 +141,10 @@ public class DetalleRecepcionAdapter extends RecyclerView.Adapter<DetalleRecepci
                                 Double cant = Double.parseDouble(s.toString().trim());
                                 if ((tipotransaccion.equals("4,20") || tipotransaccion.equals("20,4")) && !visualizacion) {
                                     if (cant <= 0 || cant > detalleComprobante.get(getAdapterPosition()).producto.lotes.get(0).stock) {
-                                        Banner.make(rootView,activity,Banner.ERROR,
+                                        Banner.make(rootView, activity, Banner.ERROR,
                                                 "La cantidad de transferencia debe estar entre 0 y " + detalleComprobante.get(getAdapterPosition()).producto.lotes.get(0).stock,
-                                                Banner.BOTTOM,2500).show();
-                                        tvCantidad.setText(Utils.RoundDecimal(detalleComprobante.get(getAdapterPosition()).producto.lotes.get(0).stock,2).toString());
+                                                Banner.BOTTOM, 2500).show();
+                                        tvCantidad.setText(Utils.RoundDecimal(detalleComprobante.get(getAdapterPosition()).producto.lotes.get(0).stock, 2).toString());
                                         tvCantidad.clearFocus();
                                         tvCantidad.requestFocus();
                                     } else {
@@ -149,14 +152,14 @@ public class DetalleRecepcionAdapter extends RecyclerView.Adapter<DetalleRecepci
                                     }
                                 }
                             }
-                        }catch (Exception e){
-                            Banner.make(rootView,activity,Banner.ERROR,"Ingrese un valor válido.", Banner.BOTTOM,2000).show();
+                        } catch (Exception e) {
+                            Banner.make(rootView, activity, Banner.ERROR, "Ingrese un valor válido.", Banner.BOTTOM, 2000).show();
                         }
                     }
                 });
 
-            }catch (Exception e){
-                Log.d(TAG,e.getMessage());
+            } catch (Exception e) {
+                Log.d(TAG, e.getMessage());
             }
 
         }
