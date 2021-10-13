@@ -146,14 +146,14 @@ public class Comprobante {
                 sqLiteDatabase.execSQL("INSERT OR REPLACE INTO " +
                                 "detallecomprobante(comprobanteid, linea, productoid, cantidad, precio, numerolote, " +
                                 "fechavencimiento, stock, preciocosto, precioreferencia, valoriva, valorice, descuento, " +
-                                "codigoproducto, nombreproducto, marquetas) " +
-                                "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                                "codigoproducto, nombreproducto, marquetas, porcentajedesc) " +
+                                "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                         new String[]{idComprobante.toString(), this.detalle.get(i).linea.toString(), this.detalle.get(i).producto.idproducto.toString(),
                                 this.detalle.get(i).cantidad.toString(), this.detalle.get(i).precio.toString(), this.detalle.get(i).numerolote,
                                 this.detalle.get(i).fechavencimiento, this.detalle.get(i).stock.toString(), this.detalle.get(i).preciocosto.toString(),
                                 this.detalle.get(i).precioreferencia.toString(), this.detalle.get(i).valoriva.toString(), this.detalle.get(i).valorice.toString(),
                                 this.detalle.get(i).descuento.toString(), this.detalle.get(i).producto.codigoproducto, this.detalle.get(i).producto.nombreproducto,
-                                this.detalle.get(i).marquetas.toString()});
+                                this.detalle.get(i).marquetas.toString(), this.detalle.get(i).producto.descuento.toString()});
 
                 this.detalle.get(i).comprobanteid = idComprobante;
 
@@ -416,12 +416,15 @@ public class Comprobante {
         this.total = 0d;
         this.subtotaliva = 0d;
         this.subtotal = 0d;
+        this.descuento = 0d;
         for (DetalleComprobante item : this.detalle) {
+            //this.descuento += item.Descuento(item.producto.descuento);
             this.total += item.Subtotaliva();
             if (item.producto.porcentajeiva > 0)
                 this.subtotaliva += item.Subtotal();
             else
                 this.subtotal += item.Subtotal();
+            this.descuento += item.descuento;
         }
         return this.total;
     }

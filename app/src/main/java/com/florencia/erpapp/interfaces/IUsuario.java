@@ -49,4 +49,7 @@ public interface IUsuario {
     @POST("gettotalventas")
     Call<JsonObject> getTotalVentas(@Field("usuario") String user, @Field("clave") String clave,
                                     @Field("fecha") String fecha, @Field("establecimientoid") Integer establecimientoid);
+
+    @POST("empresas")
+    Call<JsonObject> getEmpresas();
 }

@@ -70,15 +70,20 @@ public class DetallePedidoAdapter extends RecyclerView.Adapter<DetallePedidoAdap
             Double total = 0d;
             Double subtotal = 0d;
             Double subtotaliva = 0d;
+            Double descuento0 = 0d;
+            Double descuento12 = 0d;
             for (DetallePedido miDetalle : this.detallePedido) {
-                total += miDetalle.Subtotaliva();
-                if (miDetalle.producto.porcentajeiva > 0)
+                if (miDetalle.producto.porcentajeiva > 0) {
                     subtotaliva += miDetalle.Subtotal();
-                else
+                    descuento12 += miDetalle.Descuento(miDetalle.producto.descuento);
+                }else {
                     subtotal += miDetalle.Subtotal();
+                    descuento0 += miDetalle.Descuento(miDetalle.producto.descuento);
+                }
+                total += miDetalle.Subtotaliva();
             }
             this.activity.lblTotal.setText("Total: " + Utils.FormatoMoneda(total, 2));
-            this.activity.setSubtotales(total, subtotal, subtotaliva);
+            this.activity.setSubtotales(total, subtotal, subtotaliva, descuento0 + descuento12);
         } catch (Exception e) {
             Log.d(TAG, e.getMessage());
         }
@@ -101,7 +106,7 @@ public class DetallePedidoAdapter extends RecyclerView.Adapter<DetallePedidoAdap
 
     class ProductoViewHolder extends RecyclerView.ViewHolder {
 
-        TextView tvNombreProducto, tvPrecio, tvCantidad, tvSubtotal;
+        TextView tvNombreProducto, tvPrecio, tvCantidad, tvSubtotal, tvDescuento, tvPercentDesc;
         ImageButton btnDelete, btnInfo;
 
         ProductoViewHolder(@NonNull View itemView) {
@@ -112,6 +117,8 @@ public class DetallePedidoAdapter extends RecyclerView.Adapter<DetallePedidoAdap
             tvSubtotal = itemView.findViewById(R.id.tvSubtotal);
             btnDelete = itemView.findViewById(R.id.btnDeleteProducto);
             btnInfo = itemView.findViewById(R.id.btnInfo);
+            tvDescuento = itemView.findViewById(R.id.tvDescuento);
+            tvPercentDesc = itemView.findViewById(R.id.tv_PercentDesc);
             btnDelete.setVisibility(View.VISIBLE);
             btnInfo.setVisibility(View.VISIBLE);
         }
@@ -127,6 +134,16 @@ public class DetallePedidoAdapter extends RecyclerView.Adapter<DetallePedidoAdap
                 tvCantidad.setSelectAllOnFocus(true);
 
                 tvCantidad.setEnabled(!visualizacion);
+                tvPercentDesc.setText("-" + detalle.producto.descuento.toString() + "%");
+
+                tvDescuento.setText(Utils.FormatoMoneda(detalle.Descuento(detalle.producto.descuento), 2));
+                tvSubtotal.setText(Utils.FormatoMoneda(detalle.Subtotal() - detalle.descuento, 2));
+
+                if(detalle.producto.descuento>0)
+                    tvPercentDesc.setVisibility(View.VISIBLE);
+                else
+                    tvPercentDesc.setVisibility(View.GONE);
+
                 if (visualizacion) {
                     btnDelete.setVisibility(View.GONE);
                     btnInfo.setVisibility(View.GONE);
@@ -192,6 +209,7 @@ public class DetallePedidoAdapter extends RecyclerView.Adapter<DetallePedidoAdap
                                         tvPrecio.setText(Utils.FormatoMoneda(precio, 2));
                                     }
                                 }
+                                tvDescuento.setText(Utils.FormatoMoneda(detallePedido.get(getAdapterPosition()).Descuento(detallePedido.get(getAdapterPosition()).producto.descuento), 2));
                                 tvSubtotal.setText(Utils.FormatoMoneda(detallePedido.get(getAdapterPosition()).Subtotal(), 2));
                             }
                             CalcularTotal();

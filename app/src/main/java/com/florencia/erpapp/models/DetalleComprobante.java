@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
 import com.florencia.erpapp.services.SQLite;
+import com.florencia.erpapp.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +16,7 @@ public class DetalleComprobante {
     public Producto producto;
     public Double cantidad, precio, total;
     public String numerolote, fechavencimiento, codigoproducto, nombreproducto;
-    public Double stock, preciocosto, precioreferencia, valoriva, valorice, descuento, marquetas;
+    public Double stock, preciocosto, precioreferencia, valoriva, valorice, descuento, marquetas, porcentajedesc;
 
     public static SQLiteDatabase sqLiteDatabase;
     public static String TAG = "TAGDETALLECOMPROBANTE";
@@ -38,15 +39,27 @@ public class DetalleComprobante {
         this.codigoproducto = "";
         this.nombreproducto = "";
         this.marquetas = 0d;
+        this.porcentajedesc = 0d;
     }
 
     public Double Subtotal() {
         Double retorno = 0d;
         try {
-            retorno = this.cantidad * this.precio;
+            retorno = (this.cantidad * this.precio); //- this.Descuento(this.producto.descuento);
         } catch (Exception e) {
             Log.d(TAG, e.getMessage());
         }
+        return retorno;
+    }
+    public Double Descuento(Double percent){
+        Double retorno = 0d;
+        try{
+            retorno = Utils.RoundDecimal(this.cantidad * (this.precio * percent/100), 2);
+        }catch (Exception e){
+            Log.d(TAG, "Descuento(): " + e.getMessage());
+        }
+        Log.d(TAG, "Descuento: " + retorno);
+        this.descuento = retorno;
         return retorno;
     }
 
@@ -63,10 +76,12 @@ public class DetalleComprobante {
     public Double Subtotaliva() {
         Double retorno = 0d;
         try {
-            retorno = this.cantidad * (this.precio + (this.precio * this.producto.porcentajeiva / 100));
+            retorno = Utils.RoundDecimal (((this.cantidad * this.precio) - this.Descuento(this.producto.descuento)) * (1 + (this.producto.porcentajeiva /100)),2);
+            //(this.cantidad * (this.precio + (this.precio * this.producto.porcentajeiva / 100))) - this.descuento;
         } catch (Exception e) {
             Log.d(TAG, e.getMessage());
         }
+        Log.d(TAG, "Precio: " + this.precio.toString() + " - Sub: " + retorno.toString() + " - Desc: " + this.descuento);
         return retorno;
     }
 
@@ -77,7 +92,7 @@ public class DetalleComprobante {
             if(agrupaDetalle) {
                 SELECT = "SELECT comprobanteid, 0 as linea, productoid, sum(cantidad) as cantidad, 0 total, " +
                         "precio, '' numerolote, '' fechavencimiento, 0 stock, 0 preciocosto, precioreferencia, valoriva, valorice," +
-                        "descuento, codigoproducto, nombreproducto, marquetas " +
+                        "descuento, codigoproducto, nombreproducto, marquetas, porcentajedesc " +
                         "FROM detallecomprobante WHERE comprobanteid = ? GROUP BY productoid";
             }
             sqLiteDatabase = SQLite.sqlDB.getReadableDatabase();
@@ -117,12 +132,14 @@ public class DetalleComprobante {
             Item.codigoproducto = cursor.getString(14);
             Item.nombreproducto = cursor.getString(15);
             Item.marquetas = cursor.getDouble(16);
+            Item.porcentajedesc = cursor.getDouble(17);
             if (Item.producto == null) {
                 Item.producto = new Producto();
                 Item.producto.codigoproducto = Item.codigoproducto;
                 Item.producto.nombreproducto = Item.nombreproducto;
                 Item.producto.iva = Item.valoriva > 0 ? 1 : 0;
             }
+            Item.producto.descuento = Item.porcentajedesc;
         } catch (Exception ec) {
             Log.d(TAG, "AsignaDatos(): " + ec.getMessage());
             ec.printStackTrace();

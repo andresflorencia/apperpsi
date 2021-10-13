@@ -387,7 +387,7 @@ public class PedidoActivity extends AppCompatActivity {
                             detalleAdapter.CalcularTotal();
                             pedido.getTotal();
                             detalleAdapter.notifyDataSetChanged();
-                            setSubtotales(pedido.total, pedido.subtotal, pedido.subtotaliva);
+                            setSubtotales(pedido.total, pedido.subtotal, pedido.subtotaliva, pedido.descuento);
                             btnObservacion.setTag(pedido.observacion);
                         } else {
                             //Utils.showMessage(PedidoActivity.this, "Ocurrió un error al obtener los datos para este comprobante.");
@@ -725,7 +725,7 @@ public class PedidoActivity extends AppCompatActivity {
                     pedido.detalle.clear();
                     pedido.detalle.addAll(detalleAdapter.detallePedido);
                     pedido.getTotal();
-                    this.setSubtotales(pedido.total, pedido.subtotal, pedido.subtotaliva);
+                    this.setSubtotales(pedido.total, pedido.subtotal, pedido.subtotaliva, pedido.descuento);
                     detalleAdapter.CambiarPrecio(cliente.categoria.equals("") ? "0" : cliente.categoria);
                     detalleAdapter.CalcularTotal();
                     detalleAdapter.notifyDataSetChanged();
@@ -766,10 +766,12 @@ public class PedidoActivity extends AppCompatActivity {
         }
     }
 
-    public void setSubtotales(Double total, Double subtotal, Double subtotaliva) {
-        lblSubtotales.setText("Subtotal 0%:    " + Utils.FormatoMoneda(subtotal, 2) +
+    public void setSubtotales(Double total, Double subtotal, Double subtotaliva, Double descuento) {
+        lblSubtotales.setText(
+                "Subtotal 0%:    " + Utils.FormatoMoneda(subtotal, 2) +
                 "\nSubtotal 12%:    " + Utils.FormatoMoneda(subtotaliva, 2) +
-                "\nIVA 12%:    " + Utils.FormatoMoneda((total - subtotaliva - subtotal), 2));
+                "\nDescuento:    " + Utils.FormatoMoneda(descuento, 2) +
+                "\nIVA 12%:    " + Utils.FormatoMoneda((total - subtotaliva - subtotal + descuento), 2));
     }
 
     @Override

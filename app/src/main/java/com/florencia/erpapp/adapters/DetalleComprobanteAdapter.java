@@ -42,6 +42,8 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import okhttp3.internal.Util;
+
 public class DetalleComprobanteAdapter extends RecyclerView.Adapter<DetalleComprobanteAdapter.ProductoViewHolder> {
 
     private static String TAG = "TAGDETALLECOMP_ADAPTER";
@@ -84,15 +86,20 @@ public class DetalleComprobanteAdapter extends RecyclerView.Adapter<DetalleCompr
             Double total = 0d;
             Double subtotal = 0d;
             Double subtotaliva = 0d;
+            Double descuento0 = 0d;
+            Double descuento12 = 0d;
             for (DetalleComprobante miDetalle : this.detalleComprobante) {
-                total += miDetalle.Subtotaliva();
-                if (miDetalle.producto.porcentajeiva > 0)
+                if (miDetalle.producto.porcentajeiva > 0) {
                     subtotaliva += miDetalle.Subtotal();
-                else
+                    descuento12 += miDetalle.Descuento(miDetalle.producto.descuento);
+                }else {
                     subtotal += miDetalle.Subtotal();
+                    descuento0 += miDetalle.Descuento(miDetalle.producto.descuento);
+                }
+                total += miDetalle.Subtotaliva();
             }
             this.activity.lblTotal.setText("Total: " + Utils.FormatoMoneda(total, 2));
-            this.activity.setSubtotales(total, subtotal, subtotaliva);
+            this.activity.setSubtotales(total, subtotal, subtotaliva, descuento0 + descuento12);
         } catch (Exception e) {
             Log.d(TAG, e.getMessage());
         }
@@ -132,7 +139,7 @@ public class DetalleComprobanteAdapter extends RecyclerView.Adapter<DetalleCompr
 
     class ProductoViewHolder extends RecyclerView.ViewHolder {
 
-        TextView tvNombreProducto, tvPrecio, tvCantidad, tvSubtotal;
+        TextView tvNombreProducto, tvPrecio, tvCantidad, tvSubtotal, tvDescuento, tvPercentDesc;
         ImageButton btnDelete, btnInfo;
 
         ProductoViewHolder(@NonNull View itemView) {
@@ -143,6 +150,8 @@ public class DetalleComprobanteAdapter extends RecyclerView.Adapter<DetalleCompr
             tvSubtotal = itemView.findViewById(R.id.tvSubtotal);
             btnDelete = itemView.findViewById(R.id.btnDeleteProducto);
             btnInfo = itemView.findViewById(R.id.btnInfo);
+            tvDescuento = itemView.findViewById(R.id.tvDescuento);
+            tvPercentDesc = itemView.findViewById(R.id.tv_PercentDesc);
             btnDelete.setVisibility(View.VISIBLE);
             btnInfo.setVisibility(View.VISIBLE);
         }
@@ -154,9 +163,18 @@ public class DetalleComprobanteAdapter extends RecyclerView.Adapter<DetalleCompr
                 tvPrecio.setText(Utils.FormatoMoneda(detalle.precio, 2));
                 tvCantidad.setText(detalle.cantidad.toString());
                 tvCantidad.setInputType(InputType.TYPE_CLASS_PHONE);
-                tvSubtotal.setText(Utils.FormatoMoneda(detalle.Subtotal(), 2));
                 tvCantidad.setSelectAllOnFocus(true);
                 tvCantidad.setEnabled(!visualizacion);
+                tvPercentDesc.setText("-" + detalle.producto.descuento.toString() + "%");
+                //detalle.descuento = detalle.cantidad * (detalle.precio * detalle.producto.descuento/100);
+                tvDescuento.setText(Utils.FormatoMoneda(detalle.Descuento(detalle.producto.descuento), 2));
+                tvSubtotal.setText(Utils.FormatoMoneda(detalle.Subtotal() - detalle.descuento, 2));
+
+                if(detalle.producto.descuento>0)
+                    tvPercentDesc.setVisibility(View.VISIBLE);
+                else
+                    tvPercentDesc.setVisibility(View.GONE);
+
                 if (visualizacion) {
                     btnDelete.setVisibility(View.GONE);
                     btnInfo.setVisibility(View.GONE);
@@ -241,6 +259,7 @@ public class DetalleComprobanteAdapter extends RecyclerView.Adapter<DetalleCompr
                                     //notifyDataSetChanged();
                                     //CambiarPrecio(categoria);
                                 }
+                                tvDescuento.setText(Utils.FormatoMoneda(detalleComprobante.get(getAdapterPosition()).Descuento(detalleComprobante.get(getAdapterPosition()).producto.descuento), 2));
                                 tvSubtotal.setText(Utils.FormatoMoneda(detalleComprobante.get(getAdapterPosition()).Subtotal(), 2));
                             }
                             CalcularTotal();

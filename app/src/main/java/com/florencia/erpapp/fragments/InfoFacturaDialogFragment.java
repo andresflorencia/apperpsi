@@ -52,7 +52,7 @@ public class InfoFacturaDialogFragment extends AppCompatDialogFragment {
 
     private View view;
     private TextView txtNumFactura, txtInfoRight, txtInfoLeft, lblCant, lblDetalle, lblPUnit, lblSubtotal,
-            lblTotalesLeft, lblTotalesRight, lblLeyenda, lblEmpresa;
+            lblTotalesLeft, lblTotalesRight, lblLeyenda, lblEmpresa, lblDesc;
     private ProgressBar pbCargando;
     private ImageButton btnCerrar, btnShareW, btnShare;
     LinearLayout lyLotes, lyReglasPrecio, lyContent;
@@ -95,6 +95,7 @@ public class InfoFacturaDialogFragment extends AppCompatDialogFragment {
         btnShare = view.findViewById(R.id.btnShare);
         lblLeyenda = view.findViewById(R.id.txtLeyenda);
         lblEmpresa = view.findViewById(R.id.lblEmpresa);
+        lblDesc = view.findViewById(R.id.lblDesc);
 
         File miFile = new File(activity.getExternalMediaDirs()[0], Constants.FOLDER_FILES);
         if (!miFile.exists())
@@ -189,6 +190,7 @@ public class InfoFacturaDialogFragment extends AppCompatDialogFragment {
                                     txtInfoRight.setText(textRight);
 
                                     //lblDetalle.setBackground(getResources().getDrawable(R.drawable.bg_btn_gps));
+                                    Double desc0 = 0d, desc12 = 0d;
                                     for (DetalleComprobante detalle : comprobante.detalle) {
                                         lblCant.setText(lblCant.getText().toString().concat(detalle.cantidad.toString()).concat("\n"));
                                         lblDetalle.setText(lblDetalle.getText().toString().concat(
@@ -197,17 +199,26 @@ public class InfoFacturaDialogFragment extends AppCompatDialogFragment {
                                                         ? detalle.producto.nombreproducto.substring(0, 20) + "..." + detalle.producto.nombreproducto.substring(detalle.producto.nombreproducto.length() - 5)
                                                         : detalle.producto.nombreproducto)).concat("\n"));
                                         lblPUnit.setText(lblPUnit.getText().toString().concat(Utils.FormatoMoneda(detalle.precio, 2)).concat("\n"));
-                                        lblSubtotal.setText(lblSubtotal.getText().toString().concat(Utils.FormatoMoneda(detalle.Subtotal(), 2)).concat("\n"));
+                                        lblDesc.setText(lblDesc.getText().toString().concat(Utils.FormatoMoneda(detalle.descuento, 2)).concat("\n"));
+                                        lblSubtotal.setText(lblSubtotal.getText().toString().concat(Utils.FormatoMoneda(detalle.Subtotal() - detalle.descuento, 2)).concat("\n"));
+                                        if(detalle.producto.porcentajeiva>0)
+                                            desc12 += detalle.descuento;
+                                        else
+                                            desc0 += detalle.descuento;
                                     }
 
-                                    lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("SUBTOTAL 0%\n"));
-                                    lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("SUBTOTAL 12%\n"));
-                                    lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("IVA 12%\n"));
-                                    lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("TOTAL\n"));
+                                    lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("SUBTOTAL:\n"));
+                                    lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("SUBTOTAL 0% (+):\n"));
+                                    lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("SUBTOTAL 12% (+):\n"));
+                                    lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("DESCUENTO (-):\n"));
+                                    lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("IVA 12% (+):\n"));
+                                    lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("TOTAL:\n"));
 
+                                    lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda(comprobante.subtotal + comprobante.subtotaliva, 2).concat("\n")));
                                     lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda(comprobante.subtotal, 2).concat("\n")));
                                     lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda(comprobante.subtotaliva, 2).concat("\n")));
-                                    lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda((comprobante.total - comprobante.subtotal - comprobante.subtotaliva), 2).concat("\n")));
+                                    lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda(comprobante.descuento, 2).concat("\n")));
+                                    lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda((comprobante.total - comprobante.subtotal - comprobante.subtotaliva + comprobante.descuento), 2).concat("\n")));
                                     lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda(comprobante.total, 2).concat("\n")));
 
                                     lblLeyenda.setVisibility(View.VISIBLE);
@@ -274,17 +285,24 @@ public class InfoFacturaDialogFragment extends AppCompatDialogFragment {
                                                         ? detalle.producto.nombreproducto.substring(0, 20) + "..." + detalle.producto.nombreproducto.substring(detalle.producto.nombreproducto.length() - 5)
                                                         : detalle.producto.nombreproducto)).concat("\n"));
                                         lblPUnit.setText(lblPUnit.getText().toString().concat(Utils.FormatoMoneda(detalle.precio, 2)).concat("\n"));
-                                        lblSubtotal.setText(lblSubtotal.getText().toString().concat(Utils.FormatoMoneda(detalle.Subtotal(), 2)).concat("\n"));
+                                        //lblSubtotal.setText(lblSubtotal.getText().toString().concat(Utils.FormatoMoneda(detalle.Subtotal(), 2)).concat("\n"));
+                                        lblDesc.setText(lblDesc.getText().toString().concat(Utils.FormatoMoneda(detalle.descuento, 2)).concat("\n"));
+                                        lblSubtotal.setText(lblSubtotal.getText().toString().concat(Utils.FormatoMoneda(detalle.Subtotal() - detalle.descuento, 2)).concat("\n"));
                                     }
 
-                                    lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("SUBTOTAL 0%\n"));
-                                    lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("SUBTOTAL 12%\n"));
-                                    lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("IVA 12%\n"));
-                                    lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("TOTAL\n"));
 
+                                    lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("SUBTOTAL:\n"));
+                                    lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("SUBTOTAL 0% (+):\n"));
+                                    lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("SUBTOTAL 12% (+):\n"));
+                                    lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("DESCUENTO (-):\n"));
+                                    lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("IVA 12% (+):\n"));
+                                    lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("TOTAL:\n"));
+
+                                    lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda(pedido.subtotal + pedido.subtotaliva, 2).concat("\n")));
                                     lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda(pedido.subtotal, 2).concat("\n")));
                                     lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda(pedido.subtotaliva, 2).concat("\n")));
-                                    lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda((pedido.total - pedido.subtotal - pedido.subtotaliva), 2).concat("\n")));
+                                    lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda(pedido.descuento, 2).concat("\n")));
+                                    lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda((pedido.total - pedido.subtotal - pedido.subtotaliva + pedido.descuento), 2).concat("\n")));
                                     lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda(pedido.total, 2).concat("\n")));
                                 }
                                 pbCargando.setVisibility(View.GONE);

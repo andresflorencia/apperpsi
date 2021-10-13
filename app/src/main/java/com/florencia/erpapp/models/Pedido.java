@@ -101,11 +101,13 @@ public class Pedido {
             sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
             for (int i = 0; i < this.detalle.size(); i++) {
                 sqLiteDatabase.execSQL("INSERT OR REPLACE INTO " +
-                                "detallepedido(pedidoid, orden, cantidad, factorconversion, precio, idproducto, observacion, usuarioid, porcentajeiva, codigoproducto, nombreproducto) " +
-                                "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                                "detallepedido(pedidoid, orden, cantidad, factorconversion, precio, idproducto, observacion, usuarioid, " +
+                                "porcentajeiva, codigoproducto, nombreproducto, descuento, porcentajedesc) " +
+                                "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                         new String[]{idpedido.toString(), String.valueOf(i + 1), detalle.get(i).cantidad.toString(), detalle.get(i).factorconversion.toString(),
                                 detalle.get(i).precio.toString(), detalle.get(i).producto.idproducto.toString(), detalle.get(i).observacion,
-                                String.valueOf(SQLite.usuario.IdUsuario), detalle.get(i).producto.porcentajeiva.toString(), detalle.get(i).producto.codigoproducto, detalle.get(i).producto.nombreproducto});
+                                String.valueOf(SQLite.usuario.IdUsuario), detalle.get(i).producto.porcentajeiva.toString(), detalle.get(i).producto.codigoproducto,
+                                detalle.get(i).producto.nombreproducto, detalle.get(i).descuento.toString(), detalle.get(i).producto.descuento.toString()});
 
                 this.detalle.get(i).pedidoid = idpedido;
             }
@@ -327,12 +329,14 @@ public class Pedido {
         this.total = 0d;
         this.subtotaliva = 0d;
         this.subtotal = 0d;
+        this.descuento = 0d;
         for (DetallePedido item : this.detalle) {
             this.total += item.Subtotaliva();
             if (item.producto.porcentajeiva > 0)
                 this.subtotaliva += item.Subtotal();
             else
                 this.subtotal += item.Subtotal();
+            this.descuento += item.descuento;
         }
         return this.total;
     }

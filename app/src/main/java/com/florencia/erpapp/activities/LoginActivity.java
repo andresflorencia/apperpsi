@@ -79,6 +79,9 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        if (getIntent().getBooleanExtra("EXIT", false)) {
+            finish();
+        }
         SQLite.sqlDB = new SQLite(getApplicationContext());
         Utilidades.createdb(this);
         pbProgreso = new ProgressDialog(this);
@@ -110,7 +113,6 @@ public class LoginActivity extends AppCompatActivity {
         if (SQLite.configuracion != null) {
             SQLite.configuracion.url_ws = (SQLite.configuracion.hasSSL ? Constants.HTTPs : Constants.HTTP)
                     + SQLite.configuracion.urlbase
-                    + (SQLite.configuracion.hasSSL ? "" : "/erpproduccion")
                     + Constants.ENDPOINT;
         }
 
@@ -516,7 +518,6 @@ public class LoginActivity extends AppCompatActivity {
             btnLogin.setEnabled(true);
             SQLite.configuracion.url_ws = (SQLite.configuracion.hasSSL ? Constants.HTTPs : Constants.HTTP)
                     + SQLite.configuracion.urlbase
-                    + (SQLite.configuracion.hasSSL ? "" : "/erpproduccion")
                     + Constants.ENDPOINT;
 
             //VOLVEMOS A INSTANCIAR EL OBJETO RETROFIT CON LA NUEVA URL

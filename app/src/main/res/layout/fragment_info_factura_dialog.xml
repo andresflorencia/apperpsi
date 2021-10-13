@@ -134,7 +134,8 @@
                                 android:text="CANT"
                                 android:textAlignment="center"
                                 android:textColor="@android:color/black"
-                                android:textStyle="bold" />
+                                android:textStyle="bold"
+                                android:textSize="12sp"/>
 
                             <TextView
                                 android:layout_width="0dp"
@@ -143,7 +144,8 @@
                                 android:text="DETALLE"
                                 android:textAlignment="center"
                                 android:textColor="@android:color/black"
-                                android:textStyle="bold" />
+                                android:textStyle="bold"
+                                android:textSize="12sp" />
 
                             <TextView
                                 android:layout_width="0dp"
@@ -152,16 +154,28 @@
                                 android:text="P. UNIT"
                                 android:textAlignment="center"
                                 android:textColor="@android:color/black"
-                                android:textStyle="bold" />
+                                android:textStyle="bold"
+                                android:textSize="12sp"/>
 
                             <TextView
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="TOTAL"
+                                android:text="DESC"
                                 android:textAlignment="center"
                                 android:textColor="@android:color/black"
-                                android:textStyle="bold" />
+                                android:textStyle="bold"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="SUBTOT"
+                                android:textAlignment="center"
+                                android:textColor="@android:color/black"
+                                android:textStyle="bold"
+                                android:textSize="12sp" />
                         </LinearLayout>
 
                         <LinearLayout
@@ -191,6 +205,17 @@
 
                             <TextView
                                 android:id="@+id/lblPUnit"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:paddingRight="5dp"
+                                android:text=""
+                                android:textAlignment="textEnd"
+                                android:textColor="@android:color/black"
+                                android:textSize="11sp" />
+
+                            <TextView
+                                android:id="@+id/lblDesc"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
@@ -234,7 +259,7 @@
                                 android:text=""
                                 android:textAlignment="textEnd"
                                 android:textColor="@android:color/black"
-                                android:textSize="15sp"
+                                android:textSize="14sp"
                                 android:textStyle="bold" />
 
                             <TextView
@@ -247,7 +272,7 @@
                                 android:text=""
                                 android:textAlignment="textEnd"
                                 android:textColor="@android:color/black"
-                                android:textSize="15sp" />
+                                android:textSize="14sp" />
                         </LinearLayout>
                     </LinearLayout>
 

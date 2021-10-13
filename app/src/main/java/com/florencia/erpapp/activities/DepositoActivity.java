@@ -343,13 +343,13 @@ public class DepositoActivity extends AppCompatActivity implements View.OnClickL
             miIngreso.fotos.clear();
             miIngreso.fotos.addAll(fotoAdapter.listFoto);
 
-            //SubirDeposito(DepositoActivity.this);  DESCOMENTAR
-            if(miIngreso.Save()){
+            SubirDeposito(DepositoActivity.this);  //DESCOMENTAR
+            /*if(miIngreso.Save()){
                 Banner.make(rootView, DepositoActivity.this, Banner.SUCCESS, Constants.MSG_DATOS_GUARDADOS, Banner.BOTTOM, 3000).show();
                 LimpiarDatos();
             }else{
                 Banner.make(rootView, DepositoActivity.this, Banner.ERROR, Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM, 3000).show();
-            }
+            }*/
         } catch (Exception e) {
             Log.d(TAG, e.getMessage());
             Banner.make(rootView, DepositoActivity.this, Banner.ERROR, "Excepcion: " + Constants.MSG_DATOS_NO_GUARDADOS, Banner.BOTTOM, 3000).show();
@@ -506,7 +506,7 @@ public class DepositoActivity extends AppCompatActivity implements View.OnClickL
         dtpDialog.show();
     }
 
-    private void BuscarTotalVenta(String fecha) {
+    private void BuscarTotalVenta2(String fecha) {
         try {
             if (toolbar.getMenu() != null) {
                 toolbar.getMenu().findItem(R.id.option_save).setVisible(true);
@@ -544,7 +544,7 @@ public class DepositoActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
-    private void BuscarTotalVenta2(String fecha) {
+    private void BuscarTotalVenta(String fecha) {
         try {
             pgCargando.setVisibility(View.VISIBLE);
             btnRefresh.setVisibility(View.GONE);

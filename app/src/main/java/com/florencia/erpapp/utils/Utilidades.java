@@ -3,6 +3,7 @@ package com.florencia.erpapp.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -61,6 +62,14 @@ public class Utilidades {
         SQLite.sqlDB.SQLEstructura(context.getString(R.string.dbVersion));
     }
 
+    public static boolean deletedb(Context context){
+        try {
+            return context.deleteDatabase(SQLite.DB_NAME);
+        }catch (Exception ex){
+            Log.d("TAGUTIL", ex.getMessage());
+        }
+        return false;
+    }
     public static String[] getDateTime() {
         final Calendar c = Calendar.getInstance();
         String dateTime[] = new String[2];

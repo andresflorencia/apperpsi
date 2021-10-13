@@ -333,7 +333,7 @@ public class AceptaTransferenciaActivity extends AppCompatActivity implements Vi
 
     private void DialogoGuardar(boolean aceptar){
 
-        if (!SQLite.usuario.VerificaPermiso(this, Constants.RECEPCION_INVENTARIO, "escritura")) {
+        if (!SQLite.usuario.VerificaPermiso(this, Constants.ACEPTA_TRANSFERENCIA, "escritura")) {
             Banner.make(rootView, AceptaTransferenciaActivity.this, Banner.ERROR, "No tiene permisos para registrar recepciones de inventario.", Banner.BOTTOM, 3000).show();
             return;
         }
@@ -428,6 +428,7 @@ public class AceptaTransferenciaActivity extends AppCompatActivity implements Vi
                                 if(data != null){
                                     mitransferencia.sucursalenvia = data.get("sucenvia").getAsString();
                                     mitransferencia.sucursalrecibe = data.get("sucrecibe").getAsString();
+                                    mitransferencia.claveacceso = mitransferencia.codigotransaccion.concat(mitransferencia.fechacelular);
                                 }
                                 if (mitransferencia.Save(false)) {
                                     Banner.make(rootView, AceptaTransferenciaActivity.this, Banner.SUCCESS, Constants.MSG_PROCESO_COMPLETADO, Banner.BOTTOM, 3000).show();

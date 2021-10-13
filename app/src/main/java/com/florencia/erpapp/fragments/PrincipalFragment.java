@@ -238,10 +238,10 @@ public class PrincipalFragment extends Fragment implements View.OnClickListener,
         //Uri selectedUri = Uri.parse("file://" + Environment.getExternalStorageDirectory() + "/tuCarpeta");
         try {
             Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setDataAndType(pickerInitialUri, "application/vnd.android.package-archive");
             //intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.setDataAndType(pickerInitialUri, "application/vnd.android.package-archive");
             startActivity(intent);//Intent.createChooser(intent, "Open folder"));
         } catch (Exception e) {
             Log.d(TAG, e.getMessage());

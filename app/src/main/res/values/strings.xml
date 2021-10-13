@@ -81,6 +81,7 @@
         ALTER TABLE producto ADD COLUMN tipo VARCHAR(5) DEFAULT \'P\';
         ALTER TABLE producto ADD COLUMN clasificacionid INTEGER DEFAULT 0;
         ALTER TABLE producto ADD COLUMN nombreclasificacion VARCHAR(50) DEFAULT \'Sin clasificación\';
+        ALTER TABLE producto ADD COLUMN descuento DOUBLE DEFAULT 0;
     </string>
 
     <string name="dbCliente">
@@ -183,6 +184,7 @@
         ALTER TABLE detallecomprobante ADD COLUMN codigoproducto VARCHAR(100) DEFAULT \'\';
         ALTER TABLE detallecomprobante ADD COLUMN nombreproducto VARCHAR(250) DEFAULT \'\';
         ALTER TABLE detallecomprobante ADD COLUMN marquetas DOUBLE DEFAULT 0;
+        ALTER TABLE detallecomprobante ADD COLUMN porcentajedesc DOUBLE DEFAULT 0;
     </string>
 
     <string name="dbPedido">
@@ -230,6 +232,8 @@
         ALTER TABLE detallepedido ADD COLUMN porcentajeiva DOUBLE DEFAULT 0;
         ALTER TABLE detallepedido ADD COLUMN codigoproducto  VARCHAR(150) DEFAULT \'\';
         ALTER TABLE detallepedido ADD COLUMN nombreproducto  VARCHAR(250) DEFAULT \'\';
+        ALTER TABLE detallepedido ADD COLUMN descuento DOUBLE DEFAULT 0;
+        ALTER TABLE detallepedido ADD COLUMN porcentajedesc DOUBLE DEFAULT 0;
     </string>
 
     <string name="dbPermiso">
@@ -436,4 +440,6 @@
     <string name="leyendaFactura2">Este comprobante no tiene validez tributaria.
     Puede revisar su factura en https://comprobantes.sanisidrosa.com/,
     por primera vez utilice como usuario y contraseña su número de identificación.</string>
+    <string name="leyendaRestablecer"><![CDATA[¿Desea restablecer los datos de la aplicación?
+        <br/><br/><strong>NOTA:</strong> Se perderán todos los datos almacenados hasta el momento.]]></string>
 </resources>

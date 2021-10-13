@@ -155,7 +155,7 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.Produc
 
     class ProductoViewHolder extends RecyclerView.ViewHolder {
 
-        TextView tvNombreProducto, tvPrecio, tvStock;
+        TextView tvNombreProducto, tvPrecio, tvStock, tvPercentDesc;
         ImageButton btnInfo;
         CheckBox ckIva;
 
@@ -166,6 +166,7 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.Produc
             tvStock = itemView.findViewById(R.id.tv_Stock);
             ckIva = itemView.findViewById(R.id.ckIva);
             btnInfo = itemView.findViewById(R.id.btnInfo);
+            tvPercentDesc = itemView.findViewById(R.id.tv_PercentDesc);
         }
 
         void bindProducto(final Producto producto) {
@@ -186,7 +187,14 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.Produc
                 } else {
                     ckIva.setVisibility(View.VISIBLE);
                     btnInfo.setVisibility(View.VISIBLE);
-                    tvPrecio.setText("PVP: " + Utils.FormatoMoneda(producto.getPrecioSugerido(), 2));
+                    tvPercentDesc.setVisibility(View.GONE);
+                    tvPrecio.setText("PVP: " + Utils.FormatoMoneda(producto.getPrecioSugerido(false), 2));
+
+                    if(producto.descuento>0) {
+                        tvPercentDesc.setText("-" + producto.descuento + "%");
+                        tvPercentDesc.setVisibility(View.VISIBLE);
+                    }
+
                     if (producto.stock > 0 && producto.tipo.equalsIgnoreCase("P")) {
                         tvStock.setText("Stock: " + Utils.RoundDecimal(producto.stock, 2));
                         tvStock.setTextColor(Color.BLACK);

@@ -443,7 +443,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                                     detalleAdapter.CalcularTotal();
                                     comprobante.getTotal();
                                     detalleAdapter.notifyDataSetChanged();
-                                    setSubtotales(comprobante.total, comprobante.subtotal, comprobante.subtotaliva);
+                                    setSubtotales(comprobante.total, comprobante.subtotal, comprobante.subtotaliva, comprobante.descuento);
                                     lblLeyendaCF.setVisibility(View.GONE);
                                     rbEfectivo.setChecked(comprobante.formapago == 1);
                                     rbCredito.setChecked(comprobante.formapago == 0);
@@ -557,6 +557,8 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                     newDetalle.producto.idproducto = miDetalle.producto.idproducto;
                     newDetalle.cantidad = miDetalle.cantidad;
                     newDetalle.precio = miDetalle.precio;
+                    newDetalle.producto.descuento = miDetalle.producto.descuento;
+                    newDetalle.descuento = miDetalle.descuento;
                     newDetalle.producto.porcentajeiva = miDetalle.producto.porcentajeiva;
                     newDetalle.numerolote = miLote.numerolote;
                     newDetalle.fechavencimiento = miLote.fechavencimiento;
@@ -592,6 +594,8 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                             newDetalle.producto.stock = miDetalle.producto.stock;
                             newDetalle.stock = 0d;//miDetalle.producto.stock;
                             newDetalle.precio = miDetalle.precio;
+                            newDetalle.producto.descuento = miDetalle.producto.descuento;
+                            newDetalle.descuento = miDetalle.descuento;
                             newDetalle.producto.porcentajeiva = miDetalle.producto.porcentajeiva;
                             newDetalle.cantidad = lote.stock;
                             newDetalle.fechavencimiento = lote.fechavencimiento;
@@ -620,6 +624,8 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                             newDetalle.producto.stock = miDetalle.producto.stock - cantFaltante;
                             newDetalle.stock = miDetalle.producto.tipo.equals("P") ? miLote.stock : 0;
                             newDetalle.precio = miDetalle.precio;
+                            newDetalle.producto.descuento = miDetalle.producto.descuento;
+                            newDetalle.descuento = miDetalle.descuento;
                             newDetalle.cantidad = cantFaltante;
                             newDetalle.fechavencimiento = lote.fechavencimiento;
                             newDetalle.preciocosto = lote.preciocosto;
@@ -878,9 +884,11 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                             printer.printArray(Datos, 0, 0);
                         }
                         printer.printCustom("------------------------------------------", 0, 1);
-                        printer.printCustom("SUB TOTAL 0%: " + Utils.FormatoMoneda(comprobante.subtotal, 2), 0, 2);
-                        printer.printCustom("SUB TOTAL 12%: " + Utils.FormatoMoneda(comprobante.subtotaliva, 2), 0, 2);
-                        printer.printCustom("IVA 12%: " + Utils.FormatoMoneda((comprobante.total - comprobante.subtotal - comprobante.subtotaliva), 2), 0, 2);
+                        printer.printCustom("SUB TOTAL: " + Utils.FormatoMoneda(comprobante.subtotal + comprobante.subtotaliva, 2), 0, 2);
+                        printer.printCustom("SUB TOTAL 0% (+): " + Utils.FormatoMoneda(comprobante.subtotal, 2), 0, 2);
+                        printer.printCustom("SUB TOTAL 12% (+): " + Utils.FormatoMoneda(comprobante.subtotaliva, 2), 0, 2);
+                        printer.printCustom("DESCUENTO (-): " + Utils.FormatoMoneda(comprobante.descuento, 2), 0, 2);
+                        printer.printCustom("IVA 12% (+): " + Utils.FormatoMoneda((comprobante.total - comprobante.subtotal - comprobante.subtotaliva + comprobante.descuento), 2), 0, 2);
                         printer.printCustom("TOTAL: " + Utils.FormatoMoneda(comprobante.total, 2), 0, 2);
                         printer.printCustom("", 1, 1);
                         printer.printCustom("FORMA PAGO: " + (comprobante.formapago == 0 ? "CREDITO" : "EFECTIVO"), 0, 0);
@@ -975,10 +983,12 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
-    public void setSubtotales(Double total, Double subtotal, Double subtotaliva) {
-        lblSubtotales.setText("Subtotal 0%:    " + Utils.FormatoMoneda(subtotal, 2) +
+    public void setSubtotales(Double total, Double subtotal, Double subtotaliva, Double descuento) {
+        lblSubtotales.setText(
+                "Subtotal 0%:    " + Utils.FormatoMoneda(subtotal, 2) +
                 "\nSubtotal 12%:    " + Utils.FormatoMoneda(subtotaliva, 2) +
-                "\nIVA 12%:    " + Utils.FormatoMoneda((total - subtotaliva - subtotal), 2));
+                "\nDescuento:    " + Utils.FormatoMoneda(descuento, 2) +
+                "\nIVA 12%:    " + Utils.FormatoMoneda((total - subtotaliva - subtotal + descuento), 2));
     }
 
     @Override
@@ -1004,7 +1014,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                     comprobante.detalle.clear();
                     comprobante.detalle.addAll(detalleAdapter.detalleComprobante);
                     comprobante.getTotal();
-                    this.setSubtotales(comprobante.total, comprobante.subtotal, comprobante.subtotaliva);
+                    this.setSubtotales(comprobante.total, comprobante.subtotal, comprobante.subtotaliva, comprobante.descuento);
                     detalleAdapter.CambiarPrecio(cliente.categoria.equals("") ? "0" : cliente.categoria, rbCredito.isChecked());
                     detalleAdapter.CalcularTotal();
                     detalleAdapter.notifyDataSetChanged();

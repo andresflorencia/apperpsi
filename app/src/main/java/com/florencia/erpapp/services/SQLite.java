@@ -20,7 +20,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 public class SQLite extends SQLiteOpenHelper {
-    private static String DB_NAME = "sanisidro.db";
+    public static String DB_NAME = "sanisidro.db";
     public static SQLite sqlDB;
     public static Usuario usuario;
     public static Configuracion configuracion;
@@ -121,8 +121,7 @@ public class SQLite extends SQLiteOpenHelper {
         return nD;
     }
 
-    public void
-    SQLEstructura(String S) {
+    public void SQLEstructura(String S) {
         SQLiteDatabase sqLiteDatabase;
         sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
         for (String str : S.split(";")) {

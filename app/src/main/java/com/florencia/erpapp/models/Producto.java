@@ -9,6 +9,7 @@ import android.os.Build;
 import android.util.Log;
 
 import com.florencia.erpapp.services.SQLite;
+import com.florencia.erpapp.utils.Utils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -24,7 +25,7 @@ public class Producto {
     public Integer idproducto;
     public String codigoproducto, nombreproducto, detalleproducto, tipo, nombreclasificacion;
     public Integer unidadid, unidadesporcaja, iva, ice, establecimientoid, clasificacionid;
-    public Double factorconversion, pvp, pvp1, pvp2, pvp3, pvp4, pvp5, stock, porcentajeiva, preciocosto;
+    public Double factorconversion, pvp, pvp1, pvp2, pvp3, pvp4, pvp5, stock, porcentajeiva, preciocosto, descuento;
     public String numerolote, fechavencimiento;
     public List<Lote> lotes;
     public List<Regla> reglas;
@@ -61,9 +62,10 @@ public class Producto {
         this.precioscategoria = new ArrayList<>();
         this.clasificacionid = 0;
         this.nombreclasificacion = "";
+        this.descuento = 0d;
     }
 
-    public Double getPrecioSugerido() {
+    public Double getPrecioSugerido(boolean aplicadesc) {
         Double pvpR = this.getPrecio("R");
         if (this.precioscategoria.size() > 0) {
             for (PrecioCategoria pc : this.precioscategoria) {
@@ -73,6 +75,8 @@ public class Producto {
                 }
             }
         }
+        if(aplicadesc)
+            pvpR -= Utils.RoundDecimal(pvpR * this.descuento/100, 2);
         return pvpR + (pvpR * this.porcentajeiva / 100);
     }
 
@@ -82,14 +86,14 @@ public class Producto {
             this.sqLiteDatabase.execSQL("INSERT OR REPLACE INTO " +
                             "producto(idproducto, codigoproducto, nombreproducto, pvp, unidadid, unidadesporcaja, iva," +
                             "ice, factorconversion, pvp1, pvp2, pvp3, pvp4, pvp5, stock, porcentajeiva, establecimientoid, " +
-                            "tipo, clasificacionid, nombreclasificacion) " +
-                            "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                            "tipo, clasificacionid, nombreclasificacion, descuento) " +
+                            "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     new String[]{this.idproducto.toString(), this.codigoproducto, this.nombreproducto, this.pvp.toString(),
                             this.unidadid.toString(), this.unidadesporcaja.toString(), this.iva.toString(),
                             this.ice.toString(), this.factorconversion.toString(), this.pvp1.toString(), this.pvp2.toString(),
                             this.pvp3.toString(), this.pvp4.toString(), this.pvp5.toString(), this.stock.toString(),
                             this.porcentajeiva.toString(), this.establecimientoid.toString(), this.tipo, this.clasificacionid.toString(),
-                            this.nombreclasificacion});
+                            this.nombreclasificacion, this.descuento.toString()});
             this.sqLiteDatabase.close();
             Log.d("TAGPRODUCTO", "SAVE PRODUCTO OK");
             Lote.InsertMultiple(this.idproducto, this.establecimientoid, this.lotes);
@@ -126,6 +130,7 @@ public class Producto {
             Item.tipo = cursor.getString(17);
             Item.clasificacionid = cursor.getInt(18);
             Item.nombreclasificacion = cursor.getString(19);
+            Item.descuento = cursor.getDouble(20);
             Item.lotes = Lote.getAll(Item.idproducto, Item.establecimientoid);
             Item.reglas = Regla.getAll(Item.idproducto, SQLite.usuario.establecimiento_fact);
             Item.precioscategoria = PrecioCategoria.getAll(Item.idproducto, SQLite.usuario.establecimiento_fact);
@@ -161,13 +166,13 @@ public class Producto {
             Item.clasificacionid = cursor.getInt(18);
             Item.nombreclasificacion = cursor.getString(19);
             Lote milote = new Lote();
-            milote.productoid = cursor.getInt(20);
-            milote.numerolote = cursor.getString(21);
-            milote.stock = cursor.getDouble(22);
-            milote.preciocosto = cursor.getDouble(23);
-            milote.fechavencimiento = cursor.getString(24);
-            milote.longdate = cursor.getLong(25);
-            milote.establecimientoid = cursor.getInt(26);
+            milote.productoid = cursor.getInt(21);
+            milote.numerolote = cursor.getString(22);
+            milote.stock = cursor.getDouble(23);
+            milote.preciocosto = cursor.getDouble(24);
+            milote.fechavencimiento = cursor.getString(25);
+            milote.longdate = cursor.getLong(26);
+            milote.establecimientoid = cursor.getInt(27);
             Item.lotes.add(milote);
             //Item.lotes = Lote.getAll(Item.idproducto, Item.establecimientoid);
         } catch (Exception e) {

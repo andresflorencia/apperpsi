@@ -43,6 +43,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -252,7 +254,9 @@ public class Utils {
     }
 
     public static Double RoundDecimal(Double numero, Integer numeroDecimales) {
-        return (double) Math.round(numero * Math.pow(10, numeroDecimales)) / Math.pow(10, numeroDecimales);
+        BigDecimal result = BigDecimal.valueOf(numero);
+        //return (double) Math.round(numero * Math.pow(10, numeroDecimales)) / Math.pow(10, numeroDecimales);
+        return result.setScale(numeroDecimales, RoundingMode.HALF_UP).doubleValue();
     }
 
     public static void verificarPermisos(Activity context) {
@@ -500,10 +504,12 @@ public class Utils {
 
     public static void DescargaApk(Context c, String url) {
         try {
-            Uri uri = Uri.parse(url);
+            /*Uri uri = Uri.parse(url);
             Intent i = new Intent(Intent.ACTION_VIEW);
             i.setDataAndType(uri, "text/html");
-            i.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            i.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);*/
+            Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             c.startActivity(i);
         } catch (Exception e) {
             Log.d("TAG", e.getMessage());

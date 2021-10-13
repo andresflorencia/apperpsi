@@ -321,7 +321,7 @@ public class Usuario {
         return editor.commit();
     }
 
-    public boolean CerrarSesionLocal(Context context) {
+    public static boolean CerrarSesionLocal(Context context) {
         //Crea preferencia
         SharedPreferences sharedPreferences = context.getSharedPreferences("DatosSesion", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit()
@@ -443,6 +443,19 @@ public class Usuario {
             Log.d(TAG, "Update(): " + ex.getMessage());
             return false;
         }
+    }
+
+    public static int numUsuarios() {
+        int cant = 0;
+        try {
+            sqLiteDatabase = SQLite.sqlDB.getWritableDatabase();
+            Cursor cursor = sqLiteDatabase.rawQuery("SELECT COUNT(*) FROM usuario", null);
+            if (cursor.moveToFirst())
+                cant = cursor.getInt(0);
+        } catch (Exception e) {
+            Log.d(TAG, "numUsuarios(): " + e.getMessage());
+        }
+        return cant;
     }
 }
 

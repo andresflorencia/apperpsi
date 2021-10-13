@@ -96,6 +96,7 @@ public class InfoItemDialogFragment extends AppCompatDialogFragment {
                                     .concat("Clasificación:\n")
                                     .concat("PVP Normal:\n")
                                     .concat("IVA:\n")
+                                    .concat(producto.descuento>0?"Descuento:\n": "")
                                     .concat(producto.unidadesporcaja > 0 ? "U/Caja:\n" : "")
                                     .concat(producto.tipo.equalsIgnoreCase("S") ? "" : "Stock:\n")
                                     .concat(producto.lotes.size() > 0 ? "\n\nLOTES:" : "");
@@ -103,8 +104,9 @@ public class InfoItemDialogFragment extends AppCompatDialogFragment {
                             textRight = textRight.concat(producto.codigoproducto).concat("\n")
                                     .concat(producto.tipo.equalsIgnoreCase("S") ? "SERVICIO" : "PRODUCTO").concat("\n")
                                     .concat(producto.nombreclasificacion).concat("\n")
-                                    .concat(Utils.FormatoMoneda(producto.getPrecioSugerido(), 2).concat("\n"))
+                                    .concat(Utils.FormatoMoneda(producto.getPrecioSugerido(false), 2).concat("\n"))
                                     .concat(producto.porcentajeiva > 0 ? "Si" : "No").concat("\n")
+                                    .concat(producto.descuento>0? producto.descuento + "% -> " + Utils.FormatoMoneda(producto.getPrecioSugerido(true), 2) +"\n": "")
                                     .concat(producto.unidadesporcaja > 0 ? producto.unidadesporcaja.toString() + "\n" : "")
                                     .concat(producto.tipo.equalsIgnoreCase("S") ? "" : producto.stock.toString());
 

@@ -4,12 +4,8 @@ package com.florencia.erpapp.utils;
 public class Constants {
 
     public static final String PING_Server = "ping -c 1 -w 2 ";
-    //public static final String WEBSERVICE = "http://192.168.0.9/erpproduccion/index.php/wsmovil2/";
-    //public static final String BASEURL = "192.168.0.9";
-    public static final String WEBSERVICE = "http://192.168.100.146/erpproduccion/index.php/wsmovil2/";
-    public static final String BASEURL = "192.168.100.146";
-    //public static final String WEBSERVICE = "https://pruebas.sanisidrosa.com/index.php/wsmovil2/";
-    //public static final String BASEURL = "sanisidrosa.com";
+    //public static final String WS_EMPRESAS = "http://192.168.100.168/pagogsi/index.php/";
+    public static final String WS_EMPRESAS = "https://pagos.sanisidrosa.com/index.php/";
     public static final String HTTP  = "http://";
     public static final String HTTPs = "https://";
     public static final String ENDPOINT = "/index.php/wsmovil2/";
@@ -36,6 +32,7 @@ public class Constants {
     public static final String RECEPCION_INVENTARIO = "in/recepcion";
     public static final String TRANSFERENCIA_INVENTARIO = "in/transferencia";
     public static final String PEDIDO_INVENTARIO = "in/pedido";
+    public static final String ACEPTA_TRANSFERENCIA = "in/aceptatransf";
 
     public static final String CLAVE_SEGURIDAD = "T3cn0l0g14_";
     public static final String URL_DOWNLOAD_APK = "downloadapk";

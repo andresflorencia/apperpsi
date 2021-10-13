@@ -30,6 +30,7 @@ import com.florencia.erpapp.models.Comprobante;
 import com.florencia.erpapp.models.Ingreso;
 import com.florencia.erpapp.models.Pedido;
 import com.florencia.erpapp.models.PedidoInventario;
+import com.florencia.erpapp.services.SQLite;
 import com.florencia.erpapp.utils.Constants;
 import com.florencia.erpapp.utils.Utils;
 import com.makeramen.roundedimageview.RoundedImageView;
@@ -404,6 +405,12 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
 
             itemView.setOnLongClickListener(
                     v -> {
+                        if(tipobusqueda.equals("01")){
+                            if(!SQLite.usuario.VerificaPermiso(v.getContext(), Constants.PUNTO_VENTA, "borrar")){
+                                Utils.showErrorDialog(activity, "Atención!", "No tiene permiso para eliminar facturas.");
+                                return false;
+                            }
+                        }
                         String secuencial = "";
                         switch (tipobusqueda) {
                             case "01":
@@ -491,9 +498,13 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
             btnAnular.setOnClickListener(
                     v -> {
                         String secuencial = "";
-                        if (tipobusqueda.equals("01"))
+                        if (tipobusqueda.equals("01")) {
+                            if(!SQLite.usuario.VerificaPermiso(v.getContext(), Constants.PUNTO_VENTA, "borrar")){
+                                Utils.showErrorDialog(activity, "Atención!", "No tiene permiso para eliminar facturas.");
+                                return;
+                            }
                             secuencial = listComprobantes.get(getAdapterPosition()).codigotransaccion;
-                        else if (tipobusqueda.equals("PC"))
+                        }else if (tipobusqueda.equals("PC"))
                             secuencial = listPedidos.get(getAdapterPosition()).secuencialpedido;
                         else if (tipobusqueda.equals("PI"))
                             secuencial = listPedidosInv.get(getAdapterPosition()).codigopedido;

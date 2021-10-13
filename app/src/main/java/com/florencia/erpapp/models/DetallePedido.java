@@ -6,13 +6,14 @@ import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
 import com.florencia.erpapp.services.SQLite;
+import com.florencia.erpapp.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class DetallePedido {
     public Integer pedidoid, orden, usuarioid;
-    public Double cantidad, factorconversion, precio, porcentajeiva;
+    public Double cantidad, factorconversion, precio, porcentajeiva, descuento, porcentajedesc;
     public String observacion, codigoproducto, nombreproducto;
     public Producto producto;
 
@@ -28,6 +29,8 @@ public class DetallePedido {
         this.precio = 0d;
         this.observacion = "";
         this.producto = new Producto();
+        this.descuento = 0d;
+        this.porcentajedesc = 0d;
     }
 
     public Double Subtotal() {
@@ -43,10 +46,23 @@ public class DetallePedido {
     public Double Subtotaliva() {
         Double retorno = 0d;
         try {
-            retorno = this.cantidad * (this.precio + (this.precio * this.producto.porcentajeiva / 100));
+            //retorno = this.cantidad * (this.precio + (this.precio * this.producto.porcentajeiva / 100));
+            retorno = Utils.RoundDecimal (((this.cantidad * this.precio) - this.Descuento(this.producto.descuento)) * (1 + (this.producto.porcentajeiva /100)),2);
         } catch (Exception e) {
             Log.d(TAG, "Subtotaliva(): " + e.getMessage());
         }
+        return retorno;
+    }
+
+    public Double Descuento(Double percent){
+        Double retorno = 0d;
+        try{
+            retorno = Utils.RoundDecimal(this.cantidad * (this.precio * percent/100), 2);
+        }catch (Exception e){
+            Log.d(TAG, "Descuento(): " + e.getMessage());
+        }
+        Log.d(TAG, "Descuento: " + retorno);
+        this.descuento = retorno;
         return retorno;
     }
 
@@ -84,6 +100,8 @@ public class DetallePedido {
             Item.porcentajeiva = cursor.getDouble(8);
             Item.codigoproducto = cursor.getString(9);
             Item.nombreproducto = cursor.getString(10);
+            Item.descuento = cursor.getDouble(11);
+            Item.porcentajedesc = cursor.getDouble(12);
             if (Item.producto == null) {
                 Item.producto = new Producto();
                 Item.producto.idproducto = cursor.getInt(5);
@@ -91,6 +109,7 @@ public class DetallePedido {
                 Item.producto.nombreproducto = Item.nombreproducto;
                 Item.producto.porcentajeiva = Item.porcentajeiva;
             }
+            Item.producto.descuento = Item.porcentajedesc;
         } catch (Exception ec) {
             ec.printStackTrace();
             Log.d(TAG, "AsignaDatos(): " + ec.getMessage());
