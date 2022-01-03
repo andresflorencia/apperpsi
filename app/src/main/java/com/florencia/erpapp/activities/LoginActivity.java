@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -48,6 +49,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.shasin.notificationbanner.Banner;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -307,7 +309,15 @@ public class LoginActivity extends AppCompatActivity {
 
             IUsuario miInterface = retrofit.create(IUsuario.class);
 
-            String device = Build.MANUFACTURER.concat(" ").concat(Build.MODEL).concat(" - Android: ").concat(Build.VERSION.RELEASE);
+            String uid = Build.SERIAL != Build.UNKNOWN ? Build.SERIAL : Secure.getString(getContentResolver(), Secure.ANDROID_ID);
+            String serial = Utils.getSerialNumber();
+
+            String device = Build.MANUFACTURER.concat(" ").concat(Build.MODEL)
+                    .concat(" - Modelo: ").concat(Build.DEVICE)
+                    .concat(" - Android: ").concat(Build.VERSION.RELEASE)
+                    .concat(" - SDK: ").concat(Build.VERSION.SDK)
+                    .concat(" - UID: ").concat(uid)
+                    .concat(" - Serial: ").concat(serial);
 
             Call<JsonObject> call = miInterface.IniciarSesion(User, Clave, device);
             call.enqueue(new Callback<JsonObject>() {

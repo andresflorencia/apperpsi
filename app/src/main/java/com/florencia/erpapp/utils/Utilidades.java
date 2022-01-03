@@ -60,6 +60,8 @@ public class Utilidades {
         SQLite.sqlDB.SQLEstructura(context.getString(R.string.dbIngreso));
         SQLite.sqlDB.SQLEstructura(context.getString(R.string.dbDetalleIngreso));
         SQLite.sqlDB.SQLEstructura(context.getString(R.string.dbVersion));
+        SQLite.sqlDB.SQLEstructura(context.getString(R.string.dbRetencion));
+        SQLite.sqlDB.SQLEstructura(context.getString(R.string.dbDetalleRetencion));
     }
 
     public static boolean deletedb(Context context){

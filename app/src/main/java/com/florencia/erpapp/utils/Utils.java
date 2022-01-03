@@ -17,6 +17,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.MediaStore;
 import android.util.Base64;
 import android.util.Log;
@@ -43,6 +44,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
@@ -596,5 +598,33 @@ public class Utils {
         } catch (Exception e) {
             Log.d("TAGUTILS", "insert_image(): " + e.getMessage());
         }
+    }
+
+    public static String getSerialNumber() {
+        String serialNumber;
+
+        try {
+            Class<?> c = Class.forName("Android.os.SystemProperties");
+            Method get = c.getMethod("get", String.class);
+
+            serialNumber = (String) get.invoke(c, "gsm.sn1");
+            if (serialNumber == null || serialNumber.equals(""))
+                serialNumber = (String) get.invoke(c, "ril.serialnumber");
+            if (serialNumber == null || serialNumber.equals(""))
+                serialNumber = (String) get.invoke(c, "ro.serialno");
+            if (serialNumber == null || serialNumber.equals(""))
+                serialNumber = (String) get.invoke(c, "sys.serialnumber");
+            if (serialNumber == null || serialNumber.equals(""))
+                serialNumber = Build.SERIAL;
+
+            // If none of the methods above worked
+            if (serialNumber == null || serialNumber.equals(""))
+                serialNumber = "Desconocido";
+        } catch (Exception e) {
+            e.printStackTrace();
+            serialNumber = "Error: "+ e.getMessage();
+        }
+
+        return serialNumber;
     }
 }

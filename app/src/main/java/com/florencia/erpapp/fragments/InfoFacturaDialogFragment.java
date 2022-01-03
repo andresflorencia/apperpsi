@@ -34,6 +34,7 @@ import com.florencia.erpapp.R;
 import com.florencia.erpapp.models.Comprobante;
 import com.florencia.erpapp.models.DetalleComprobante;
 import com.florencia.erpapp.models.DetallePedido;
+import com.florencia.erpapp.models.DetalleRetencion;
 import com.florencia.erpapp.models.Ingreso;
 import com.florencia.erpapp.models.Pedido;
 import com.florencia.erpapp.models.Producto;
@@ -207,19 +208,30 @@ public class InfoFacturaDialogFragment extends AppCompatDialogFragment {
                                             desc0 += detalle.descuento;
                                     }
 
-                                    lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("SUBTOTAL:\n"));
+                                    //lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("SUBTOTAL:\n"));
                                     lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("SUBTOTAL 0% (+):\n"));
                                     lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("SUBTOTAL 12% (+):\n"));
                                     lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("DESCUENTO (-):\n"));
-                                    lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("IVA 12% (+):\n"));
+                                    lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("IVA 12% (+):\n\n"));
                                     lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("TOTAL:\n"));
+                                    if(comprobante.retencion != null && comprobante.retencion.detalle.size()>0){
+                                        lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("RETENCION (-):\n"));
+                                        lblTotalesLeft.setText(lblTotalesLeft.getText().toString().concat("A PAGAR:\n"));
+                                    }
 
-                                    lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda(comprobante.subtotal + comprobante.subtotaliva, 2).concat("\n")));
+                                    //lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda(comprobante.subtotal + comprobante.subtotaliva, 2).concat("\n")));
                                     lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda(comprobante.subtotal, 2).concat("\n")));
                                     lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda(comprobante.subtotaliva, 2).concat("\n")));
                                     lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda(comprobante.descuento, 2).concat("\n")));
-                                    lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda((comprobante.total - comprobante.subtotal - comprobante.subtotaliva + comprobante.descuento), 2).concat("\n")));
+                                    lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda((comprobante.total - comprobante.subtotal - comprobante.subtotaliva + comprobante.descuento), 2).concat("\n\n")));
                                     lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda(comprobante.total, 2).concat("\n")));
+                                    if(comprobante.retencion != null && comprobante.retencion.detalle.size()>0){
+                                        Double totret = 0d;
+                                        for(DetalleRetencion det:comprobante.retencion.detalle)
+                                            totret += det.valorretenido + det.valorretenidoiva;
+                                        lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda(totret, 2).concat("\n")));
+                                        lblTotalesRight.setText(lblTotalesRight.getText().toString().concat(Utils.FormatoMoneda(comprobante.total - totret, 2).concat("\n")));
+                                    }
 
                                     lblLeyenda.setVisibility(View.VISIBLE);
                                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

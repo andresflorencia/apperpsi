@@ -102,7 +102,8 @@
                                         android:background="@null"
                                         android:inputType="phone"
                                         android:selectAllOnFocus="true"
-                                        android:textAlignment="center" />
+                                        android:textAlignment="center"
+                                        android:maxLength="20"/>
                                 </com.google.android.material.textfield.TextInputLayout>
                             </LinearLayout>
 
@@ -342,7 +343,7 @@
                                     android:layout_marginRight="2dp"
                                     android:layout_weight="1"
                                     android:background="@drawable/border_radius_spinner"
-                                    android:hint="Celular"
+                                    android:hint="Contacto principal"
                                     android:paddingHorizontal="5dp"
                                     android:textColorHint="@color/texthint">
 
@@ -355,7 +356,8 @@
                                         android:inputType="phone"
                                         android:paddingHorizontal="5dp"
                                         android:selectAllOnFocus="true"
-                                        android:textAlignment="center" />
+                                        android:textAlignment="center"
+                                        android:maxLength="20"/>
                                 </com.google.android.material.textfield.TextInputLayout>
 
                                 <com.google.android.material.textfield.TextInputLayout
@@ -364,7 +366,7 @@
                                     android:layout_marginLeft="2dp"
                                     android:layout_weight="1"
                                     android:background="@drawable/border_radius_spinner"
-                                    android:hint="Convencional"
+                                    android:hint="Contacto secundario"
                                     android:paddingHorizontal="5dp"
                                     android:textColorHint="@color/texthint">
 
@@ -377,7 +379,8 @@
                                         android:inputType="phone"
                                         android:paddingHorizontal="5dp"
                                         android:selectAllOnFocus="true"
-                                        android:textAlignment="center" />
+                                        android:textAlignment="center"
+                                        android:maxLength="20"/>
                                 </com.google.android.material.textfield.TextInputLayout>
                             </LinearLayout>
 
@@ -416,7 +419,8 @@
                                     android:background="@null"
                                     android:inputType="textMultiLine|textCapCharacters"
                                     android:lines="3"
-                                    android:maxLines="3" />
+                                    android:maxLines="3"
+                                    android:maxLength="300"/>
                             </com.google.android.material.textfield.TextInputLayout>
                         </LinearLayout>
                     </LinearLayout>

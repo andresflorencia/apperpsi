@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -251,7 +252,13 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                              final PedidoInventario pedidoinv, final Ingreso ingreso) {
             try {
                 if (tipobusqueda.equals("01")) {
-                    tvNombreCliente.setText(comprobante.cliente.nip + " - " + comprobante.cliente.razonsocial);
+                    if(comprobante.cliente == null) {
+                        tvNombreCliente.setText("Factura con errores. Intente eliminar.");
+                        tvNombreCliente.setTextColor(Color.RED);
+                    }else {
+                        tvNombreCliente.setText(comprobante.cliente.nip + " - " + comprobante.cliente.razonsocial);
+                        tvNombreCliente.setTextColor(Color.BLACK);
+                    }
                     tvNumeroComprobante.setText("N°: ".concat(comprobante.codigotransaccion).concat(" - FP: ").concat(comprobante.formapago == 0 ? "CRÉDITO" : "EFECTIVO"));
                     tvTotal.setText("Total: " + Utils.FormatoMoneda(comprobante.total, 2));
                     tvFecha.setText("Fecha: " + comprobante.fechadocumento);
@@ -359,16 +366,32 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
 
             itemView.setOnClickListener(v -> {
                         int idcomprobante = 0;
+                        boolean validacliente = false;
+                        boolean validadetalle = false;
                         if (tipobusqueda.equals("01")
                                 || tipobusqueda.equals("8,23") || tipobusqueda.equals("23,8")
                                 || tipobusqueda.equals("4,20") || tipobusqueda.equals("20,4")) {
                             idcomprobante = listComprobantes.get(getAdapterPosition()).idcomprobante;
-                        } else if (tipobusqueda.equals("PC"))
+                            validacliente = (tipobusqueda.equals("01") && listComprobantes.get(getAdapterPosition()).cliente == null);
+                            validadetalle = (listComprobantes.get(getAdapterPosition()).detalle == null || listComprobantes.get(getAdapterPosition()).detalle.size()== 0);
+                        } else if (tipobusqueda.equals("PC")) {
                             idcomprobante = listPedidos.get(getAdapterPosition()).idpedido;
-                        else if (tipobusqueda.equals("PI"))
+                            validacliente = (listPedidos.get(getAdapterPosition()).cliente == null);
+                            validadetalle = (listPedidos.get(getAdapterPosition()).detalle == null || listPedidos.get(getAdapterPosition()).detalle.size()== 0);
+                        }else if (tipobusqueda.equals("PI"))
                             idcomprobante = listPedidosInv.get(getAdapterPosition()).idpedido;
                         else if (tipobusqueda.equals("DE") || tipobusqueda.equals("5"))
                             return;
+
+                        if(validacliente){
+                            Utils.showErrorDialog(activity, "Atención!", "Este documento no tiene cliente asignado, intente eliminarlo.");
+                            return;
+                        }
+
+                        if(validadetalle){
+                            Utils.showErrorDialog(activity, "Atención!", "Este documento no tiene productos en su detalle, intente eliminarlo.");
+                            return;
+                        }
 
                         if (retornar) {
                             activity.setResult(Activity.RESULT_OK, new Intent().putExtra("idcomprobante", idcomprobante));
@@ -498,8 +521,10 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
             btnAnular.setOnClickListener(
                     v -> {
                         String secuencial = "";
+                        final boolean permite_eliminar = (tipobusqueda.equals("01") && (listComprobantes.get(getAdapterPosition()).cliente == null || listComprobantes.get(getAdapterPosition()).detalle == null || listComprobantes.get(getAdapterPosition()).detalle.size()==0));
+
                         if (tipobusqueda.equals("01")) {
-                            if(!SQLite.usuario.VerificaPermiso(v.getContext(), Constants.PUNTO_VENTA, "borrar")){
+                            if(!permite_eliminar && !SQLite.usuario.VerificaPermiso(v.getContext(), Constants.PUNTO_VENTA, "borrar")){
                                 Utils.showErrorDialog(activity, "Atención!", "No tiene permiso para eliminar facturas.");
                                 return;
                             }
@@ -511,7 +536,7 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                         else if (tipobusqueda.equals("DE"))
                             secuencial = listIngresos.get(getAdapterPosition()).secuencialdocumento;
                         AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-                        builder.setTitle("Anular documento " + secuencial);
+                        builder.setTitle((permite_eliminar?"Eliminar":"Anular")+" documento " + secuencial);
                         builder.setMessage("¿Está seguro que desea anular este documento?\n" +
                                 "Nota: Después de anulado no podrá sincronizarse y ya no será visible.");
                         builder.setIcon(R.drawable.ic_delete2);
@@ -523,7 +548,10 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
                                     values.put("estado", -1);
                                     if (tipobusqueda.equals("01")) {
                                         id = listComprobantes.get(getAdapterPosition()).idcomprobante;
-                                        actualizado = Comprobante.Update(id, values, listComprobantes.get(getAdapterPosition()).tipotransaccion);
+                                        if(permite_eliminar)
+                                            actualizado = Comprobante.Delete(id, "", "", 0, false)>0;
+                                        else
+                                            actualizado = Comprobante.Update(id, values, listComprobantes.get(getAdapterPosition()).tipotransaccion);
                                         listComprobantes.remove(getAdapterPosition());
                                         notifyDataSetChanged();
                                     } else if (tipobusqueda.equals("PC")) {
@@ -561,6 +589,14 @@ public class ComprobantesAdapter extends RecyclerView.Adapter<ComprobantesAdapte
 
             btnPreview.setOnClickListener(
                     v -> {
+                        if(tipobusqueda.equals("01") && (listComprobantes.get(getAdapterPosition()).cliente == null || listComprobantes.get(getAdapterPosition()).detalle == null || listComprobantes.get(getAdapterPosition()).detalle.size()==0)){
+                            Utils.showErrorDialog(activity, "Atención!", "Este documento tiene errores en su contenido, no podrá visualizarla.\nIntente eliminarla.");
+                            return;
+                        }else if(tipobusqueda.equals("PC") && (listPedidos.get(getAdapterPosition()).cliente == null || listPedidos.get(getAdapterPosition()).detalle == null || listComprobantes.get(getAdapterPosition()).detalle.size()==0)){
+                            Utils.showErrorDialog(activity, "Atención!", "Este documento tiene errores en su contenido, no podrá visualizarla.\nIntente eliminarla.");
+                            return;
+                        }
+
                         DialogFragment dialogFragment = new InfoFacturaDialogFragment(activity);
                         Bundle bundle = new Bundle();
                         switch (tipobusqueda) {

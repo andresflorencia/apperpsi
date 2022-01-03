@@ -83,7 +83,7 @@
                         android:hint="Cantidad"
                         android:text="1.00"
                         android:textAlignment="center"
-                        android:textColor="@color/colorGray"
+                        android:textColor="@color/colorDate"
                         android:textSize="17sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 

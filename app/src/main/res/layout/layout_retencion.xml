@@ -4,8 +4,8 @@
     android:id="@+id/lyDialogContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="20dp"
-    android:padding="20dp">
+    android:layout_margin="10dp"
+    android:padding="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/lyDialog"
@@ -20,9 +20,11 @@
             android:layout_height="wrap_content"
             android:background="@drawable/bg_title_confirmation"
             android:padding="10dp"
-            android:text="Ingrese la cantidad"
+            android:text="Retención"
             android:textColor="@color/colorWhite"
             android:textSize="18sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
@@ -30,50 +32,153 @@
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:layout_marginEnd="10dp"
-            android:src="@drawable/ic_edit"
+            android:src="@drawable/ic_note_add"
             android:tint="@color/colorWhite"
             app:layout_constraintBottom_toBottomOf="@id/lblTitle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/lblTitle" />
 
-        <TextView
-            android:id="@+id/lblMessage"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginBottom="75dp"
-            android:textColor="@color/colorError"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="@id/etPassword"
-            app:layout_constraintTop_toBottomOf="@id/lblTitle" />
-
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/etPassword"
+            android:id="@+id/etRetencion"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="10dp"
             android:layout_marginTop="10dp"
-            android:layout_marginBottom="30dp"
             android:background="@drawable/border_radius_spinner"
             android:paddingHorizontal="10dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/lblMessage">
+            app:layout_constraintBottom_toTopOf="@id/etAutorizacion"
+            app:layout_constraintTop_toBottomOf="@id/lblTitle">
 
             <EditText
-                android:id="@+id/txtCantidad"
+                android:id="@+id/txtNumRetencion"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:drawablePadding="10dp"
+                android:layout_height="wrap_content"
                 android:ems="10"
-                android:hint="Cantidad"
-                android:inputType="number|numberDecimal"
-                android:paddingRight="10dp"
-                android:text="10.0"
-                android:textAlignment="center"
-                android:textSize="20sp" />
-
+                android:hint="Número de Documento"
+                android:inputType="phone"
+                android:textAlignment="center" />
         </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/etAutorizacion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/border_radius_spinner"
+            android:paddingHorizontal="10dp"
+            app:layout_constraintBottom_toBottomOf="@id/lyTipoRetencion"
+            app:layout_constraintTop_toBottomOf="@id/etRetencion">
+
+            <EditText
+                android:id="@+id/txtNumAutorizacion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="Número de Autorización"
+                android:inputType="phone"
+                android:textAlignment="center" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <LinearLayout
+            android:id="@+id/lyTipoRetencion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginTop="10dp"
+            app:layout_constraintBottom_toBottomOf="@id/lyCombo"
+            app:layout_constraintTop_toBottomOf="@id/etAutorizacion">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:text="Fecha de Documento"
+                    android:textColor="@color/colorDate"
+                    android:textSize="10sp" />
+
+                <Button
+                    android:id="@+id/btnFechaDoc"
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"
+                    android:layout_marginRight="3dp"
+                    android:background="@drawable/bg_btn_date"
+                    android:drawableLeft="@drawable/ic_date"
+                    android:paddingLeft="10dp"
+                    android:text="01-01-0001"
+                    android:textAllCaps="false"
+                    android:textColor="@color/colorDate" />
+            </LinearLayout>
+
+            <TextView
+                style="@style/EstiloText_Black"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:clickable="true"
+                android:paddingLeft="10dp"
+                android:text="TIPO:"
+                android:textSize="14sp"
+                android:textAlignment="viewEnd"/>
+
+            <RadioGroup
+                android:id="@+id/rgTipoRetencion"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/rbRetFuente"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:text="Fuente"
+                    android:textSize="15sp" />
+
+                <RadioButton
+                    android:id="@+id/rbRetIVA"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:checked="false"
+                    android:text="IVA"
+                    android:textSize="15sp" />
+            </RadioGroup>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/lyCombo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/border_radius_spinner"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginTop="10dp"
+            app:layout_constraintTop_toBottomOf="@id/lyTipoRetencion"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="Fecha de Documento"
+                android:textColor="@color/colorDate"
+                android:textSize="10sp"/>
+            <Spinner
+                android:id="@+id/spTipoDocumento"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:spinnerMode="dropdown" />
+        </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <Button

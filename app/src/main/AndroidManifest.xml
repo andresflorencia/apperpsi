@@ -35,7 +35,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".activities.AceptaTransferenciaActivity"></activity>
+        <activity android:name=".activities.RetencionActivity"></activity>
+        <activity android:name=".activities.AceptaTransferenciaActivity" />
         <activity
             android:name=".activities.DepositoActivity"
             android:theme="@style/ClienteTheme" />

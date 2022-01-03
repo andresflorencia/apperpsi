@@ -24,6 +24,7 @@ public class Comprobante {
     public Integer estado, secuencial;
     public Long longdate;
     public Cliente cliente;
+    public Retencion retencion;
 
     public static SQLiteDatabase sqLiteDatabase;
     public static String TAG = "TAGCOMPROBANTE";
@@ -59,6 +60,7 @@ public class Comprobante {
         this.responsableid = 0;
         this.nombreresponsable = "";
         this.estadoresponsable = "AC";
+        this.retencion = new Retencion();
     }
 
     public static boolean Update(Integer idcomprobante, ContentValues values, String tipotransaccion) {
@@ -108,6 +110,7 @@ public class Comprobante {
 
     public boolean Save(boolean updateStock) {
         //this.Fecha = Printer.getFecha();
+        boolean retorno;
         try {
             if (updateStock)
                 this.getTotal();
@@ -129,13 +132,18 @@ public class Comprobante {
             else
                 sqLiteDatabase.execSQL("DELETE FROM detallecomprobante WHERE comprobanteid = ?", new String[]{String.valueOf(this.idcomprobante)});
             sqLiteDatabase.close();
+            retorno = true;
             Log.d(TAG, "GUARDO ENCABEZADO - ID: " + this.idcomprobante);
-            return this.SaveDetalle(this.idcomprobante, updateStock);
+            if(this.retencion != null && this.retencion.detalle.size()>0) {
+                this.retencion.comprobanteid = this.idcomprobante;
+                retorno = this.retencion.Save();
+            }
+            retorno = retorno && this.SaveDetalle(this.idcomprobante, updateStock);
         } catch (SQLException ex) {
-            //Toast.makeText(context,ex.getMessage(),Toast.LENGTH_LONG).show();
             Log.d(TAG, "Save(): " + ex.getMessage());
             return false;
         }
+        return retorno;
     }
 
     boolean SaveDetalle(Integer idComprobante, boolean updateStock) {
@@ -318,6 +326,7 @@ public class Comprobante {
             Item.estadoresponsable = cursor.getString(27);
             Item.nombreresponsable = cursor.getString(28);
             Item.detalle = DetalleComprobante.getDetalle(Item.idcomprobante, agrupaDetalle);
+            Item.retencion = Retencion.get(Item.idcomprobante, true);
         } catch (Exception ec) {
             ec.printStackTrace();
             Log.d(TAG, "AsignaDatos(): " + ec.getMessage());

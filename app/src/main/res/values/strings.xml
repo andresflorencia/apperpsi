@@ -358,7 +358,7 @@
             nombrecatalogo varchar(150),
             codigopadre varchar(50),
             cuentaid integer,
-            CONSTRAINT ukcatalogo UNIQUE(codigocatalogo, codigopadre)
+            CONSTRAINT ukcatalogo UNIQUE(codigocatalogo, nombrecatalogo, codigopadre)
         );
         ALTER TABLE catalogo ADD COLUMN entidadfinancieracodigo INTEGER DEFAULT 0;
     </string>
@@ -421,6 +421,44 @@
             requerida varchar(1),
             instalada verchar(1),
             CONSTRAINT ukcanton UNIQUE(idversion)
+        );
+    </string>
+
+    <string name="dbRetencion">
+        CREATE TABLE IF NOT EXISTS retencion(
+            idretencion INTEGER PRIMARY KEY AUTOINCREMENT,
+            comprobanteid INTEGER,
+            personaid INTEGER,
+            ambiente INTEGER DEFAULT 2,
+            tipoemision INTEGER DEFAULT 1,
+            origenretencion INTEGER DEFAULT 2,
+            numeroautorizacion VARCHAR(50),
+            numerodocumento VARCHAR(25),
+            periodofiscal VARCHAR(10),
+            puntoemision VARCHAR(3),
+            establecimiento VARCHAR(3),
+            estadosri VARCHAR(1) DEFAULT \'4\',
+            fechahora VARCHAR(25),
+            usuarioid INTEGER,
+            CONSTRAINT ukretencion UNIQUE (numerodocumento, personaid, establecimiento, puntoemision)
+        );
+    </string>
+    <string name="dbDetalleRetencion">
+        CREATE TABLE IF NOT EXISTS detalleretencion(
+            retencionid INTEGER,
+            linea INTEGER,
+            codigo VARCHAR(5),
+            codigoretencion VARCHAR(5),
+            coddocsustento VARCHAR(25) DEFAULT \'01\',
+            numdocsustento VARCHAR(25),
+            fechaemisiondocumento VARCHAR(25),
+            baseimponible DOUBLE DEFAULT 0,
+            baseimponibleiva DOUBLE DEFAULT 0,
+            porcentajeretener DOUBLE DEFAULT 0,
+            porcentajereteneriva DOUBLE DEFAULT 0,
+            valorretenido DOUBLE DEFAULT 0,
+            valorretenidoiva DOUBLE DEFAULT 0,
+            tipo VARCHAR(10)
         );
     </string>
     <!-- TODO: Remove or change this placeholder text -->

@@ -98,8 +98,13 @@ public class DetalleComprobanteAdapter extends RecyclerView.Adapter<DetalleCompr
                 }
                 total += miDetalle.Subtotaliva();
             }
-            this.activity.lblTotal.setText("Total: " + Utils.FormatoMoneda(total, 2));
-            this.activity.setSubtotales(total, subtotal, subtotaliva, descuento0 + descuento12);
+            //this.activity.lblTotal.setText("Total: " + Utils.FormatoMoneda(total, 2));
+            this.activity.totales.total = total;
+            this.activity.totales.subtotal = subtotal;
+            this.activity.totales.subtotaliva = subtotaliva;
+            this.activity.totales.descuento = descuento0 + descuento12;
+            //this.activity.setSubtotales(total, subtotal, subtotaliva, descuento0 + descuento12);
+            this.activity.updateTotales();
         } catch (Exception e) {
             Log.d(TAG, e.getMessage());
         }
@@ -260,7 +265,7 @@ public class DetalleComprobanteAdapter extends RecyclerView.Adapter<DetalleCompr
                                     //CambiarPrecio(categoria);
                                 }
                                 tvDescuento.setText(Utils.FormatoMoneda(detalleComprobante.get(getAdapterPosition()).Descuento(detalleComprobante.get(getAdapterPosition()).producto.descuento), 2));
-                                tvSubtotal.setText(Utils.FormatoMoneda(detalleComprobante.get(getAdapterPosition()).Subtotal(), 2));
+                                tvSubtotal.setText(Utils.FormatoMoneda(detalleComprobante.get(getAdapterPosition()).Subtotal() - detalleComprobante.get(getAdapterPosition()).descuento, 2));
                             }
                             CalcularTotal();
                         } catch (Exception e) {

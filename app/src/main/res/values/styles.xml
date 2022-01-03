@@ -62,6 +62,27 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="EstiloText_Black4">
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">sans-serif-black</item>
+    </style>
+
+    <style name="EstiloText3">
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:fontFamily">sans-serif-black</item>
+    </style>
+    <style name="EstiloText4">
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
     <style name="EditText_Round">
         <item name="android:padding">16dp</item>
         <item name="android:paddingLeft">15dp</item>

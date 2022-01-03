@@ -8,6 +8,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
@@ -51,8 +52,11 @@ import com.florencia.erpapp.interfaces.ICliente;
 import com.florencia.erpapp.models.Cliente;
 import com.florencia.erpapp.models.Comprobante;
 import com.florencia.erpapp.models.DetalleComprobante;
+import com.florencia.erpapp.models.DetalleRetencion;
 import com.florencia.erpapp.models.Lote;
+import com.florencia.erpapp.models.Retencion;
 import com.florencia.erpapp.models.Sucursal;
+import com.florencia.erpapp.models.Totales;
 import com.florencia.erpapp.services.DeviceList;
 import com.florencia.erpapp.services.GPSTracker;
 import com.florencia.erpapp.services.Printer;
@@ -86,6 +90,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
     public static final int REQUEST_BUSQUEDA = 1;
     public static final int REQUEST_CLIENTE = 2;
     public static final int REQUEST_BUSQUEDA_COMPROBANTE = 3;
+    public static final int REQUEST_RETENCION = 4;
     public static String TAG = "TAGCOMPROBANTE_ACT";
     Button btnBuscarProducto;
     EditText txtCliente;
@@ -106,7 +111,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
     TextView lblMessage, lblTitle, lblCliente, lblProducto, lblLeyendaCF, lblEstablecimiento;
     LinearLayout lyCliente, lyProductos, lyBotones, lyFormaPago, lyEstablecimiento;
     BottomSheetDialog btsDialog;
-    Button btnPositive, btnNegative;
+    Button btnPositive, btnNegative, btnAddRetencion;
     public Button btnCambiaEstablecimiento;
     View viewSeparator, rootView;
     RadioButton rbEfectivo, rbCredito, rbFactura, rbProforma;
@@ -116,6 +121,8 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
     Retrofit retrofit;
 
     Integer posEstablec = -1;
+    Retencion miRetencion = new Retencion();
+    public Totales totales =  new Totales();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -165,6 +172,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                             detalleAdapter.isCredito = false;
                             detalleAdapter.CambiarPrecio("0", false);
                             detalleAdapter.notifyDataSetChanged();
+                            btnAddRetencion.setVisibility(View.INVISIBLE);
                             return true;
                         } else if (event.getRawX() <= txtCliente.getTotalPaddingLeft()
                                 && cliente.idcliente > 0 && !cliente.nip.contains("999999999")) {
@@ -252,6 +260,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
         btnCambiaEstablecimiento = findViewById(R.id.btnCambiaEstablecimiento);
         lyEstablecimiento = findViewById(R.id.lyEstablecimiento);
         rgTipoDocumento = findViewById(R.id.rgTipoDocumento);
+        btnAddRetencion = findViewById(R.id.btnAddRetencion);
         rbFactura = findViewById(R.id.rbFactura);
         rbProforma = findViewById(R.id.rbProforma);
         lyEstablecimiento.setVisibility(View.VISIBLE);
@@ -266,6 +275,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
         lblCliente.setOnClickListener(this::onClick);
         lblProducto.setOnClickListener(this::onClick);
         btnCambiaEstablecimiento.setOnClickListener(this::onClick);
+        btnAddRetencion.setOnClickListener(this::onClick);
 
         rbEfectivo.setOnCheckedChangeListener(this::onCheckedChanged);
         rbCredito.setOnCheckedChangeListener(this::onCheckedChanged);
@@ -344,6 +354,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
 
     @Override
     public void onClick(View v) {
+        Intent i;
         switch (v.getId()) {
             case R.id.lblTotal:
             case R.id.lySubtotales:
@@ -351,7 +362,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                 Utils.EfectoLayout(lySubtotales);
                 break;
             case R.id.btnBuscarProducto:
-                Intent i = new Intent(v.getContext(), ProductoBusquedaActivity.class);
+                i = new Intent(v.getContext(), ProductoBusquedaActivity.class);
                 i.putExtra("tipobusqueda", rbProforma.isChecked() ? "PR" : "01");
                 startActivityForResult(i, REQUEST_BUSQUEDA);
                 overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
@@ -375,6 +386,23 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                 break;
             case R.id.btnCambiaEstablecimiento:
                 CambiarEstablecimiento();
+                break;
+            case R.id.btnAddRetencion:
+                i = new Intent(v.getContext(), RetencionActivity.class);
+
+                Double bim = Utils.RoundDecimal(totales.subtotal + totales.subtotaliva, 2);
+                Double biv = Utils.RoundDecimal(totales.total - totales.subtotaliva - totales.subtotal + totales.descuento, 2);
+                for (DetalleRetencion det: miRetencion.detalle) {
+                    bim -= det.baseimponible;
+                    biv -= det.baseimponibleiva;
+                }
+
+                i.putExtra("baseimponible", Utils.RoundDecimal(bim,2));
+                i.putExtra("baseiva", Utils.RoundDecimal(biv, 2));
+                i.putExtra("ruccliente", cliente.nip);
+                i.putExtra("retencion", new Gson().toJson(miRetencion, Retencion.class));
+                startActivityForResult(i, REQUEST_RETENCION);
+                overridePendingTransition(R.anim.zoom_back_in, R.anim.zoom_back_out);
                 break;
         }
     }
@@ -412,6 +440,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
         dialogFragment.show(getSupportFragmentManager(), "dialog");
     }
 
+    @SuppressLint("RestrictedApi")
     private void BuscaComprobante(Integer idcomprobante) {
 
         txtCliente.setEnabled(false);
@@ -443,7 +472,20 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                                     detalleAdapter.CalcularTotal();
                                     comprobante.getTotal();
                                     detalleAdapter.notifyDataSetChanged();
-                                    setSubtotales(comprobante.total, comprobante.subtotal, comprobante.subtotaliva, comprobante.descuento);
+                                    if(comprobante.retencion!=null && comprobante.retencion.detalle.size()>0){
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                            comprobante.retencion.detalle.stream().forEach(z -> totales.retencion += z.valorretenido + z.valorretenidoiva);
+                                        }else{
+                                            for (DetalleRetencion det: comprobante.retencion.detalle)
+                                                totales.retencion += det.valorretenido + det.valorretenidoiva;
+                                        }
+                                    }
+                                    totales.total = comprobante.total;
+                                    totales.subtotal = comprobante.subtotal;
+                                    totales.subtotaliva = comprobante.subtotaliva;
+                                    totales.descuento = comprobante.descuento;
+                                    //setSubtotales(comprobante.total, comprobante.subtotal, comprobante.subtotaliva, comprobante.descuento);
+                                    updateTotales();
                                     lblLeyendaCF.setVisibility(View.GONE);
                                     rbEfectivo.setChecked(comprobante.formapago == 1);
                                     rbCredito.setChecked(comprobante.formapago == 0);
@@ -451,6 +493,10 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                                     rbEfectivo.setEnabled(false);
                                     rbCredito.setEnabled(false);
                                     lyEstablecimiento.setVisibility(View.GONE);
+                                    if(comprobante.retencion != null && comprobante.retencion.detalle.size()>0){
+                                        btnAddRetencion.setVisibility(View.VISIBLE);
+                                        miRetencion = comprobante.retencion;
+                                    }
                                 } else {
                                     Banner.make(rootView, ComprobanteActivity.this, Banner.ERROR, "Ocurrió un error al obtener los datos para esta factura.", Banner.BOTTOM, 3500).show();
                                 }
@@ -672,6 +718,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
             if (comprobante.lon == null)
                 comprobante.lon = 0d;
 
+            comprobante.retencion = miRetencion;
             if (comprobante.Save(rbFactura.isChecked())) {
                 toolbar.getMenu().findItem(R.id.option_save).setVisible(false);
                 if (rbFactura.isChecked())
@@ -759,6 +806,7 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
             cliente.deudatotal = 0d;
             cliente.montodisponible = 0d;
 
+            totales = new Totales();
             detalleAdapter.visualizacion = false;
             detalleAdapter.detalleComprobante.clear();
             detalleProductos.clear();
@@ -775,6 +823,8 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                 btnCambiaEstablecimiento.setVisibility(View.GONE);
             else
                 btnCambiaEstablecimiento.setVisibility(View.VISIBLE);
+            btnAddRetencion.setVisibility(View.INVISIBLE);
+            miRetencion = new Retencion();
         } catch (Exception e) {
             Log.d(TAG, "LimpiarDatos(): " + e.getMessage());
         }
@@ -988,7 +1038,37 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                 "Subtotal 0%:    " + Utils.FormatoMoneda(subtotal, 2) +
                 "\nSubtotal 12%:    " + Utils.FormatoMoneda(subtotaliva, 2) +
                 "\nDescuento:    " + Utils.FormatoMoneda(descuento, 2) +
-                "\nIVA 12%:    " + Utils.FormatoMoneda((total - subtotaliva - subtotal + descuento), 2));
+                "\nIVA 12%:    " + Utils.FormatoMoneda((total - totales.retencion - subtotaliva - subtotal + descuento), 2));
+
+        if(totales.retencion > 0) {
+            lblSubtotales.setText(lblSubtotales.getText().toString() +
+                    "\nRet.:    " + Utils.FormatoMoneda(totales.retencion, 2));
+        }
+
+        lblTotal.setText("Total: " + Utils.FormatoMoneda(total - totales.retencion, 2));
+
+        totales.total = total;
+        totales.subtotal = subtotal;
+        totales.subtotaliva = subtotaliva;
+        totales.descuento = descuento;
+    }
+
+    public void updateTotales() {
+        lblSubtotales.setText(
+                "Subtotal 0%:    " + Utils.FormatoMoneda(totales.subtotal, 2) +
+                        "\nSubtotal 12%:    " + Utils.FormatoMoneda(totales.subtotaliva, 2) +
+                        "\nDescuento:    " + Utils.FormatoMoneda(totales.descuento, 2) +
+                        "\nIVA 12%:    " + Utils.FormatoMoneda((totales.total - totales.subtotaliva - totales.subtotal + totales.descuento), 2));
+
+        lblTotal.setText("Total: " + Utils.FormatoMoneda(totales.total, 2));
+
+        if(totales.retencion > 0) {
+            lblSubtotales.setText(lblSubtotales.getText().toString()
+                    + "\n\nTotal: "+ Utils.FormatoMoneda(totales.total, 2)
+                    + "\nRetención: " + Utils.FormatoMoneda(totales.retencion, 2));
+            lblTotal.setText("Por Pagar: " + Utils.FormatoMoneda(totales.total - totales.retencion, 2));
+        }
+
     }
 
     @Override
@@ -1014,7 +1094,14 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                     comprobante.detalle.clear();
                     comprobante.detalle.addAll(detalleAdapter.detalleComprobante);
                     comprobante.getTotal();
-                    this.setSubtotales(comprobante.total, comprobante.subtotal, comprobante.subtotaliva, comprobante.descuento);
+
+                    totales.total = comprobante.total;
+                    totales.subtotal = comprobante.subtotal;
+                    totales.subtotaliva = comprobante.subtotaliva;
+                    totales.descuento = comprobante.descuento;
+
+                    //this.setSubtotales(comprobante.total, comprobante.subtotal, comprobante.subtotaliva, comprobante.descuento);
+                    updateTotales();
                     detalleAdapter.CambiarPrecio(cliente.categoria.equals("") ? "0" : cliente.categoria, rbCredito.isChecked());
                     detalleAdapter.CalcularTotal();
                     detalleAdapter.notifyDataSetChanged();
@@ -1032,6 +1119,8 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                         detalleAdapter.isCredito = rbCredito.isChecked();
                         detalleAdapter.isFactura = rbFactura.isChecked();
                         detalleAdapter.CambiarPrecio(cliente.categoria, rbCredito.isChecked());
+                        if(!cliente.nip.contains("999999999"))
+                            btnAddRetencion.setVisibility(View.VISIBLE);
                     }
                     break;
                 case DeviceList.REQUEST_CONNECT_BT:
@@ -1056,6 +1145,19 @@ public class ComprobanteActivity extends AppCompatActivity implements View.OnCli
                         toolbar.getMenu().findItem(R.id.option_reimprimir).setVisible(true);
                         toolbar.getMenu().findItem(R.id.option_save).setVisible(false);
                     }
+                    break;
+                case REQUEST_RETENCION:
+                    miRetencion = new Gson().fromJson(data.getExtras().getString("retencion", ""), Retencion.class);
+                    totales.retencion = 0d;
+                    if(miRetencion != null && miRetencion.detalle.size()>0){
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                            miRetencion.detalle.stream().forEach(z -> totales.retencion += z.valorretenido + z.valorretenidoiva);
+                        else{
+                            for (DetalleRetencion det: miRetencion.detalle)
+                                totales.retencion += det.valorretenido + det.valorretenidoiva;
+                        }
+                    }
+                    updateTotales();
                     break;
             }
         }

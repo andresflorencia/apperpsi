@@ -33,7 +33,7 @@
                 android:id="@+id/lblMessage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="No hay el texto..."
+                android:text="No hay el texto guambrita..."
                 android:textAlignment="center"
                 android:textColor="@color/colorBlue"
                 android:textSize="16sp" />

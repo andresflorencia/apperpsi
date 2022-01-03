@@ -597,9 +597,10 @@ public class MainActivity extends AppCompatActivity {
                                     }
 
                                     if (numUpdate == jsonComprobantesUpdate.size()) {
-                                        Banner.make(rootView, MainActivity.this, Banner.SUCCESS, Constants.MSG_PROCESO_COMPLETADO
-                                                + "\nSe sincronizó " + numUpdate + " comprobante(s)."
-                                                + "\n" + obj.get("message").getAsString(), Banner.BOTTOM, 3000).show();
+                                        if(obj.get("message").getAsString().trim().equals(""))
+                                            Banner.make(rootView, MainActivity.this, Banner.SUCCESS, Constants.MSG_PROCESO_COMPLETADO + "\nSe sincronizó " + numUpdate + " comprobante(s).", Banner.BOTTOM, 3000).show();
+                                        else
+                                            Utils.showSuccessDialog(MainActivity.this, "Éxito!", Constants.MSG_PROCESO_COMPLETADO + "\nSe sincronizó " + numUpdate + " comprobante(s).\n\nRespuesta servidor:" + obj.get("message").getAsString(), false, false);
 
                                         List<Fragment> fragments = fragmentManager.getFragments();
                                         if (fragments != null) {
@@ -617,11 +618,12 @@ public class MainActivity extends AppCompatActivity {
                                                 ((PrincipalFragment) fragment).BuscaResumen("");
                                             }
                                         }
-                                    } else
-                                        Banner.make(rootView, MainActivity.this, Banner.ERROR, Constants.MSG_PROCESO_NO_COMPLETADO
-                                                + "\nSe sincronizó " + numUpdate + "/" + jsonComprobantesUpdate.size() + " comprobante(s)."
-                                                + "\n" + obj.get("message").getAsString(), Banner.BOTTOM, 3500).show();
-
+                                    } else {
+                                        if(obj.get("message").getAsString().trim().equals(""))
+                                            Banner.make(rootView, MainActivity.this, Banner.WARNING, Constants.MSG_PROCESO_NO_COMPLETADO + "\nSe sincronizó " + numUpdate + "/" + jsonComprobantesUpdate.size() + " comprobante(s).", Banner.BOTTOM, 3500).show();
+                                        else
+                                            Utils.showSuccessDialog(MainActivity.this, "Atención!", Constants.MSG_PROCESO_NO_COMPLETADO + "\nSe sincronizó " + numUpdate + "/" + jsonComprobantesUpdate.size() + " comprobante(s).\n\nRespuesta servidor:" + obj.get("message").getAsString(), false, false);
+                                    }
 
                                 }
 

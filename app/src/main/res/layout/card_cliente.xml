@@ -39,7 +39,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:drawableLeft="@drawable/ic_user"
-                android:maxLines="1"
                 android:text="CONSUMIDOR FINAL"
                 android:textColor="@color/colorPrimaryDark"
                 android:textSize="15sp"
