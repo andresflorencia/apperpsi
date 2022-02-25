@@ -27,6 +27,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -592,12 +593,12 @@ public class MainActivity extends AppCompatActivity {
                                         values = new ContentValues();
                                         values.put("codigosistema", upd.get("codigosistema_comprobante").getAsInt());
                                         values.put("estado", 1);
-                                        if (Comprobante.Update(upd.get("idcomprobante").getAsInt(), values,""))
+                                        if (Comprobante.Update(upd.get("idcomprobante").getAsInt(), values, ""))
                                             numUpdate++;
                                     }
 
                                     if (numUpdate == jsonComprobantesUpdate.size()) {
-                                        if(obj.get("message").getAsString().trim().equals(""))
+                                        if (obj.get("message").getAsString().trim().equals(""))
                                             Banner.make(rootView, MainActivity.this, Banner.SUCCESS, Constants.MSG_PROCESO_COMPLETADO + "\nSe sincronizó " + numUpdate + " comprobante(s).", Banner.BOTTOM, 3000).show();
                                         else
                                             Utils.showSuccessDialog(MainActivity.this, "Éxito!", Constants.MSG_PROCESO_COMPLETADO + "\nSe sincronizó " + numUpdate + " comprobante(s).\n\nRespuesta servidor:" + obj.get("message").getAsString(), false, false);
@@ -619,7 +620,7 @@ public class MainActivity extends AppCompatActivity {
                                             }
                                         }
                                     } else {
-                                        if(obj.get("message").getAsString().trim().equals(""))
+                                        if (obj.get("message").getAsString().trim().equals(""))
                                             Banner.make(rootView, MainActivity.this, Banner.WARNING, Constants.MSG_PROCESO_NO_COMPLETADO + "\nSe sincronizó " + numUpdate + "/" + jsonComprobantesUpdate.size() + " comprobante(s).", Banner.BOTTOM, 3500).show();
                                         else
                                             Utils.showSuccessDialog(MainActivity.this, "Atención!", Constants.MSG_PROCESO_NO_COMPLETADO + "\nSe sincronizó " + numUpdate + "/" + jsonComprobantesUpdate.size() + " comprobante(s).\n\nRespuesta servidor:" + obj.get("message").getAsString(), false, false);
@@ -802,8 +803,8 @@ public class MainActivity extends AppCompatActivity {
 
             IProducto miInterface = retrofit.create(IProducto.class);
 
-            Call<JsonObject> call = null;
-            call = miInterface.GetProductos(SQLite.usuario.Usuario, SQLite.usuario.Clave, SQLite.usuario.sucursal.IdEstablecimiento);
+            Call<JsonObject> call = miInterface.GetProductos(SQLite.usuario.Usuario, SQLite.usuario.Clave,
+                    SQLite.usuario.sucursal.IdEstablecimiento, Utils.getDateFormat("yyyy-MM-dd HH:mm:ss"));
             call.enqueue(new Callback<JsonObject>() {
                 @Override
                 public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
@@ -817,6 +818,10 @@ public class MainActivity extends AppCompatActivity {
                             JsonObject obj = response.body();
                             if (!obj.get("haserror").getAsBoolean()) {
                                 JsonArray jsonProductos = obj.getAsJsonArray("productos");
+                                Integer idauditoria = 0;
+                                if (obj.has("idauditoria"))
+                                    idauditoria = obj.get("idauditoria").getAsInt();
+
                                 if (jsonProductos != null) {
                                     int numProd = 0;
                                     Producto.Delete(SQLite.usuario.sucursal.IdEstablecimiento);
@@ -846,13 +851,15 @@ public class MainActivity extends AppCompatActivity {
                                         if (miProducto != null) {
                                             if (miProducto.Save())
                                                 numProd++;
-                                            Log.d(TAG, prod.get("nombreproducto").getAsString());
                                         }
                                     }
                                     if (numProd == jsonProductos.size())
                                         Banner.make(rootView, MainActivity.this, Banner.SUCCESS, Constants.MSG_PROCESO_COMPLETADO + (numProd > 0 ? "\nSe descargó " + numProd + " producto(s)" : ""), Banner.BOTTOM, 3000).show();
                                     else
                                         Banner.make(rootView, MainActivity.this, Banner.ERROR, Constants.MSG_PROCESO_NO_COMPLETADO, Banner.BOTTOM, 3000).show();
+
+                                    if (idauditoria > 0)
+                                        ConfirmaAuditoria(idauditoria, miInterface);
                                 }
                             } else
                                 Banner.make(rootView, MainActivity.this, Banner.ERROR, obj.get("message").getAsString(), Banner.BOTTOM, 3000).show();
@@ -877,6 +884,42 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, e.getMessage());
             Utils.showErrorDialog(this, "Error", e.getMessage());
             pbProgreso.dismiss();
+        }
+    }
+
+    private void ConfirmaAuditoria(Integer idauditoria, IProducto myInterface) {
+        try {
+            String uid = Build.SERIAL != Build.UNKNOWN ? Build.SERIAL : Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+            String serial = Utils.getSerialNumber();
+
+            String device = Build.MANUFACTURER.concat(" ").concat(Build.MODEL)
+                    .concat(" - Modelo: ").concat(Build.DEVICE)
+                    .concat(" - Android: ").concat(Build.VERSION.RELEASE)
+                    .concat(" - SDK: ").concat(Build.VERSION.SDK)
+                    .concat(" - UID: ").concat(uid)
+                    .concat(" - Serial: ").concat(serial);
+
+            Map<String, Object> post = new HashMap<>();
+            post.put("fechaconfirma", Utils.getDateFormat("yyyy-MM-dd HH:mm:ss"));
+            post.put("device", device);
+            post.put("idauditoria", idauditoria);
+
+            Call<JsonObject> call = myInterface.ConfirmAuditoria(post);
+            call.enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    if (!response.isSuccessful())
+                        return;
+                }
+
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    Log.d(TAG, t.getMessage());
+                    call.cancel();
+                }
+            });
+        } catch (Exception ex) {
+            Log.d(TAG, ex.getMessage());
         }
     }
 
